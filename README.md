@@ -6,5 +6,6 @@
 
 * Project is currently in the process of moving out of wordpress cvs repository. [What happened?](https://wordpress.org/support/topic/what-happened-50/)
 
-* Please star & watch this repository.
+* Plugin will have some additional functionalities, in order to make it comfortable to use (& update) even after moving.
 
+* Please star & watch this repository.
