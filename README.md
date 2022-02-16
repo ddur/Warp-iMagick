@@ -4,7 +4,7 @@
 
 * Plugin is compatible with WP from version 5.3 up to 5.9 and from PHP version 5.6 up to 8.1. If you want to download and try final WP.org release of Warp iMagick plugin you can [(download it here)](https://downloads.wordpress.org/plugin/warp-imagick.1.9.6.zip). 
 
-* Project is currently in the process of moving out of wordpress cvs repository. [What happened?}(https://wordpress.org/support/topic/what-happened-50/)
+* Project is currently in the process of moving out of wordpress cvs repository. [What happened?](https://wordpress.org/support/topic/what-happened-50/)
 
 * Please star & watch this repository.
 
