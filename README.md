@@ -8,4 +8,4 @@
 
 * Plugin will have some additional functionalities, in order to make it comfortable to use (& update) even after moving.
 
-* Please star & watch this repository.
+* Please watch changes & star this repository (see the buttons at the top of this page).
