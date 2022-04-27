@@ -1,0 +1,53 @@
+/**!
+ * Copyright © 2017-2022 Dragan Đurić. All rights reserved.
+ *
+ * @package warp-imagick
+ * @license GNU General Public License Version 2.
+ * @copyright © 2017-2022. All rights reserved.
+ * @author Dragan Đurić
+ * @link https://warp-imagick.pagespeed.club/
+ *
+ * This copyright notice, source files, licenses and other included
+ * materials are protected by U.S. and international copyright laws.
+ * You are not allowed to remove or modify this or any other
+ * copyright notice contained within this software package.
+ */
+
+.rotate {
+	-webkit-animation: rotate-function 32s ease-in-out 3s infinite;
+	-moz-animation: rotate-function 32s ease-in-out 3s infinite;
+	-ms-animation: rotate-function 32s ease-in-out 3s infinite;
+	-o-animation: rotate-function 32s ease-in-out 3s infinite;
+	animation: rotate-function 32s ease-in-out 3s infinite;
+}
+@-webkit-keyframes rotate-function {
+	0%{-webkit-transform: rotate(0deg)}
+	90%{-webkit-transform: rotate(0deg)}
+	95%{-webkit-transform: rotate(360deg)}
+	100%{-webkit-transform: rotate(360deg)}
+}
+@-moz-keyframes rotate-function {
+	0%{-moz-transform: rotate(0deg)}
+	90%{-moz-transform: rotate(0deg)}
+	95%{-moz-transform: rotate(360deg)}
+	100%{-moz-transform: rotate(360deg)}
+}
+@-ms-keyframes rotate-function {
+	0%{-ms-transform: rotate(0deg)}
+	90%{-ms-transform: rotate(0deg)}
+	95%{-ms-transform: rotate(360deg)}
+	100%{-ms-transform: rotate(360deg)}
+}
+@-o-keyframes rotate-function {
+	0%{-o-transform: rotate(0deg)}
+	90%{-o-transform: rotate(0deg)}
+	95%{-o-transform: rotate(360deg)}
+	100%{-o-transform: rotate(360deg)}
+}
+
+@keyframes rotate-function {
+	0%{transform: rotate(0deg)}
+	90%{transform: rotate(0deg)}
+	95%{transform: rotate(360deg)}
+	100%{transform: rotate(360deg)}
+}

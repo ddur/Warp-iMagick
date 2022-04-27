@@ -1,0 +1,42 @@
+/*!
+ * Copyright © 2017-2022 Dragan Đurić. All rights reserved.
+ *
+ * @package warp-imagick
+ * @license GNU General Public License Version 2.
+ * @copyright © 2017-2022. All rights reserved.
+ * @author Dragan Đurić
+ * @link https://warp-imagick.pagespeed.club/
+ *
+ * This copyright notice, source files, licenses and other included
+ * materials are protected by U.S. and international copyright laws.
+ * You are not allowed to remove or modify this or any other
+ * copyright notice contained within this software package.
+ */
+
+/* Highlight opened section (wp-accordion) with italic font */
+.js .accordion-section.open .accordion-section-title{font-style:italic}
+
+/* Section submit button */
+.accordion-section .submit-button {
+	padding-top:10px;
+	border-top-style: solid;
+	border-top-width: 1px;
+	border-top-color: lightgray;
+}
+
+/* Nav-Tab submit button */
+.nav-tab-page-footer .submit-button {
+	padding:10px 20px;
+	border-top-style: solid;
+	border-top-width: 1px;
+	border-top-color: lightgray;
+}
+
+/* Align multiple-input dashicons */
+.multiple-input.dashicons-before:before{padding-top:4px}
+
+.accordion-section-content th>label[for]>div[title] {cursor:help}
+
+/* Android 2.3 :checked fix */
+@keyframes fake{from{opacity:1}to{opacity:1}}
+body{animation:fake 1s infinite}
