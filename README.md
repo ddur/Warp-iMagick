@@ -8,7 +8,7 @@
 
 * Plugin has integrated some additional functionalities, in order to make it comfortable to use (& update) after moving.
 
-* Please watch & star this repository (see the buttons at the top of this page).
+* Please press [watch] & [star] buttons of this repository (at the top-right of this github page).
 
 # Installation:
 
