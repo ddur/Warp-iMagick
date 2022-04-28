@@ -11,8 +11,8 @@ Optimize Images On-Site. No Cloud-Service/Signup. Convert to WebP On Upload/Rege
 
 == Description ==
 
-* **NEW: Plugin updates are now served from [Updates Server](https://warp-imagick.pagespeed.club/) (NOT from WordPress.org).**
-Check & Update (one-click or enable auto-update) from your site admin Dashboard requires (free) Update Password. Login on Updates Server to manage your user profile Update Passwords.
+* **NEW: Tested with WP 6.0 Beta 3 (26 April 2022). Plugin updates are now served from [Updates Server](https://warp-imagick.pagespeed.club/) (NOT from WordPress.org).**
+Check & Update (one-click or enable auto-update) from your site admin Dashboard requires Update Password. Login on Updates Server to manage Free Update Passwords in your User Profile.
 
 
 * **NEXT: 2.+ VERSION: WebP On Demand (on-the-fly) Convert JPEG/PNG images to WebP for the whole site.**

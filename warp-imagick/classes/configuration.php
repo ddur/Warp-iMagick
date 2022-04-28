@@ -505,7 +505,7 @@ you may disable warning notice by setting checkbox to "on".</p>
 					'type'    => 'text',
 					'style'   => 'width:200px',
 					'default' => wp_parse_url( home_url(), PHP_URL_HOST ),
-					'title'   => __( 'Enter or paste this Hostname as "Application Name" to create free plugin-update-password in your profile at Update Server', 'warp-imagick' ),
+					'title'   => __( 'Enter or paste this Hostname as "Application Name" to create free plugin-update-password in your profile at Update Server (https://warp-imagick.pagespeed.club/)', 'warp-imagick' ),
 					'options' => array(
 						'disabled' => true,
 					),
@@ -516,12 +516,12 @@ you may disable warning notice by setting checkbox to "on".</p>
 					'type'        => 'password',
 					'style'       => 'width:200px',
 					'default'     => '',
-					'title'       => __( 'Enter/paste password from Update Server', 'warp-imagick' ),
+					'title'       => __( 'Enter or paste update password from your User Profile at Update Server (https://warp-imagick.pagespeed.club/)', 'warp-imagick' ),
 					'placeholder' => 'xxxx xxxx xxxx xxxx xxxx xxxx',
 				),
 
 				'disable-auto-update-notice' => array(
-					'label'   => __( 'Disable "auto-update" warning', 'warp-imagick' ),
+					'label'   => __( 'Disable warning notice: "Plugin \'auto-update\' is disabled..."', 'warp-imagick' ),
 					'type'    => 'checkbox',
 					'style'   => 'width:200px',
 					'default' => Shared::disable_auto_update_notice_value_default(),
@@ -533,7 +533,7 @@ you may disable warning notice by setting checkbox to "on".</p>
 					'type'    => 'checkbox',
 					'style'   => 'width:200px',
 					'default' => Shared::remove_plugin_settings_default(),
-					'title'   => __( 'Remove plugin settings along with plugin uninstall and delete', 'warp-imagick' ),
+					'title'   => __( 'Remove plugin settings when plugin is uninstalled (and deleted)', 'warp-imagick' ),
 				),
 
 				'menu-parent-slug'           => array(

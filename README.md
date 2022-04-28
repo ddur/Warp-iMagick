@@ -9,3 +9,15 @@
 * Plugin has integrated some additional functionalities, in order to make it comfortable to use (& update) after moving.
 
 * Please watch & star this repository (see the buttons at the top of this page).
+
+# Installation:
+
+* Download free warp-imagick.1.9.7.zip from [Plugin Update Server](https://warp-imagick.pagespeed.club/)
+
+* Use Wordpress Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select warp-imagick.1.9.7.zip file.
+
+# Installation from Github:
+
+* Clone this Repository and zip /warp-imagick directory into warp-imagick.zip file. Note: Zip file must contain only warp-imagick directory.
+
+* Use Wordpress Admin Menu as described above.
