@@ -8,7 +8,7 @@
 
 * Plugin released here is integrated with [YahnisElsts/plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker) in order to replace WordPress.org hosting & update service.
 
-* Please press [watch] & [star] buttons of this repository (at the top-right of this github page).
+* Please star (or watch) this repository (see at the top-right of this github page).
 
 # Installation:
 
