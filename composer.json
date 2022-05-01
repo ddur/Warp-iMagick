@@ -1,0 +1,6 @@
+{
+    "name": "ddur/Warp-iMagick",
+    "require": {
+        "yahnis-elsts/plugin-update-checker": "^4.11"
+    }
+}
