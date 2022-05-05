@@ -1,4 +1,4 @@
-# Image Compressor – Convert WebP.
+# Image Compressor + Convert WebP
 
 * Image Optimization is performed by your WordPress site server, free and at the "expense" of your hosting provider. No external image optimization service/signup required. No limits in number or megabytes of optimized images. Plugin uses only PHP extension software installed on your server: PHP-imagick and PHP-GD.
 
@@ -19,3 +19,7 @@
 * Clone this Repository and zip /warp-imagick directory into warp-imagick.zip file. Note: Zip file must contain only warp-imagick directory.
 
 * Use Wordpress Admin Menu as described above.
+
+# Automatic Upgrades:
+
+* Login at [Plugin Update Server](https://warp-imagick.pagespeed.club/), add your sites and get free upgrade passwords.
