@@ -1,6 +1,9 @@
 {
     "name": "ddur/Warp-iMagick",
     "require": {
+        "php": "^7.2|^7.3|^7.4|^8.0|^8.1|",
+        "ext-imagick": "*",
+        "ext-gd": "*",
         "yahnis-elsts/plugin-update-checker": "^4.11"
     }
 }
