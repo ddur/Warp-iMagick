@@ -22,8 +22,4 @@
 
 # Automatic Upgrades:
 
-<<<<<<< HEAD
 * Open [Plugin Update Server](https://warp-imagick.pagespeed.club/), press [Automatic Updates], login (register), add your sites and get free upgrade passwords.
-=======
-* Login at [Plugin Update Server](https://warp-imagick.pagespeed.club/), add your sites and get free upgrade passwords.
->>>>>>> 3273c3671f54597a7865e311028aeeff72e4dfe6
