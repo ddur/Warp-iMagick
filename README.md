@@ -1,4 +1,4 @@
-# Warp iMagick - Image Compressor + Convert to WebP for WordPress
+# Warp iMagick - WordPress Image Compressor + Convert to WebP
 
 * Image Optimization is performed by your WordPress site server, free and at the "expense" of your hosting provider. No external image optimization service/signup required. No limits in number or megabytes of optimized images. Plugin uses only PHP extension software installed on your server: PHP-imagick and PHP-GD.
 
