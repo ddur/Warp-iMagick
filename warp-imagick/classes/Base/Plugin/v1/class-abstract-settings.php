@@ -1506,6 +1506,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$field_options = array_key_exists( 'options', $args ) ? $args ['options'] : array();
 			$autofocus     = array_key_exists( 'autofocus', $field_options ) ? true === $field_options ['autofocus'] : false;
 			$disabled      = array_key_exists( 'disabled', $field_options ) ? true === $field_options ['disabled'] : false;
+			$readonly      = array_key_exists( 'readonly', $field_options ) ? true === $field_options ['readonly'] : false;
 			$required      = array_key_exists( 'required', $field_options ) ? true === $field_options ['required'] : false;
 			$multiple      = array_key_exists( 'multiple', $field_options ) ? true === $field_options ['multiple'] : false;
 			$sortable      = array_key_exists( 'sortable', $field_options ) ? true === $field_options ['sortable'] : false;
@@ -1553,6 +1554,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$autofocus ? $attrs[] = 'autofocus' : null;
 			$disabled ? $attrs[]  = 'disabled' : null;
+			$readonly ? $attrs[]  = 'readonly' : null;
 			$required ? $attrs[]  = 'required' : null;
 
 			\is_int( $range_min ) ? $attrs[]  = "min=\"$range_min\"" : null;

@@ -4,21 +4,23 @@ Author: © 2017-2022, Dragan Đurić. All rights reserved.
 License: GPLv2
 Requires PHP: 7.2
 Tested up to: 6.0
-Stable tag: 1.9.7
+Stable tag: 1.10
 Requires at least: 5.3
 
 Optimize Images On-Site. No Cloud-Service/Signup. Convert to WebP On Upload/Regenerate. Resize Uploads. Set Sharpness, Quality & Big-Image-Threshold.
 
 == Description ==
 
-* **NEW: Tested with WP 6.0 Beta 3 (26 April 2022). Plugin updates are now served from [Updates Server](https://warp-imagick.pagespeed.club/) (NOT from WordPress.org).**
+* **NEW: Tested with WP 6.0 RC-1. Plugin updates are now served from [Updates Server](https://warp-imagick.pagespeed.club/) (NOT from WordPress.org).**
 Check & Update (one-click or enable auto-update) from your site admin Dashboard requires Update Password. Login on Updates Server to manage Free Update Passwords in your User Profile.
 
 
-* **NEXT: 2.+ VERSION: WebP On Demand (on-the-fly) Convert JPEG/PNG images to WebP for the whole site.**
+* **VERSION 2.+: WebP On Demand (on-the-fly) Convert JPEG/PNG images to WebP for the whole site.**
 When modern (WebP enabled) browser request for JPEG/PNG image, if WebP Clone does not exists, plugin will respond with On Demand (on-the-fly) converted WebP Clone.
 Converted WebP Clone images will be permanently available for subsequent requests. Anywhere on the site, including images in Media, WP Core, Plugins, Themes, etc. As on Theme, Plugin and Core updates, directories are removed and replaced with newer version, converted WebP Clones are removed along. New WebP Clones are again created on the first demand/request.
 You don't have to, but still, you may regenerate old Media for better compression and sharpness of JPEG images, with or without generating WebP Clones.
+Available only to users registered on [Updates Server](https://warp-imagick.pagespeed.club/).
+
 
 
 * **Warp iMagick | Optimize Images: EASY to use, PRIVATE and FREE.**

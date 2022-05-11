@@ -503,18 +503,20 @@ you may disable warning notice by setting checkbox to "on".</p>
 				'plugin-app-update-hostname' => array(
 					'label'   => __( 'Plugin Update Hostname', 'warp-imagick' ),
 					'type'    => 'text',
-					'style'   => 'width:200px',
+					'class'   => 'code',
+					'style'   => 'width:19em;color:darkred',
 					'default' => wp_parse_url( home_url(), PHP_URL_HOST ),
 					'title'   => __( 'Enter or paste this Hostname as "Application Name" to create free plugin-update-password in your profile at Update Server (https://warp-imagick.pagespeed.club/)', 'warp-imagick' ),
 					'options' => array(
-						'disabled' => true,
+						'readonly' => true,
 					),
 				),
 
 				'plugin-app-update-password' => array(
 					'label'       => __( 'Plugin Update Password', 'warp-imagick' ),
-					'type'        => 'password',
-					'style'       => 'width:200px',
+					'type'        => 'text',
+					'class'       => 'code',
+					'style'       => 'width:19em;color:darkblue',
 					'default'     => '',
 					'title'       => __( 'Enter or paste update password from your User Profile at Update Server (https://warp-imagick.pagespeed.club/)', 'warp-imagick' ),
 					'placeholder' => 'xxxx xxxx xxxx xxxx xxxx xxxx',
