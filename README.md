@@ -8,11 +8,11 @@
 
 * Plugin is integrated with [YahnisElsts/plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker) in order to replace WordPress.org hosting & update service.
 
-# Installation:
+# Simple Installation:
 
 * Download free warp-imagick.zip from [Plugin Update Server](https://warp-imagick.pagespeed.club/)
 
-* Use Wordpress Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select just downloaded warp-imagick.zip file.
+* Use Wordpress Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select just downloaded warp-imagick.zip file. Follow WordPress instructions ....
 
 # Installation from Github:
 
