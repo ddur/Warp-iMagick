@@ -6,7 +6,7 @@
 
 * Project is active since 2019 and reached almost 20.000 active installs, in February-April 2022 moved out of WordPress cvs repository here.
 
-* Plugin is integrated with [YahnisElsts/plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker) in order to replace WordPress.org hosting & update service.
+* Plugin is extended with [YahnisElsts/plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker) in order to replace WordPress.org hosting & update service.
 
 * Please give a star (see top right) if you like or use this plugin.
 
