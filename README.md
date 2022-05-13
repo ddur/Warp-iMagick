@@ -24,4 +24,4 @@
 
 # Automatic Upgrades:
 
-* Open [Plugin Update Server](https://warp-imagick.pagespeed.club/), press [Automatic Updates], login (register), add your sites and get free upgrade passwords. Convert to WebP On Demand (version 2.+) will be available soon, only via automatic updates.
+* Open [Plugin Update Server](https://warp-imagick.pagespeed.club/), press [Automatic Updates], login (register), add your sites and get free upgrade passwords. Convert to WebP On Demand (version 2.+) will be available soon via plugin updates, only to registered users with upgrade-password acquired from update server.
