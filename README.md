@@ -8,6 +8,8 @@
 
 * Plugin is integrated with [YahnisElsts/plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker) in order to replace WordPress.org hosting & update service.
 
+* Please give a star (see top right) if you like or use this plugin.
+
 # Simple Installation:
 
 * Download free warp-imagick.zip from [Plugin Update Server](https://warp-imagick.pagespeed.club/)
@@ -16,10 +18,10 @@
 
 # Installation from Github:
 
-* Clone this Repository and zip /warp-imagick directory into warp-imagick.zip file. Note: Zip file must contain only warp-imagick directory.
+* Clone this Repository and zip /warp-imagick/ subdirectory into warp-imagick.zip file. Note: Zip file must contain only /warp-imagick/ subdirectory.
 
-* Use Wordpress Admin Menu as described above.
+* Use Wordpress Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select just downloaded warp-imagick.zip file. Follow WordPress instructions ....
 
 # Automatic Upgrades:
 
-* Open [Plugin Update Server](https://warp-imagick.pagespeed.club/), press [Automatic Updates], login (register), add your sites and get free upgrade passwords.
+* Open [Plugin Update Server](https://warp-imagick.pagespeed.club/), press [Automatic Updates], login (register), add your sites and get free upgrade passwords. Convert to WebP On Demand (version 2.+) will be available soon, only via automatic updates.
