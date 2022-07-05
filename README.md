@@ -2,7 +2,7 @@
 
 * Image Optimization is performed by your WordPress site server, free and at the "expense" of your hosting provider. No external image optimization service/signup required. No limits in number or megabytes of optimized images. Plugin uses only PHP extension software installed on your server: PHP-imagick and PHP-GD.
 
-* Get your free plugin (warp-imagick.zip) download at [Plugin Update Server](https://warp-imagick.pagespeed.club/). Plugin is tested with WorPress version 5.3 - 6.0-RC2. Compatible with PHP version 7.2 up to 8.1.
+* Get your free plugin (warp-imagick.zip) download at [Plugin Update Server](https://warp-imagick.pagespeed.club/). Plugin is tested with WorPress version 5.3 - 6.0. Compatible with PHP version 7.2 up to 8.1.
 
 * Project is active since 2019 and reached almost 20.000 active installs, in February-April 2022 moved out of WordPress cvs repository here.
 
