@@ -4,7 +4,7 @@
 
 * Get your free plugin (warp-imagick.zip) download at [Plugin Update Server](https://warp-imagick.pagespeed.club/). Plugin is tested with WorPress version 5.3 - 6.0. Compatible with PHP version 7.2 up to and including 8.1.
 
-* Project is active since 2019 and reached almost 20.000 active installs, in February-April 2022 moved out of WordPress cvs repository here.
+* Project is active since 2019 and reached almost 20.000 active installs, in February-April 2022 moved out of WordPress cvs repository to Github ([here](https://github.com/ddur/Warp-iMagick/)).
 
 * Plugin is extended with [YahnisElsts/plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker) in order to replace WordPress.org hosting & update service.
 
@@ -20,7 +20,7 @@
 
 * Clone this Repository and zip /warp-imagick/ subdirectory into warp-imagick.zip file. Note: Zip file must contain only /warp-imagick/ subdirectory.
 
-* Use Wordpress Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select just downloaded warp-imagick.zip file. Follow WordPress instructions ....
+* Use Wordpress Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select your warp-imagick.zip file. Follow WordPress instructions ....
 
 # Automatic Upgrades:
 
