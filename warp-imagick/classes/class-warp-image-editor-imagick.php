@@ -191,7 +191,7 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 				} catch ( Exception $e ) {
 
 					Lib::error( 'Exception: ' . $e->getMessage() );
-					return new WP_Error( 'warp_optimize_error', $e->getMessage() );
+					return new \WP_Error( 'warp_optimize_error', $e->getMessage() );
 
 				}
 			}
@@ -319,7 +319,7 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 					} catch ( Exception $e ) {
 
 						Lib::error( 'Exception: ' . $e->getMessage() );
-						return new WP_Error( 'warp_optimize_error', $e->getMessage() );
+						return new \WP_Error( 'warp_optimize_error', $e->getMessage() );
 
 					}
 				}
@@ -382,7 +382,7 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 					} catch ( Exception $e ) {
 
 						Lib::error( 'Exception: ' . $e->getMessage() );
-						return new WP_Error( 'warp_optimize_error', $e->getMessage() );
+						return new \WP_Error( 'warp_optimize_error', $e->getMessage() );
 
 					}
 				}

@@ -3,8 +3,8 @@ Plugin URI: https://warp-imagick.pagespeed.club/
 Author: © 2017-2022, Dragan Đurić. All rights reserved.
 License: GPLv2
 Requires PHP: 7.2
-Tested up to: 6.0
-Stable tag: 1.10
+Tested up to: 6.2
+Stable tag: 1.10.1
 Requires at least: 5.3
 
 Optimize Images On-Site. No Cloud-Service/Signup. Convert to WebP On Upload/Regenerate. Resize Uploads. Set Sharpness, Quality & Big-Image-Threshold.

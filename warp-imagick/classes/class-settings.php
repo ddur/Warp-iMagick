@@ -548,7 +548,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 			$actual_wp_version = get_bloginfo( 'version' );
 
-			$tested_wp_version = '6.0';
+			$tested_wp_version = '6.2';
 			if ( 0 === \strpos( $actual_wp_version, $tested_wp_version . '.' ) ) {
 				return;
 			}

@@ -483,7 +483,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 			if ( 'Warp_Image_Editor_Imagick' !== get_class( $editor ) ) {
 				$msg = 'Wrong editor class selected: ' . get_class( $editor );
 				Lib::error( $msg );
-				return new WP_Error( 'warp-imagick', $msg );
+				return new \WP_Error( 'warp-imagick', $msg );
 			}
 
 			return $editor;
