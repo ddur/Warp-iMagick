@@ -1,9 +1,7 @@
-This repository is just a release mirror of the private Git Repository.
+Contibutions by reporting Issues or opening Discussions are very welcome.
 
-Please do not send Pull Request, they won't be accepted.
+In the process ot the commiting and releasing, some code is transformed to comply with WordPress Code Standards (ie. translation) and development comments are removed (except doc-comments). This repository is just a transformed mirror of the private Git Repository.
 
-In the process ot the releasing, some code is transformed to comply with WordPress Code Standards (ie. translation) and code comments are removed (except doc-comments). There is no way to accept PR and revert it to original code.
-
-Please contribute by using Discussions and Issues only.
+Consequently, there is no way to accept PR and merge it to original code, so please do not send Pull Request.
 
 Thank you.
