@@ -8,12 +8,12 @@
 
 * Tested with WorPress version 5.3 - 6.2. Compatible with PHP version 7.2 up to and including 8.1.
 
-* Please give a star (see top right) if you like or use this plugin.
+* Please award this project with a __GitHub Star__ (see top right) if you like or use this plugin.
 
 
 # Installation from Github:
 
-* Clone this Repository and zip /warp-imagick/ subdirectory into warp-imagick.zip file. Note: Zip file must contain only /warp-imagick/ subdirectory.
+* Clone this Repository and zip /warp-imagick/ subdirectory into warp-imagick.zip file. __Important Note__: Zip file must contain only /warp-imagick/ subdirectory.
 * Use Wordpress Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select your warp-imagick.zip file. Follow WordPress instructions ....
 
 
@@ -34,4 +34,4 @@
 
 # Automatic Updates:
 
-* Open [Plugin Update Server](https://warp-imagick.pagespeed.club/), press [Automatic Updates] button, (register &) login and get free upgrade passwords.
+* Open [Plugin Update Server](https://warp-imagick.pagespeed.club/), press [Automatic Updates] button, (register &) login and get free update API password.
