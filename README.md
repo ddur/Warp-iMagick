@@ -1,6 +1,14 @@
-# Warp iMagick - WordPress Image Compressor. Resize, Optimize, Regenerate & Convert to WebP
+# Warp iMagick - WordPress Image Compressor. Resize, Optimize, Sharpen, Regenerate & Convert to WebP
 
-* Image Optimization is performed by your WordPress site server, free and at the "expense" of your hosting provider. No external image optimization service/signup required. No limits in number or megabytes of optimized images. Plugin uses only PHP extension software installed on your server: PHP-imagick and PHP-GD.
+* Unlike most of other WordPress Image Optimization Plugins, this plugin is not just connector to external Image Optimization Service. Image Optimization is performed by your WordPress site server, free and at the "expense" of your hosting provider. No external image optimization service/signup required. No limits in number or megabytes of optimized images. Plugin uses only PHP extension software installed on your server: PHP-imagick and PHP-GD.
+
+* Unlike many other WordPress Image Optimization Plugins, this plugin allows you to regenerate images to high-compression/low-quality and back to higher quality images. You can't overcompress or degrade images quality by regenerating thumbnails again and again. Original is always preserved.
+
+* Due to flexible configuration and compression quality, Warp iMagick Plugin is endorsed and recommended by fotografic site owners.
+
+* Resizing images on upload (optional) allows you to reduce uploaded images to maximal number of pixels used on site.
+
+* Sharpening images allows you to fix blurry WordPress thumbnails.
 
 * Project is active since 2019 and reached almost 20.000 active installs, in February-April 2022 moved out of WordPress cvs repository. Why? Because of [dispute about plugin TITLE LENGTH (in README.txt)](https://themekraft.com/open-letter-to-the-wordpress-plugin-review-team/).
 
@@ -18,7 +26,7 @@
 * [![PHP compatibility](https://plugintests.com/plugins/wporg/warp-imagick/php-badge.svg)](https://plugintests.com/plugins/wporg/warp-imagick/latest)
 * Download free Warp-iMagick Version 1.9.6 from [WordPress Server](https://downloads.wordpress.org/plugin/warp-imagick.1.9.6.zip)
 * Use Your Wordpress Site Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select just downloaded warp-imagick.1.9.6.zip file. Follow WordPress instructions ....
-* __Attention: Version 1.9.6 will __NOT__ be updated from WordPress-Server and can't automatically check for updates on own Update-Server. To be able to check for future version updates, download and install (or update to) any version from Github or from Update-Server (as described in sections below).__
+* __Attention: Version 1.9.6 will __NOT__ be updated from WordPress-Server and can't automatically check for updates on own Update-Server. To be able to check for future version updates, download and install (or update to) any version from this Github repository or from Warp iMagick Update-Server (as described in sections below).__
 
 
 # Install or Update from Github:
