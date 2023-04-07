@@ -2,11 +2,13 @@
 
 * Unlike most of other WordPress Image Optimization Plugins, this plugin is __NOT__ just connector to external Image Optimization Service. Image Optimization is performed by your WordPress site server, free and at the "expense" of your hosting provider. No external image optimization service/signup required. No limits in number or megabytes of optimized images. Plugin uses only PHP extension software installed on your server: PHP-imagick and PHP-GD.
 
-* Unlike many other WordPress Image Optimization Plugins, this plugin allows you to regenerate images to high-compression/low-quality and back to higher quality images. You can't overcompress or unrecoverably degrade images quality by regenerating thumbnails again and again. Original is always preserved.
+* Unlike many other WordPress Image Optimization Plugins, this plugin allows you to regenerate images to high-compression/low-quality and back to higher quality images. You can't overcompress or unrecoverably degrade images quality by regenerating thumbnails again and again. Uploaded original image quality  is always preserved.
 
 * Due to flexible configuration and compression quality, Warp iMagick Plugin is endorsed and recommended by fotografic site owners.
 
-* Resizing images on upload (optional) allows you to reduce uploaded images to maximal number of pixels used on site.
+* Resizing images on upload (optional) allows you to reduce uploaded images to maximal number of pixels used on site. Feature is usefull on WordPress multisite/multiowner installs or on mobile-only sites.
+
+* Converting and cloning images to file-size efficient WebP format, allows you cover site compatibility with older and newer browsers and better pagespeed score by Google Pagespeed Insights and GTmetrix by serving Next-Gen image format.
 
 * Sharpening images allows you to fix blurry WordPress thumbnails.
 
