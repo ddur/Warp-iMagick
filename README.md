@@ -16,7 +16,9 @@
 
 * Plugin is extended with [YahnisElsts/plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker) in order to replace WordPress.org hosting & update service.
 
-* Tested with WorPress version 5.3 - 6.2. Compatible with PHP version 7.2 up to and including 8.1.
+* Tested with WordPress version 5.3 - 6.2. Compatible with PHP version 7.2 up to and including 8.1.
+
+* Tested with Apache Server and NGinx Server on [WordOps](https://github.com/WordOps/WordOps) configuration.
 
 * Please award this project with a __GitHub Star__ (see top right) if you like or use this plugin.
 
