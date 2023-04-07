@@ -38,4 +38,5 @@
 
 * Open [Plugin Update Server](https://warp-imagick.pagespeed.club/), press [Automatic Updates] button, (register &) login, type in your site URL (or domain) and get and copy free "update API password".
 * Open Your Wordpress Site Warp-iMagick Plugin Settings Page and paste "update API password" into General Settings Tab -> Plugin Settings Section -> Plugin Update Password Field.
+* Press [Save Changes] Button.
 
