@@ -46,9 +46,11 @@
 * Use Your Wordpress Site Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select just downloaded warp-imagick.zip file. Follow WordPress instructions ....
 
 
-# Get Automatic Updates:
+# Register for Automatic Updates:
 
-* Open [Plugin Update Server](https://warp-imagick.pagespeed.club/), press [Automatic Updates] button, (register &) login, type in your site URL (or domain) and get and copy free "update API password".
-* Open Your Wordpress Site Warp-iMagick Plugin Settings Page and paste "update API password" into General Settings Tab -> Plugin Settings Section -> Plugin Update Password Field.
+* Open Your Wordpress Site Warp-iMagick Plugin Settings Page at "General Settings" Tab -> "Plugin Settings" Section. Select and copy text from "Plugin Update Hostname" field.
+* In another browser Tab/Window, open [Plugin Update Server](https://warp-imagick.pagespeed.club/), press [Automatic Updates] button, (register &) login. In your user profile go to section "Application Passwords". Paste copied "Plugin Update Hostname" into "New Application Password Name" field. Press "Add New Application Password" button and you will be presented with your new password. Copy text from "new password".
+* Go back to your Wordpress Site at Warp-iMagick Plugin Settings Page -> General Settings Tab -> Plugin Settings Section and paste your new password into "Plugin Update Password" Field.
 * Press [Save Changes] Button.
+* Note: Each Warp iMagick Plugin has different "Plugin Update Password" for every WordPress site (hostname). You can add (register for update) more than one Warp iMagick Plugin (or WordPress site).
 
