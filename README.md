@@ -33,13 +33,13 @@
 * __Attention: Version 1.9.6 will __NOT__ be updated from WordPress-Server and can't automatically check for updates on own Update-Server. To be able to check for future version updates, download and install (or update to) any version from this Github repository or from Warp iMagick Update-Server (as described in sections below).__
 
 
-# Install or Manual Update from Github:
+# Install or Update from Github:
 
 * Clone this Repository and zip /warp-imagick/ subdirectory into warp-imagick.zip file. __Important Note__: Zip file must contain only /warp-imagick/ subdirectory.
 * Use Your Wordpress Site Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select your warp-imagick.zip file. Follow WordPress instructions ....
 
 
-# Install or Manual Update from Update Server:
+# Install or Update from Update Server:
 
 * Go to [Plugin Update Server](https://warp-imagick.pagespeed.club/)
 * Press [Download Plugin] button and download & save free Warp iMagick plugin.
@@ -53,5 +53,5 @@
 * Go back to your Wordpress Site at Warp-iMagick Plugin Settings Page -> General Settings Tab -> Plugin Settings Section and paste your new password into "Plugin Update Password" Field.
 * Press [Save Changes] Button.
 * __Note__: Each Warp iMagick Plugin has different "Plugin Update Password" for every WordPress site (hostname). If you are administrator for more than one sites, You can add/register for update, more than one Warp iMagick Plugin (for each site where is installed).
-* __Note__: Without registration and password, plugin will let you know that new update is available but won't let you download and update plugin from WordPress administration panel/interface. You will have to use manual update from GitHub or Update Server as described in two sections above.
+* __Note__: Without registration and password, plugin will let you know that new update is available but won't let you download and update plugin from WordPress administration panel/interface. You will have to update from GitHub or Update Server as described in two sections above.
 
