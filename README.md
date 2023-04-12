@@ -53,5 +53,5 @@
 * Go back to your Wordpress Site at Warp-iMagick Plugin Settings Page -> General Settings Tab -> Plugin Settings Section and paste your new password into "Plugin Update Password" Field.
 * Press [Save Changes] Button.
 * __Note__: Each Warp iMagick Plugin has different "Plugin Update Password" for every WordPress site (hostname). If you are administrator for more than one sites, You can add/register for update, more than one Warp iMagick Plugin (for each site where is installed).
-* __Note__: Without registration and password, plugin will let you know that new update is available but won't let you download and update plugin from WordPress administration panel/interface, either update-on-click or auto-update. You will have to update from GitHub or Update Server as described in two sections above.
+* __Note__: Without registration and password, plugin will let you know that new update is available but won't let you download and update plugin from WordPress administration panel/interface, either on-click-update or auto-update. You will have to update from GitHub or Update Server as described in two sections above.
 
