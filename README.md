@@ -25,10 +25,11 @@
 
 # Install from WordPress - Version 1.9.6:
 
+* [__Plugin Reviews__](https://wordpress.org/support/plugin/warp-imagick/reviews/?filter=5)
 * [__10.000+ active installs__](https://plugintests.com/plugins/wporg/warp-imagick/latest#)
 * [![WP compatibility](https://plugintests.com/plugins/wporg/warp-imagick/wp-badge.svg)](https://plugintests.com/plugins/wporg/warp-imagick/latest)
 * [![PHP compatibility](https://plugintests.com/plugins/wporg/warp-imagick/php-badge.svg)](https://plugintests.com/plugins/wporg/warp-imagick/latest)
-* Download free Warp-iMagick Version 1.9.6 from [WordPress Server](https://downloads.wordpress.org/plugin/warp-imagick.1.9.6.zip)
+* Download Warp-iMagick Version 1.9.6 from [WordPress Server](https://downloads.wordpress.org/plugin/warp-imagick.1.9.6.zip)
 * Use Your Wordpress Site Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select just downloaded warp-imagick.1.9.6.zip file. Follow WordPress instructions ....
 * __Attention: Version 1.9.6 will __NOT__ be updated from WordPress-Server and can't automatically check for updates on own Update-Server. To be able to check for future version updates, download and install (or update to) any version from this Github repository or from Warp iMagick Update-Server (as described in sections below).__
 
