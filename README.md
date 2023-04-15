@@ -12,7 +12,9 @@
 
 * Sharpening images allows you to fix blurry WordPress thumbnails.
 
-* Project is active since 2019 and reached almost 20.000 active installs, in February-April 2022 moved out of WordPress cvs repository. Why? Because of [dispute about plugin TITLE LENGTH (in README.txt)](https://themekraft.com/open-letter-to-the-wordpress-plugin-review-team/).
+* WooCommerce compatible.
+
+* Project is active since 2019 and reached almost 20.000 active installs, in February-April 2022 moved out of WordPress cvs repository. Why? Because of [dispute about plugin TITLE LENGTH in README.txt (See the comment)](https://themekraft.com/open-letter-to-the-wordpress-plugin-review-team/).
 
 * Plugin is extended with [YahnisElsts/plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker) in order to replace WordPress.org hosting & update service.
 
@@ -20,7 +22,7 @@
 
 * Tested with Apache Server and NGinx Server on [WordOps](https://github.com/WordOps/WordOps) configuration.
 
-* Please award this project with a __GitHub Star__ (see top right) if you like or use this plugin.
+* if you like or use this plugin, please award this project with a __GitHub Star__ (see top right) 
 
 
 # Install from WordPress - Version 1.9.6:
@@ -54,5 +56,5 @@
 * Go back to your Wordpress Site at Warp-iMagick Plugin Settings Page -> General Settings Tab -> Plugin Settings Section and paste your new password into "Plugin Update Password" Field.
 * Press [Save Changes] Button.
 * __Note__: Each Warp iMagick Plugin has different "Plugin Update Password" for every WordPress site (hostname). If you are administrator for more than one sites, You can add/register for update, more than one Warp iMagick Plugin (for each site where is installed).
-* __Note__: Without registration and password, plugin will let you know that new update is available but won't let you download and update plugin from WordPress administration panel/interface, either on-click-update or auto-update. You will have to update from GitHub or Update Server as described in two sections above.
+* __Note__: Without registration and password, plugin should let you know that new update is available but may fail to update plugin via WordPress administration panel/interface, either on-click-update or auto-update. In that case you still have option to update from GitHub or Update Server as described in two sections above.
 
