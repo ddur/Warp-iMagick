@@ -24,6 +24,11 @@
 
 * if you like or use this plugin, please award this project with a __GitHub Star__ (see top right) 
 
+# Listed on
+
+* [14 Best WordPress Plugins for Using WebP Images](https://www.cloudzat.com/webp-images-wordpress-plugins/)
+* [Awesome WP Speed Up - Image Optimization Plugins](https://github.com/lukecav/awesome-wp-speed-up#image-optimization-plugins)
+
 
 # Install from WordPress - Version 1.9.6:
 
