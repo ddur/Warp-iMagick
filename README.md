@@ -1,4 +1,4 @@
-[![WP Version compatible](https://img.shields.io/badge/WP%205.3--6.2-compatible-darkgreen)](https://wordpress.org/download/releases/) [![PHP Version compatible](https://img.shields.io/badge/PHP%207.2--8.2-compatible-darkgreen)](https://www.php.net/supported-versions.php)
+[![WP Version compatible](https://img.shields.io/badge/WP%205.3--6.2-compatible-darkgreen)](https://wordpress.org/download/releases/) [![PHP Version compatible](https://img.shields.io/badge/PHP%207.2--8.2-compatible-darkgreen)](https://www.php.net/supported-versions.php) [![WordOps compatible](https://img.shields.io/badge/WordOps-compatible-darkgreen)](https://wordops.net/) 
 
 # Warp iMagick - WordPress Image Compressor. Resize, Optimize, Sharpen, Compress, Regenerate & Convert to WebP
 
