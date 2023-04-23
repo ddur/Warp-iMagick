@@ -6,7 +6,7 @@
 
 * Unlike many other WordPress Image Optimization Plugins, this plugin allows you to regenerate images to high-compression/low-quality and back to high-quality/low-compression images. You can't overcompress or unrecoverably degrade images quality by regenerating thumbnails again and again. Uploaded original image quality is always preserved.
 
-* Due to flexible configuration and compression quality, Warp iMagick Plugin is endorsed and recommended by fotografic site owners.
+* Due to flexible configuration and compression quality, Warp iMagick Plugin is endorsed and recommended by photografic site owners.
 
 * Resizing images on upload (optional) allows you to reduce uploaded images to maximal number of pixels used on site. Feature is usefull on WordPress multisite/multiowner installs or on mobile-only sites.
 
