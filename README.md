@@ -70,7 +70,7 @@
 
 __To serve (from JPEG/PNG converted) WebP clones to WebP enabled browsers, you must configure your Apache server!__
 
-__Configuring server to serve WebP images is fastes way, but is not done by this plugin because programmatic change could potentially break your site. You will have to DIY (Do It Yourself).__
+__Configuring server to serve WebP images is fastes (pagespeed) way to deliver WebP images. Server configuration is not done by this plugin because programmatic change could potentially break your site. You will have to DIY (Do It Yourself).__
 
 To __safely__ modify your Apache ``/.htaccess`` file, use [Htaccess File Editor plugin](https://wordpress.org/plugins/wp-htaccess-editor/).
 If you use other ways to modify/edit Apache ``/.htaccess`` file, always backup/save your original ``/.htaccess`` file __before__ applying changes!
@@ -107,6 +107,6 @@ RewriteRule (?i)(.*)\.(jpe?g|png)$ %1\.%2\.webp [T=image/webp,E=webp:1,L]
 ```
 __Paste/Add above snippet at the top of ``/.htaccess`` file. Do not remove WordPress configuration or any other content of ``/.htaccess`` file.__
 
-After Apache ``/.htaccess`` file is successfully modified and your site is serving WebP images, you can __uninstall__ [Htaccess File Editor plugin](https://wordpress.org/plugins/wp-htaccess-editor/).
+After Apache ``/.htaccess`` file is successfully modified and your site is serving WebP images, you don't need [Htaccess File Editor plugin](https://wordpress.org/plugins/wp-htaccess-editor/) anymore and feel free to __uninstall__ it.
 
 __Looking for more details? Then press [Help] button at the top-right of Warp iMagick Settings page.__
