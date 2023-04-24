@@ -65,3 +65,48 @@
 * __Note__: Each Warp iMagick Plugin has different "Plugin Update Password" for every WordPress site (hostname). If you are administrator for more than one sites, You can add/register for update, more than one Warp iMagick Plugin (for each site where is installed).
 * __Note__: Without registration and password, plugin should let you know that new update is available but may fail to update plugin via WordPress administration panel/interface, either on-click-update or auto-update. In that case you still have option to update from GitHub or Update Server as described in two sections above.
 
+
+# __Post Install Apache Server Configuration for WebP images:__
+
+__To serve (from JPEG/PNG converted) WebP clones to WebP enabled browsers, you must configure your Apache server!__
+
+__Configuring server to serve WebP images is fastes way, but is not done by this plugin because programmatic change could potentially break your site. You will have to DIY (Do It Yourself).__
+
+To __safely__ modify your Apache ``/.htaccess`` file, use [Htaccess File Editor plugin](https://wordpress.org/plugins/wp-htaccess-editor/).
+If you use other ways to modify/edit Apache ``/.htaccess`` file, always backup/save your original ``/.htaccess`` file __before__ applying changes!
+
+Below is Apache ``/.htaccess`` configuration snippet that should work on most Apache servers. Snippet is tested on Apache 2.4 installed on Linux Debian.
+
+```
+# BEGIN Warp-iMagick - First line of .htaccess file.
+# Transparently serve WebP images instead of JPEG/PNG to WebP enabled browsers.
+
+<IfModule mod_mime.c>
+	AddType image/webp .webp
+</IfModule>
+<ifModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+
+# If request is for jpg/png file ...
+# and browser accepts WebP files ...
+# and WebP Clone file does exists ...
+# Then transparently serve existing WebP image.
+RewriteCond %{HTTP_ACCEPT} image/webp
+RewriteCond %{REQUEST_URI} (?i)(.*)\.(jpe?g|png)$
+RewriteCond %{DOCUMENT_ROOT}%1\.%2.webp -f
+RewriteRule (?i)(.*)\.(jpe?g|png)$ %1\.%2\.webp [T=image/webp,E=webp:1,L]
+
+	<IfModule mod_headers.c>
+		Header append Vary Accept env=REDIRECT_webp
+		Header append X-Powered-By https://warp-imagick.pagespeed.club/
+	</IfModule>
+</IfModule>
+
+# END Warp-iMagick
+```
+__Paste/Add above snippet at the top of ``/.htaccess`` file. Do not remove WordPress configuration or any other content of ``/.htaccess`` file.__
+
+After Apache ``/.htaccess`` file is successfully modified and your site is serving WebP images, you can __uninstall__ [Htaccess File Editor plugin](https://wordpress.org/plugins/wp-htaccess-editor/).
+
+__Looking for more details? Then press [Help] button at the top-right of Warp iMagick Settings page.__
