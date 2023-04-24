@@ -110,3 +110,9 @@ __Paste/Add above snippet at the top of ``/.htaccess`` file. Do not remove WordP
 After Apache ``/.htaccess`` file is successfully modified and your site is serving WebP images, you don't need [Htaccess File Editor plugin](https://wordpress.org/plugins/wp-htaccess-editor/) anymore and feel free to __uninstall__ it.
 
 __Looking for more details? Then press [Help] button at the top-right of Warp iMagick Settings page.__
+
+
+# __Post Install [WordOps Nginx Server](https://wordops.net/) Configuration for WebP images:__
+
+No Nginx configuration changes required. WebP redirection just works with default configuration.
+
