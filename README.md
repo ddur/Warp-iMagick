@@ -66,7 +66,7 @@
 * __Note__: Without registration and password, plugin should let you know that new update is available but may fail to update plugin via WordPress administration panel/interface, either on-click-update or auto-update. In that case you still have option to update from GitHub or Update Server as described in two sections above.
 
 
-# __Post Install Apache Server Configuration for WebP images:__
+# __Post Install: Apache Server WebP Configuration:__
 
 __To serve (from JPEG/PNG converted) WebP clones to WebP enabled browsers, you must configure your Apache server!__
 
@@ -112,7 +112,7 @@ After Apache ``/.htaccess`` file is successfully modified and your site is servi
 __Looking for more details? Then press [Help] button at the top-right of Warp iMagick Settings page.__
 
 
-# __Post Install [WordOps Nginx Server](https://wordops.net/) Configuration for WebP images:__
+# __Post Install: [WordOps Nginx Server](https://wordops.net/) WebP Configuration:__
 
-No Nginx configuration changes required. WebP redirection just works with default configuration.
+No Nginx configuration changes required to automatically serve Webp images to WebP enabled browsers. WebP redirection just works with default configuration.
 
