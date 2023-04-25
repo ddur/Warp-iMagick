@@ -24,7 +24,7 @@
 
 * Tested with Apache Server and NGinx Server on [WordOps](https://github.com/WordOps/WordOps) configuration.
 
-* if you like or use this plugin, please award this project with a __GitHub Star__ (see top right) 
+* If you like or use this plugin, please award this project with a __GitHub Star__ (see top right on this page) 
 
 # Listed on
 
