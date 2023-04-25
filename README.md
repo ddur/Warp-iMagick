@@ -116,3 +116,4 @@ __Looking for more details? Then press [Help] button at the top-right of Warp iM
 
 No Nginx configuration changes required to automatically serve Webp images to WebP enabled browsers. WebP redirection just works with default configuration.
 
+:vulcan_salute:
