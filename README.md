@@ -33,6 +33,12 @@
 * [14 Best WordPress Plugins for Using WebP Images](https://www.cloudzat.com/webp-images-wordpress-plugins/)
 * [Awesome WP Speed Up - Image Optimization Plugins](https://github.com/lukecav/awesome-wp-speed-up#image-optimization-plugins)
 
+# Share
+
+* [![Facebook share](https://img.shields.io/badge/Share%20on-Facebook-darkblue)](https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fgithub.com%2Fddur%2FWarp-iMagick%2F)
+
+* [![Twitter share](https://img.shields.io/badge/Share%20on-Twitter-blue)](https://twitter.com/intent/tweet?url=https%3A%2F%2Fgithub.com%2Fddur%2FWarp-iMagick%2F&amp;text=Warp%20iMagick%20WordPress%20Image%20Compressor%20Plugin%3A%20)
+
 
 # Install from WordPress - Version 1.9.6:
 
