@@ -94,17 +94,54 @@ Below is Apache ``/.htaccess`` configuration snippet that should work on most Ap
 	AddType image/webp .webp
 </IfModule>
 <ifModule mod_rewrite.c>
-RewriteEngine On
-RewriteBase /
+	RewriteEngine On
+	RewriteBase /
 
-# If request is for jpg/png file ...
-# and browser accepts WebP files ...
-# and WebP Clone file does exists ...
-# Then transparently serve existing WebP image.
-RewriteCond %{HTTP_ACCEPT} image/webp
-RewriteCond %{REQUEST_URI} (?i)(.*)\.(jpe?g|png)$
-RewriteCond %{DOCUMENT_ROOT}%1\.%2.webp -f
-RewriteRule (?i)(.*)\.(jpe?g|png)$ %1\.%2\.webp [T=image/webp,E=webp:1,L]
+	# If request is for jpg/png file ...
+	# and browser accepts WebP files ...
+	# and WebP Clone file does exists ...
+	RewriteCond %{HTTP_ACCEPT} image/webp
+	RewriteCond %{REQUEST_URI} (?i)(.*)\.(jpe?g|png)$
+	RewriteCond %{DOCUMENT_ROOT}%1\.%2.webp -f
+
+	# Transparently serve existing WebP Clone.
+	# For each requested JPEG/PNG image, returns HTTP code [200].
+	# This is default configuration. Same as by WordOps configured NGinx server.
+	# PROS:
+		# Fastest, no redirection time taken, ever.
+		# If Webp Clone image is deleted/removed, browser will receive JPEG/PNG image content.
+	# CONS OR PROS?:
+		# If Webp Clone image is found, via browser saved JPEG/PNG image may have JPEG/PNG extension but WebP content.
+		# Some image viewers may not recognize saved JPEG/PNG with WebP content and may declare saved image invalid.
+	# CONS:
+		# If CDN/external cache is used, it should support Vary: header. CDN cache may choose to cache none, one or both image versions.
+	# DEFAULT REWRITE RULE - if you enable (uncomment) any OPTIONAL REWRITE RULE below, you MUST comment-out this RewriteRule.
+	RewriteRule .+ %1\.%2\.webp [T=image/webp,E=webp:1,L]
+
+	# Temporary redirect to existing WebP Clone.
+	# For each requested JPEG/PNG image, if WebP Clone exists, returns HTTP code [302], else [200]
+	# This is an optional, disabled (commented-out) RewriteRule configuration.
+	# PROS:
+		# Via browser saved image will have JPEG/PNG/WebP extension and extension matching content,
+		# If CDN/external cache is used, CDN/cache does not have to support Vary: header.
+		# If Webp Clone image is deleted/removed, browser will receive JPEG/PNG original.
+	# CONS:
+		# Redirection takes small/short time every time when JPEG/PNG image is requested.
+	# OPTIONAL REWRITE RULE - If you enable/un-comment this RewriteRule, you MUST comment-out other two RewriteRule-s.
+	# RewriteRule .+ %1\.%2\.webp [R=302,L]
+
+	# Permanent redirect to existing WebP Clone.
+	# For each requested JPG/PNG image, if WebP Clone exists returns HTTP code [301] once and then [200], else [200].
+	# This is an optional, disabled (commented-out) RewriteRule configuration.
+	# PROS:
+		# Via browser saved image will have JPEG/PNG/WebP extension and extension matching content,
+		# If CDN/external cache is used, it does not have to support Vary: header.
+	# CONS:
+		# Redirection takes small/short time but only first time JPEG/PNG image with WebP clone is requested.
+		# If Webp Clone image is deleted/removed, browser will receive error 404.
+		# For browser to receive JPEG/PNG again, user has to clear your site data in his browser site data cache.
+	# OPTIONAL REWRITE RULE - If you enable/un-comment this RewriteRule, you MUST comment-out other two RewriteRule-s.
+	# RewriteRule .+ %1\.%2\.webp [R=301,L]
 
 	<IfModule mod_headers.c>
 		Header append Vary Accept env=REDIRECT_webp
