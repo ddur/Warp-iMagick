@@ -86,6 +86,9 @@ If you use other ways to modify/edit Apache ``/.htaccess`` file, always backup/s
 
 Below is Apache ``/.htaccess`` configuration snippet that should work on most Apache servers. Snippet is tested on Apache 2.4 installed on Linux Debian.
 
+__Use Copy button at top-right (visible on mouse hover) of code-snippet below and paste snippet at the top of ``/.htaccess`` file. Do not remove WordPress configuration or any other content of ``/.htaccess`` file.__
+
+
 ```
 # BEGIN Warp-iMagick - First line of .htaccess file.
 # Transparently serve WebP images instead of JPEG/PNG to WebP enabled browsers.
@@ -151,7 +154,6 @@ Below is Apache ``/.htaccess`` configuration snippet that should work on most Ap
 
 # END Warp-iMagick
 ```
-__Paste/Add above snippet at the top of ``/.htaccess`` file. Do not remove WordPress configuration or any other content of ``/.htaccess`` file.__
 
 After Apache ``/.htaccess`` file is successfully modified and your site is serving WebP images, you don't need [Htaccess File Editor plugin](https://wordpress.org/plugins/wp-htaccess-editor/) anymore and feel free to __uninstall__ it.
 
