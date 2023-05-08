@@ -99,12 +99,14 @@ __Use Copy button at top-right (visible on mouse hover) of code-snippet below an
 <ifModule mod_rewrite.c>
 	RewriteEngine On
 	RewriteBase /
-
-	# If request is for jpg/png file ...
-	# and browser accepts WebP files ...
-	# and WebP Clone file does exists ...
+	
+	# If browser accepts WebP files?
 	RewriteCond %{HTTP_ACCEPT} image/webp
+
+	# If request is for jpg/png file?
 	RewriteCond %{REQUEST_URI} (?i)(.*)\.(jpe?g|png)$
+	
+	# If WebP Clone file exists?
 	RewriteCond %{DOCUMENT_ROOT}%1\.%2.webp -f
 
 	# Transparently serve existing WebP Clone.
@@ -137,10 +139,10 @@ __Use Copy button at top-right (visible on mouse hover) of code-snippet below an
 	# For each requested JPG/PNG image, if WebP Clone exists returns HTTP code [301] once and then [200], else [200].
 	# This is an optional, disabled (commented-out) RewriteRule configuration.
 	# PROS:
+		# Redirection takes small/short time but only first time JPEG/PNG image with WebP clone is requested.
 		# Via browser saved image will have JPEG/PNG/WebP extension and extension matching content,
 		# If CDN/external cache is used, it does not have to support Vary: header.
 	# CONS:
-		# Redirection takes small/short time but only first time JPEG/PNG image with WebP clone is requested.
 		# If Webp Clone image is deleted/removed, browser will receive error 404.
 		# For browser to receive JPEG/PNG again, user has to clear your site data in his browser site data cache.
 	# OPTIONAL REWRITE RULE - If you enable/un-comment this RewriteRule, you MUST comment-out other two RewriteRule-s.
