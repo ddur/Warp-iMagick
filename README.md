@@ -28,6 +28,14 @@
 
 * If you like or use this plugin, please award this project with a __GitHub Star__ (see top right on this page) 
 
+* My favorite comment (later removed by someone):
+> WordPress.org Forums <noreply@wordpress.org>
+> Jan 19, 2021, 8:26 PM
+> undisclosed wrote:
+> 
+> Thank you so much for an amazing plugin, Helped my website from 7 seconds to 2.5 seconds!!! keep up the great work!
+
+
 # Listed on
 
 * [14 Best WordPress Plugins for Using WebP Images](https://www.cloudzat.com/webp-images-wordpress-plugins/)
