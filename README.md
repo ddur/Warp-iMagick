@@ -1,6 +1,6 @@
 [![WP Version compatible](https://img.shields.io/badge/WP%205.3--6.2-compatible-darkgreen)](https://wordpress.org/download/releases/#branch-53) [![PHP Version compatible](https://img.shields.io/badge/PHP%207.2--8.2-compatible-darkgreen)](https://www.php.net/supported-versions.php) [![WordOps compatible](https://img.shields.io/badge/WordOps-compatible-darkgreen)](https://wordops.net/) 
 
-# Warp iMagick - WordPress Image Compressor Plugin. Resize, Optimize, Sharpen, Compress, Regenerate, Clone & Convert to WebP
+# Warp iMagick - WordPress Image Compressor Plugin. Resize, Optimize, Sharpen, Compress, Regenerate, Clone & Convert to WebP - Next Gen Image Format.
 
 * Unlike most of other WordPress Image Optimizer Plugins, this plugin is __NOT__ just connector to external Image Optimization Service. Image Optimization is performed by your WordPress site server, free and at the "expense" of your hosting provider CPU time. No external image optimization service/signup required. No limits in number or megabytes of optimized images. Plugin uses only PHP extension software installed on your server: PHP-imagick and PHP-GD.
 
