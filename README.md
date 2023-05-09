@@ -116,7 +116,7 @@ __Use Copy button at top-right (visible on mouse hover) of code-snippet below an
 		# Fastest, no redirection time taken, ever.
 		# If Webp Clone image is deleted/removed, browser will receive JPEG/PNG image content.
 	# CONS OR PROS?:
-		# If Webp Clone image is found, via browser saved JPEG/PNG image may have JPEG/PNG extension but WebP content.
+		# If Webp Clone image is found, via browser saved JPEG/PNG image will have JPEG/PNG name.extension but WebP content.
 		# Some image viewers may not recognize saved JPEG/PNG with WebP content and may declare saved image invalid.
 	# CONS:
 		# If CDN/external cache is used, it should support Vary: header. CDN cache may choose to cache none, one or both image versions.
