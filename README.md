@@ -96,7 +96,37 @@ Below is Apache ``/.htaccess`` configuration snippet that should work on most Ap
 
 __Use Copy button at top-right (visible on mouse hover) of code-snippet below and paste snippet at the top of ``/.htaccess`` file. Do not remove WordPress configuration or any other content of ``/.htaccess`` file.__
 
+```
+# BEGIN Warp-iMagick - First line of .htaccess file.
+# Serve WebP images instead of JPEG/PNG to WebP enabled browsers.
 
+<IfModule mod_mime.c>
+	AddType image/webp .webp
+</IfModule>
+<ifModule mod_rewrite.c>
+	RewriteEngine On
+	RewriteBase /
+	
+	RewriteCond %{HTTP_ACCEPT} image/webp
+	RewriteCond %{REQUEST_URI} (?i)(.*)\.(jpe?g|png)$
+	RewriteCond %{DOCUMENT_ROOT}%1\.%2.webp -f
+
+	RewriteRule .+ %1\.%2\.webp [T=image/webp,E=webp:1,L]
+
+	<IfModule mod_headers.c>
+		Header append Vary Accept env=REDIRECT_webp
+		Header append X-Powered-By https://warp-imagick.pagespeed.club/
+	</IfModule>
+</IfModule>
+
+# END Warp-iMagick
+
+```
+After Apache ``/.htaccess`` file is successfully modified and your site is serving WebP images, you don't need [Htaccess File Editor plugin](https://wordpress.org/plugins/wp-htaccess-editor/) anymore and feel free to __uninstall__ it.
+
+
+
+Below is annotated version of ``/.htaccess`` snippet with options/variations and explanations:
 ```
 # BEGIN Warp-iMagick - First line of .htaccess file.
 # Transparently serve WebP images instead of JPEG/PNG to WebP enabled browsers.
@@ -160,12 +190,11 @@ __Use Copy button at top-right (visible on mouse hover) of code-snippet below an
 		Header append Vary Accept env=REDIRECT_webp
 		Header append X-Powered-By https://warp-imagick.pagespeed.club/
 	</IfModule>
+
 </IfModule>
-
 # END Warp-iMagick
-```
 
-After Apache ``/.htaccess`` file is successfully modified and your site is serving WebP images, you don't need [Htaccess File Editor plugin](https://wordpress.org/plugins/wp-htaccess-editor/) anymore and feel free to __uninstall__ it.
+```
 
 __Looking for more details? Then press [Help] button at the top-right of Warp iMagick Settings page.__
 
