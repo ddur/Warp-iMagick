@@ -115,7 +115,6 @@ __Use Copy button at top-right (visible on mouse hover) of code-snippet below an
 
 	<IfModule mod_headers.c>
 		Header append Vary Accept env=REDIRECT_webp
-		Header append X-Powered-By https://warp-imagick.pagespeed.club/
 	</IfModule>
 </IfModule>
 
@@ -188,7 +187,6 @@ Below is annotated version of ``/.htaccess`` snippet with options/variations and
 
 	<IfModule mod_headers.c>
 		Header append Vary Accept env=REDIRECT_webp
-		Header append X-Powered-By https://warp-imagick.pagespeed.club/
 	</IfModule>
 
 </IfModule>
