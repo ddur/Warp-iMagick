@@ -853,12 +853,13 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				return;
 			}
 
-			// phpcs:disable WordPress.Security.NonceVerification
-			if ( isset( $_GET['page'] ) && $this->pageslug === $_GET['page'] ) {
+			$server = wp_unslash( $_SERVER );
+			if ( is_array( $server )
+			&& array_key_exists( 'QUERY_STRING', $server )
+			&& false !== strpos( $server['QUERY_STRING'], 'page=' . $this->pageslug ) ) {
 
 				add_action( 'admin_enqueue_scripts', array( $this, 'on_abstract_admin_enqueue_scripts' ) );
 			}
-			// phpcs:enable WordPress.Security.NonceVerification
 
 			add_action( 'admin_init', array( $this, 'on_abstract_register_settings_page' ) );
 
@@ -1370,6 +1371,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$field_options = array_key_exists( 'options', $args ) ? $args ['options'] : array();
 			$disabled      = array_key_exists( 'disabled', $field_options ) ? true === $field_options ['disabled'] : false;
+			$readonly      = array_key_exists( 'readonly', $field_options ) ? true === $field_options ['readonly'] : false;
 
 			$args ['value'] = $this->get_form_field_option_value( $fn, $args );
 
@@ -1388,6 +1390,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$style ? $attrs[] = "style=\"$style\"" : null;
 
 			$disabled ? $attrs[] = 'disabled' : null;
+			$readonly ? $attrs[] = 'readonly' : null;
 
 			$attrs = trim( implode( ' ', $attrs ) );
 			$attrs = '' === $attrs ? '' : ' ' . $attrs;
@@ -1418,6 +1421,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$field_options = array_key_exists( 'options', $args ) ? $args ['options'] : array();
 			$disabled      = array_key_exists( 'disabled', $field_options ) ? true === $field_options ['disabled'] : false;
+			$readonly      = array_key_exists( 'readonly', $field_options ) ? true === $field_options ['readonly'] : false;
 			$range_min     = array_key_exists( 'min', $field_options ) ? $field_options['min'] : 0;
 			$range_max     = array_key_exists( 'max', $field_options ) ? $field_options['max'] : 100;
 			$range_step    = array_key_exists( 'step', $field_options ) ? $field_options['step'] : 1;
@@ -1439,6 +1443,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$style ? $attrs[] = "style=\"$style\"" : null;
 
 			$disabled ? $attrs[] = 'disabled' : null;
+			$readonly ? $attrs[] = 'readonly' : null;
 
 			\is_int( $range_min ) ? $attrs[]  = "min=\"$range_min\"" : null;
 			\is_int( $range_max ) ? $attrs[]  = "max=\"$range_max\"" : null;
@@ -1627,6 +1632,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$field_options = array_key_exists( 'options', $args ) ? $args ['options'] : array();
 			$autofocus     = array_key_exists( 'autofocus', $field_options ) ? true === $field_options ['autofocus'] : false;
 			$disabled      = array_key_exists( 'disabled', $field_options ) ? true === $field_options ['disabled'] : false;
+			$readonly      = array_key_exists( 'readonly', $field_options ) ? true === $field_options ['readonly'] : false;
 			$required      = array_key_exists( 'required', $field_options ) ? true === $field_options ['required'] : false;
 
 			$args ['value'] = $this->get_form_field_option_value( $fn, $args );
@@ -1649,6 +1655,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$autofocus ? $attrs[] = 'autofocus' : null;
 			$disabled ? $attrs[]  = 'disabled' : null;
+			$readonly ? $attrs[]  = 'readonly' : null;
 			$required ? $attrs[]  = 'required' : null;
 
 			$attrs = trim( implode( ' ', $attrs ) );
@@ -1679,6 +1686,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$field_options = array_key_exists( 'options', $args ) ? $args ['options'] : array();
 			$autofocus     = array_key_exists( 'autofocus', $field_options ) ? true === $field_options ['autofocus'] : false;
 			$disabled      = array_key_exists( 'disabled', $field_options ) ? true === $field_options ['disabled'] : false;
+			$readonly      = array_key_exists( 'readonly', $field_options ) ? true === $field_options ['readonly'] : false;
 			$required      = array_key_exists( 'required', $field_options ) ? true === $field_options ['required'] : false;
 			$multiple      = array_key_exists( 'multiple', $field_options ) ? true === $field_options ['multiple'] : false;
 			$accept        = array_key_exists( 'accept', $field_options ) ? $accept = ( is_string( $field_options ['accept'] ) ? $field_options ['accept'] : '' ) : '';
@@ -1709,6 +1717,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$autofocus ? $attrs[] = 'autofocus' : null;
 			$disabled ? $attrs[]  = 'disabled' : null;
+			$readonly ? $attrs[]  = 'readonly' : null;
 			$required ? $attrs[]  = 'required' : null;
 			$multiple ? $attrs[]  = 'multiple' : null;
 			$accept ? $attrs[]    = "accept=\"$accept\"" : null;
@@ -1741,6 +1750,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$field_options = array_key_exists( 'options', $args ) ? $args ['options'] : array();
 			$autofocus     = array_key_exists( 'autofocus', $field_options ) ? true === $field_options ['autofocus'] : false;
 			$disabled      = array_key_exists( 'disabled', $field_options ) ? true === $field_options ['disabled'] : false;
+			$readonly      = array_key_exists( 'readonly', $field_options ) ? true === $field_options ['readonly'] : false;
 			$required      = array_key_exists( 'required', $field_options ) ? true === $field_options ['required'] : false;
 			$multiple      = array_key_exists( 'multiple', $field_options ) ? true === $field_options ['multiple'] : false;
 
@@ -1845,6 +1855,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$autofocus ? $attrs[] = 'autofocus' : null;
 			$disabled ? $attrs[]  = 'disabled' : null;
+			$readonly ? $attrs[]  = 'readonly' : null;
 			$required ? $attrs[]  = 'required' : null;
 			$multiple ? $attrs[]  = 'multiple' : null;
 
@@ -1902,6 +1913,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			'id'    => 'submit',
 			'name'  => 'submit',
 			'type'  => 'submit',
+			'title' => 'Save All Changes in All Tabs And Sections.',
 			'value' => 'Save Changes',
 		) ) {
 
@@ -1912,6 +1924,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$field_options = array_key_exists( 'options', $args ) ? $args ['options'] : array();
 			$disabled      = array_key_exists( 'disabled', $field_options ) ? true === $field_options ['disabled'] : false;
+			$readonly      = array_key_exists( 'readonly', $field_options ) ? true === $field_options ['readonly'] : false;
 
 			$args ['value'] = isset( $args ['value'] ) && is_string( $args ['value'] ) ? $args ['value'] : 'Save Changes';
 
@@ -1929,6 +1942,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$class ? $attrs[]    = "class=\"$class\"" : null;
 			$style ? $attrs[]    = "style=\"$style\"" : null;
 			$disabled ? $attrs[] = 'disabled' : null;
+			$readonly ? $attrs[] = 'readonly' : null;
 
 			$attrs = trim( implode( ' ', $attrs ) );
 			$attrs = '' === $attrs ? '' : ' ' . $attrs;
@@ -3301,7 +3315,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @param array $args - get_post( $args ).
 		 */
 		public function get_select_pages( $args = null ) {
-			$pids    = array();
+			$pageids = array();
 			$default = array(
 				'numberposts' => 100,
 				'post_type'   => 'page',
@@ -3315,9 +3329,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			}
 			$pages = get_posts( $args );
 			foreach ( $pages as $page ) {
-				$pids [ $page->ID ] = $page->post_title;
+				$pageids [ $page->ID ] = $page->post_title;
 			}
-			return $pids;
+			return $pageids;
 		}
 
 		/** Return posts for <select/option>.
@@ -3326,7 +3340,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @param array $args - get_post( $args ).
 		 */
 		public function get_select_posts( $args = null ) {
-			$pids    = array();
+			$pageids = array();
 			$default = array(
 				'numberposts' => 100,
 				'post_type'   => 'post',
@@ -3340,9 +3354,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			}
 			$posts = get_posts( $args );
 			foreach ( $posts as $post ) {
-				$pids [ $post->ID ] = $post->post_title;
+				$pageids [ $post->ID ] = $post->post_title;
 			}
-			return $pids;
+			return $pageids;
 		}
 
 		/** Return attachment image post types for <select/option>.
@@ -3351,30 +3365,30 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @param array $args - get_post( $args ).
 		 */
 		public function get_select_images( $args = null ) {
-			$pids  = array();
-			$mimes = array();
+			$pageids    = array();
+			$mime_types = array();
 			foreach ( get_allowed_mime_types() as $mime ) {
 				if ( Lib::starts_with( $mime, 'image/' ) ) {
-					$mimes [] = $mime;
+					$mime_types [] = $mime;
 				}
 			}
 			$default = array(
 				'numberposts'    => 100,
 				'post_type'      => 'attachment',
-				'post_mime_type' => $mimes,
+				'post_mime_type' => $mime_types,
 			);
 			if ( ! is_array( $args ) ) {
 				$args = $default;
 			} else {
 				$args ['post_type']      = 'attachment';
-				$args ['post_mime_type'] = $mimes;
+				$args ['post_mime_type'] = $mime_types;
 				$args                    = array_merge( $default, $args );
 			}
 			$posts = get_posts( $args );
 			foreach ( $posts as $post ) {
-				$pids [ $post->ID ] = $post->post_title;
+				$pageids [ $post->ID ] = $post->post_title;
 			}
-			return $pids;
+			return $pageids;
 		}
 
 		/** Return all custom post types for <select/option>.*/

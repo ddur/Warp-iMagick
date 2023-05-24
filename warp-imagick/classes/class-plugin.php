@@ -68,6 +68,13 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 		 */
 		private $my_generate_meta = false;
 
+		/** Internal Updating Intermediate Metadata.
+		 *
+		 * @var bool $my_updating_meta flag.
+		 */
+		private $my_updating_meta = false;
+
+
 		/** Current metadata state of the attachment image.
 		 * Possible states:
 		 * "" (default, unset)
@@ -265,6 +272,29 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 			return $args;
 		}
 
+		/**
+		 * In case Performance Lab webp-uploads module is active.
+		 * Remove all transforms or return invalid transforms
+		 */
+		public function on_webp_uploads_upload_image_mime_transforms_99_filter() {
+			return array();
+		}
+
+		/**
+		 * In case Performance Lab webp-uploads module changed code handling of above filter.
+		 */
+		public function on_webp_uploads_pre_generate_additional_image_source_99_filter() {
+			$msg = __( 'Transforming mime-types is not allowed.', 'warp-imagick' );
+			return new \WP_Error( 'warp-imagick ', $msg );
+		}
+
+		/**
+		 * In case Performance Lab webp-uploads module changed code handling of above filter(s).
+		 */
+		public function on_webp_uploads_content_image_mimes_99_filter() {
+			return array();
+		}
+
 		/** WP5.3+ Get wp_create_image_subsizes ( args ) & backup attachment metadata.
 		 * Just before attachment metadata is cleared/destroyed.
 		 *
@@ -276,40 +306,80 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 		 * @param array $metadata      Array of updated attachment meta data.
 		 * @param int   $attachment_id Attachment post ID (optional).
 		 */
-		public function catch_clear_attachment_metadata( $metadata, $attachment_id = 0 ) {
+		public function save_attachment_metadata_backup( $metadata, $attachment_id = 0 ) {
 
-			if ( 0 !== $this->my_gen_attach_id ) {
+			if ( $this->my_updating_meta ) {
+
 				return $metadata;
 			}
 
-			if ( self::is_valid_metadata( $metadata ) && is_array( $metadata['sizes'] ) && 0 === count( $metadata['sizes'] ) ) {
+			if ( 0 === $attachment_id ) {
 
-				// phpcs:ignore
-				$stack = debug_backtrace( false ); 
-				foreach ( $stack as $trace ) {
+				Lib::debug( 'No $attachment_id arg provided.' );
+				return $metadata;
+			}
 
-					if ( 'wp_create_image_subsizes' === $trace ['function'] ) {
+			if ( ! self::is_valid_metadata( $metadata ) ) {
+				Lib::debug( 'Invalid $metadata - $attachment_id: ' . $attachment_id );
+				return $metadata;
+			}
 
-						$trace_args          = $trace ['args'];
-						$trace_arg_attach_id = empty( $trace_args[1] ) ? 0 : $trace_args[1];
-						$trace_arg_file_path = empty( $trace_args[0] ) ? '' : $trace_args[0];
+			if ( ! is_string( $metadata['file'] )
+			|| empty( $metadata['file'] ) ) {
+				Lib::debug( 'Invalid $metadata[file] - $attachment_id: ' . $attachment_id );
+				return $metadata;
+			}
 
-						if ( intval( $attachment_id ) === intval( $trace_arg_attach_id ) ) {
+			// phpcs:ignore
+			$trace_stack = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 10 );
+			$calls_stack = array();
 
-							$this->my_gen_attach_id = (int) $trace_arg_attach_id;
-							$this->my_gen_file_path = $trace_arg_file_path;
-
-							$this->store_attachment_metadata( $attachment_id );
-
-							if ( ! Lib::is_wp_cli() ) {
-								\remove_action( 'wp_update_attachment_metadata', array( $this, 'catch_clear_attachment_metadata' ), $priority = 0 );
-							}
-						}
-
-						break;
-					}
+			foreach ( array_reverse( $trace_stack ) as $item ) {
+				if ( isset( $item ['function'] ) ) {
+					$calls_stack[] = $item ['function'];
 				}
 			}
+
+			$trace_stack = array();
+
+			$scope = in_array( 'wp_create_image_subsizes', $calls_stack, true );
+
+			if ( true === $scope ) {
+				Lib::debug( 'Metadata update within "wp_create_image_subsizes" scope - $attachment_id: ' . $attachment_id );
+			} else {
+				Lib::debug( 'Metadata update out of "wp_create_image_subsizes" scope - $attachment_id: ' . $attachment_id );
+			}
+
+			Lib::debug_var( $calls_stack, 'Calls:' );
+			Lib::debug_var( $metadata, '$metadata:' );
+
+			if ( true !== $scope ) {
+				return $metadata;
+			}
+
+			if ( $this->my_gen_attach_id !== $attachment_id ) {
+
+				Lib::debug( "Attachment ($attachment_id) metadata change detected" );
+
+				$this->my_gen_attach_id = $attachment_id;
+				$this->my_gen_file_path = $this->get_absolute_upload_file_path( $metadata['file'] );
+
+				$this->my_save_metadata = array();
+
+				$old_metadata = get_post_meta( $attachment_id, '_wp_attachment_metadata', $single = true );
+
+				if ( isset( $old_metadata['sizes'] ) && count( $old_metadata['sizes'] ) ) {
+					Lib::debug( 'Save metadata backup - $attachment_id: ' . $attachment_id );
+					$this->store_attachment_metadata( $attachment_id );
+				} else {
+
+					Lib::debug( 'Skip metadata backup [empty-sizes] - $attachment_id: ' . $attachment_id );
+				}
+			} else {
+
+				Lib::debug( 'Skip metadata backup [no-overwrite] - $attachment_id: ' . $attachment_id );
+			}
+
 			return $metadata;
 		}
 
@@ -404,6 +474,8 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 
 			$this->plugin_upgrade_handler();
 			$this->plugin_upgrade_checker();
+			$this->convert_webp_on_demand();
+			$this->disable_perflab_upload();
 
 			/** Check if plugin activation requirements failed?
 			 *
@@ -420,7 +492,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 
 			\add_action(
 				'wp_update_attachment_metadata',
-				array( $this, 'catch_clear_attachment_metadata' ),
+				array( $this, 'save_attachment_metadata_backup' ),
 				$priority      = 0,
 				$accepted_args = 2
 			);
@@ -549,24 +621,39 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 		 */
 		public function on_wp_image_editors_99_filter( $editors ) {
 
-			if ( ! $this->get_current_user_can( 'upload_files' )
-			&& ! Lib::is_wp_cli() ) {
-				return $editors;
-			}
-
 			require_once __DIR__ . '/class-warp-image-editor-imagick.php';
 
 			/** If default/original WordPress editors (classes) are missing,
-			 * restore WP original classes as the first values in the array.*/
+			 * restore WP original classes as the last values in the array.
+			 *
+			 * Modified Since 1.10.2
+			 * DONE: Performance Lab renames WP editors, so add WP classes at the end!
+			 */
 			$wp_editors = array( 'WP_Image_Editor_Imagick', 'WP_Image_Editor_GD' );
 			foreach ( array_reverse( $wp_editors ) as $wp_editor ) {
 				if ( ! in_array( $wp_editor, $editors, true ) ) {
-					$editors = array_merge( array( $wp_editor ), $editors );
+					$editors = array_merge( $editors, array( $wp_editor ) );
 				}
 			}
 
-			/** Prepend Warp_Image_Editor_Imagick as first/default priority editor. */
-			$editors = array_merge( array( 'Warp_Image_Editor_Imagick' ), $editors );
+			if ( 'Warp_Image_Editor_Imagick' !== reset( $editors ) ) {
+
+				if ( in_array( 'Warp_Image_Editor_Imagick', $editors, true ) ) {
+
+					$filtered = array();
+					foreach ( $editors as $editor ) {
+						if ( 'Warp_Image_Editor_Imagick' === $editor ) {
+							continue;
+						}
+						$filtered[] = $editor;
+					}
+					$editors = $filtered;
+				}
+
+				/** Prepend Warp_Image_Editor_Imagick as first/default priority editor. */
+				$editors = array_merge( array( 'Warp_Image_Editor_Imagick' ), $editors );
+
+			}
 
 			return $editors;
 		}
@@ -588,57 +675,81 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 				return $sizes;
 			}
 
-			$this->my_metadata_done = false;
-			$this->my_generate_meta = false;
+			if ( ! is_array( $sizes ) ) {
+				/**
+				 * Not an error because this may be a valid filter call.
+				 * See: wp-admin/includes/ajax-actions.php:3901!
+				 */
+				Lib::debug( '$sizes is not an array.' );
+
+				return $sizes;
+			}
+
+			if ( ! is_array( $metadata ) ) {
+				/**
+				 * Not an error because this may be a valid filter call.
+				 * See: wp-admin/includes/ajax-actions.php:3901!
+				 */
+				Lib::debug( '$metadata is not an array.' );
+				return $sizes;
+			}
 
 			if ( false === $attachment_id ) {
-				/** Required parameter $attachment_id is misssing or has false value.
+				/** Required parameter $attachment_id is omitted (or has false value).
 				 *
 				 * ATTN: This filter is called directly, out of WordPress context,
 				 * from WP-CLI media regenerate private function get_intermediate_sizes( $is_pdf, $metadata ),
 				 * without here required @param $attachment_id, which hopefully wont be changed soon or ever,
 				 * because WP-CLI media regenerate should work with WordPress versions less than 5.3.
 				 */
-				if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
+				Lib::debug( 'Argument $attachment_id === false' );
+				return $sizes;
+			}
 
-					Lib::error( '$attachment_id === false' );
+			if ( ! is_int( $attachment_id ) || 0 >= $attachment_id ) {
+				/** Required parameter $attachment_id is not an integer with value greater than 0 (zero). */
+				Lib::debug( 'Argument $attachment_id has invalid type or value' );
+				return $sizes;
+			}
+
+			/** Check wp_create_image_subsizes( _, $attachment_id ) argument
+			 * is equal to previously caught $this->my_gen_attach_id.
+			 *
+			 * WP-CLI 2.7.1 (> 2.5.0) media regenerate
+			 * may call this filter twice. Once with previous attachment ID,
+			 * just before calling wp_create_image_subsizes with next attachment ID.
+			 */
+			if ( $this->my_gen_attach_id !== $attachment_id ) {
+				if ( Lib::is_wp_cli() ) {
+					Lib::debug( 'WP CLI (media regenerate?)' );
 				}
-				return $sizes;
-			}
-
-			if ( ! is_array( $sizes ) ) {
-
-				return $sizes;
-			}
-
-			if ( ! is_array( $metadata ) ) {
-
+				Lib::debug( 'Calling "intermediate_image_sizes_advanced" outside of function scope: wp_create_image_subsizes( _, $attachment_id ) is ' . $attachment_id . ', expected: ' . $this->my_gen_attach_id . ' !' );
 				return $sizes;
 			}
 
 			if ( ! array_key_exists( 'file', $metadata ) ) {
-				Lib::error( 'Image [file] is missing from $metadata.' );
+				Lib::debug( 'Image [file] is missing from $metadata.' );
 				return $sizes;
 			}
 
 			if ( ! array_key_exists( 'width', $metadata ) ) {
-				Lib::error( 'Image [width] is missing from $metadata.' );
+				Lib::debug( 'Image [width] is missing from $metadata.' );
 				return $sizes;
 			}
 
 			if ( ! array_key_exists( 'height', $metadata ) ) {
-				Lib::error( 'Image [height] is missing from $metadata.' );
+				Lib::debug( 'Image [height] is missing from $metadata.' );
 				return $sizes;
 			}
 
 			if ( ! array_key_exists( 'sizes', $metadata ) || ! is_array( $metadata['sizes'] ) ) {
-				Lib::error( 'Image [sizes] is missing from $metadata.' );
+				Lib::debug( 'Image [sizes] is missing from $metadata.' );
 				return $sizes;
 			}
 
 			$new_file_path = $this->get_absolute_upload_file_path( $metadata['file'] );
 			if ( ! file_exists( $new_file_path ) ) {
-				Lib::error( 'File ' . $metadata['file'] . ' not found in upload directory.' );
+				Lib::debug( 'File ' . $metadata['file'] . ' not found in upload directory.' );
 				return $sizes;
 			}
 
@@ -654,37 +765,28 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 			switch ( $this->my_gen_file_path ) {
 				case $new_file_path:
 				case $new_orig_path:
+					Lib::debug( 'Regenerate wp_create_image_subsizes( $file, _ ) does match [file] or [original_image]' );
 					break;
 				default:
-					Lib::error( 'Regenerate wp_create_image_subsizes( $file, _ ) doesn\'t match [file] or [original_image]' );
-					Lib::debug_var( $this->my_gen_file_path, '$this->my_gen_file_path' );
-					Lib::debug_var( $new_file_path, '$new_file_path' );
-					Lib::debug_var( $new_orig_path, '$new_orig_path' );
-					return $sizes;
-			}
+					Lib::debug( 'Regenerate wp_create_image_subsizes( $file, _ ) doesn\'t match [file] or [original_image]' );
 
-			/** Check wp_create_image_subsizes( _, $attachment_id ) argument
-			 * is equal to this hook $attachment_id argument.
-			 */
-			if ( $this->my_gen_attach_id !== $attachment_id ) {
-				Lib::error( 'Regenerate wp_create_image_subsizes( _, $attachment_id ) argument mismatch!' );
-				return $sizes;
+					return $sizes;
 			}
 
 			$attachment = get_post( $attachment_id );
 			if ( ! is_a( $attachment, '\\WP_Post' ) ) {
-				Lib::error( 'Invalid attachment ID (can\'t get WP_Post).' );
+				Lib::debug( 'Invalid attachment ID (can\'t get WP_Post).' );
 				return $sizes;
 			}
 
 			if ( 'attachment' !== $attachment->post_type ) {
-				Lib::error( 'Invalid attached post-type (not an \'attachment\' but \'' . $attachment->post_type . '\').' );
+				Lib::debug( 'Invalid attached post-type (not an \'attachment\' but \'' . $attachment->post_type . '\').' );
 				return $sizes;
 			}
 
 			$post_mime_type = $attachment->post_mime_type;
 			if ( empty( $post_mime_type ) || 0 !== strpos( $post_mime_type, 'image/' ) ) {
-				Lib::error( 'Post mime-type is not an image type but :' . $post_mime_type . '.' );
+				Lib::debug( 'Attachment mime-type is not image mime-type: ' . $post_mime_type . '.' );
 				return $sizes;
 			}
 
@@ -702,8 +804,14 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 					$this->my_mime_type = $image_mime_type;
 					break;
 				default:
+					Lib::debug( 'Post mime-type is not equal to JPEG or PNG image type:' . $post_mime_type . '.' );
 					return $sizes;
 			}
+
+			$this->my_metadata_done = false;
+			$this->my_generate_meta = false;
+
+			Lib::debug_var( $sizes, 'argument $sizes' );
 
 			$this->my_image_state = '';
 
@@ -712,6 +820,9 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 			$backup_sizes = Lib::safe_key_value( $this->my_save_metadata, '_wp_attachment_backup_sizes', array(), false );
 
 			$is_regenerate = false !== $old_metadata;
+			if ( Lib::is_debug() && $is_regenerate === $this->my_is_upload ) {
+				Lib::debug( "is_regenerate: $is_regenerate, is_upload: $this->my_is_upload." );
+			}
 
 			$old_file_name = false;
 			$old_file_path = false;
@@ -797,6 +908,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 				if ( ! $is_regenerate ) {
 
 					$warp_original = wp_basename( $this->my_gen_file_path );
+					Lib::debug( 'Warp original image path found on new or upload attachment: ' . $warp_original );
 
 				} elseif ( 'edited' === $this->my_image_state ) {
 
@@ -952,7 +1064,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 							$this->my_image_state = 'lossless';
 							break;
 						default:
-							Lib::error( 'Unexpected mime-type: ' . $this->my_mime_type );
+							Lib::debug( 'Unexpected mime-type: ' . $this->my_mime_type );
 							return $sizes;
 					}
 				}
@@ -1020,10 +1132,14 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 
 					$source = $this->get_absolute_upload_file_path( $metadata['file'] );
 
-					/** Larger images may exhaust Imagick resources and hang response until timeout */
+					/**
+					 * For larger images create WebP clone and skip compression.
+					 * Because compressing larger images may exhaust Imagick
+					 * resources and hang response until timeout.
+					 */
 					if ( 2500 < $metadata['width'] || 2500 < $metadata['height'] ) {
+						Lib::debug( 'Rotated image can\'t fit within 2500x2500 pixels (' . $metadata['file'] . '.' );
 						$this->webp_clone_image( $source, $this->my_mime_type );
-
 						break;
 					}
 
@@ -1085,11 +1201,14 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 						break;
 					}
 
-					/** Larger images, when compressed in code below, may exhaust Imagick resources and hang response until timeout */
+					/**
+					 * For larger images create WebP clone and skip compression.
+					 * Because compressing larger images may exhaust Imagick
+					 * resources and hang response until timeout.
+					 */
 					if ( 2500 < $metadata['width'] || 2500 < $metadata['height'] ) {
-
+						Lib::debug( 'Source image can\'t fit within 2500x2500 pixels (' . $metadata['file'] . '.' );
 						$this->webp_clone_image( $source, $this->my_mime_type );
-
 						break;
 					}
 
@@ -1118,7 +1237,9 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 
 						if ( filesize( $saved['path'] ) > filesize( $source ) ) {
 
+							Lib::debug( 'Attached file-size > Original file-size ( ' . filesize( $saved['path'] ) . ' > ' . filesize( $source ) . '): ' . _wp_relative_upload_path( $source ) );
 							Shared::copy_file( $source, $saved['path'], $overwrite = true );
+							Lib::debug( 'Attached file is overwritten with Original file.' );
 						}
 						$this->webp_clone_image( $saved['path'], $this->my_mime_type );
 
@@ -1150,7 +1271,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 
 			$new_file_path = $this->get_absolute_upload_file_path( $metadata['file'] );
 			if ( ! file_exists( $new_file_path ) ) {
-				Lib::error( 'File ' . $metadata['file'] . ' not found in upload directory.' );
+				Lib::error( 'File ' . $metadata['file'] . ' is not found in upload directory.' );
 				return $sizes;
 			}
 
@@ -1203,7 +1324,11 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 
 				if ( empty( $metadata['original_image'] )
 				|| $metadata['original_image'] !== $warp_original ) {
-
+					Lib::debug(
+						'Updating [original_image] from '
+						. ( empty( $metadata['original_image'] ) ? 'empty' : $metadata['original_image'] )
+						. ' to ' . $warp_original
+					);
 					$metadata['original_image'] = $warp_original;
 				}
 			}
@@ -1219,7 +1344,10 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 			}
 
 			$metadata['sizes'] = array();
+
+			$this->my_updating_meta = true;
 			\wp_update_attachment_metadata( $attachment_id, $metadata );
+			$this->my_updating_meta = false;
 			$this->my_metadata_done = $metadata;
 
 			if ( ! empty( $sizes ) ) {
@@ -1238,37 +1366,53 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 						}
 					}
 
-					if ( \method_exists( $editor, 'multi_resize' ) ) {
+					if ( \method_exists( $editor, 'make_subsize' ) ) {
 
-						/** Clean, one-time update of metadata. Anyways, in case of fatal error or timeout,
-						 * function wp_update_image_subsizes() won't be able to use right source ("edited").
-						 * For each size, execution time is extended to prevent timeout. See class.
-						 */
-						$metadata['sizes'] = $editor->multi_resize( $sizes );
-
-						\wp_update_attachment_metadata( $attachment_id, $metadata );
-
-						$this->my_metadata_done = $metadata;
-
-					} elseif ( \method_exists( $editor, 'make_subsize' ) ) {
+						Lib::debug_var( $sizes, 'Sizes to create' );
+						Lib::debug( 'Method: $editor->make_subsize' );
 
 						foreach ( $sizes as $new_size_name => $new_size_data ) {
 							$new_size_meta = $editor->make_subsize( $new_size_data );
 
 							if ( is_wp_error( $new_size_meta ) ) {
+								Lib::debug_var( $new_size_data, 'Size request' );
+								Lib::debug_var( $new_size_meta, 'Size failure' );
 								continue;
 							} else {
 
 								$metadata['sizes'][ $new_size_name ] = $new_size_meta;
 
+								$this->my_updating_meta = true;
 								\wp_update_attachment_metadata( $attachment_id, $metadata );
+								$this->my_updating_meta = false;
 
 								$this->my_metadata_done = $metadata;
 							}
 						}
+						$sizes_generated = $metadata['sizes'];
+						Lib::debug_var( $sizes_generated, 'Sizes generated' );
+					} elseif ( \method_exists( $editor, 'multi_resize' ) ) {
+
+						/** Clean, one-time update of metadata. Anyways, in case of fatal error or timeout,
+						 * function wp_update_image_subsizes() won't be able to use right source ("edited").
+						 * For each size, execution time is extended to prevent timeout. See class.
+						 */
+
+						Lib::debug_var( $sizes, 'Sizes to create' );
+						Lib::debug( 'Method: $editor->multi_resize' );
+						$metadata['sizes'] = $editor->multi_resize( $sizes );
+						$sizes_generated   = $metadata['sizes'];
+						Lib::debug_var( $sizes_generated, 'Sizes generated' );
+
+						$this->my_updating_meta = true;
+						\wp_update_attachment_metadata( $attachment_id, $metadata );
+						$this->my_updating_meta = false;
+
+						$this->my_metadata_done = $metadata;
+
 					} else {
 
-						Lib::error( 'No known subsize/resize methods found in $editor.' );
+						Lib::error( 'Methods multi_resize/make_subsize not found in $editor (' . get_class( $editor ) . ')' );
 					}
 				}
 
@@ -1309,10 +1453,15 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 		 * intermediate_image_sizes_advanced and wp_generate_attachment_metadata hooks
 		 * Late priority (+99) will allow other hookoverwrite RT plugin returned sizes.
 		 *
-		 * @param array $metadata - attachment meta data.
-		 * @param int   $attachment_id - number.
+		 * @param array  $metadata - attachment meta data.
+		 * @param int    $attachment_id - number.
+		 * @param string $context - caller context.
 		 */
-		public function on_wp_generate_attachment_metadata_99_filter( $metadata, $attachment_id = false ) {
+		public function on_wp_generate_attachment_metadata_99_filter( $metadata, $attachment_id = false, $context = false ) {
+
+			if ( 'create' !== $context ) {
+				return $metadata;
+			}
 
 			$this->my_generate_meta = false;
 
@@ -1346,6 +1495,12 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 
 			switch ( $mime_type ) {
 				case 'image/jpeg':
+					$delete_webp = Shared::append_suffix_to_file_name( $path, '-jpg' );
+					$delete_webp = Shared::replace_file_name_extension( $delete_webp, 'webp' );
+					if ( \file_exists( $delete_webp ) ) {
+						\unlink( $delete_webp );
+					}
+					/** Fall through */
 				case 'image/png':
 					$delete_webp = Shared::get_webp_file_name( $path );
 					if ( \file_exists( $delete_webp ) ) {
@@ -1364,6 +1519,10 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 		 * @param WP_Post $wp_post Post object.
 		 */
 		public function on_delete_attachment_action( $post_id, $wp_post ) {
+
+			if ( 'attachment' !== get_post_type( $wp_post ) ) {
+				return;
+			}
 
 			switch ( $wp_post->post_mime_type ) {
 				case 'image/jpeg':
@@ -1384,6 +1543,10 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 				function ( $deleted_post_id, $wp_post ) use ( $post_id, $metadata, $tracked ) {
 
 					if ( $deleted_post_id !== $post_id ) {
+						return;
+					}
+
+					if ( ! isset( $metadata['file'] ) ) {
 						return;
 					}
 
@@ -1490,7 +1653,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 				foreach ( $functions as $function ) {
 					if ( true !== function_exists( $function ) || true !== is_callable( $function ) ) {
 						$this->my_can_do_webp = false;
-
+						Lib::debug( 'php-gd can\'t generate webp.' );
 						break;
 					}
 				}
@@ -1540,11 +1703,13 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 			}
 
 			if ( false === $this->can_generate_webp_clones() ) {
+
 				return false;
 			}
 
 			if ( ! is_readable( $image_path ) ) {
 
+				Lib::debug( 'Image file is not readable: ' . _wp_relative_upload_path( $image_path ) );
 				return false;
 			}
 
@@ -1558,6 +1723,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 					break;
 
 				default:
+					Lib::debug( 'webp_clone_image: mime-type is not JPEG/PNG, but: ' . $mime_type );
 					return false;
 			}
 
@@ -1578,7 +1744,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 				case 'image/jpeg':
 					$gd_jpeg = \imagecreatefromjpeg( $image_path );
 					if ( false === $gd_jpeg ) {
-						Lib::error( 'Failed imagecreatefromjpeg: ' . _wp_relative_upload_path( $image_path ) );
+						Lib::debug( 'Failed imagecreatefromjpeg: ' . _wp_relative_upload_path( $image_path ) );
 						break;
 					}
 					if ( 0 === $this->get_option( 'webp-jpeg-compression-quality', Shared::webp_jpeg_quality_default() ) ) {
@@ -1699,17 +1865,17 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 			}
 
 			if ( $gd_jpeg ) {
-				Lib::debug( '$gd_jpeg is not released at: ' . _wp_relative_upload_path( $image_path ) );
+				Lib::debug( 'Var $gd_jpeg is not released at: ' . _wp_relative_upload_path( $image_path ) );
 				$gd_jpeg = false;
 			}
 
 			if ( $gd_png ) {
-				Lib::debug( '$gd_png is not released at: ' . _wp_relative_upload_path( $image_path ) );
+				Lib::debug( 'Var $gd_png is not released at: ' . _wp_relative_upload_path( $image_path ) );
 				$gd_png = false;
 			}
 
 			if ( $gd_truecolor ) {
-				Lib::debug( '$gd_truecolor is not released at: ' . _wp_relative_upload_path( $image_path ) );
+				Lib::debug( 'Var $gd_truecolor is not released at: ' . _wp_relative_upload_path( $image_path ) );
 				$gd_truecolor = false;
 			}
 
@@ -1934,6 +2100,104 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 			}
 
 			return true;
+		}
+
+		// phpcs:ignore
+	# endregion
+
+		// phpcs:ignore
+	# region Convert WebP on demand
+
+		/** Convert to WebP on demand */
+		private function convert_webp_on_demand() {
+
+			if ( false === $this->get_option( 'webp-cwebp-on-demand' ) ) {
+				return;
+			}
+
+			\add_rewrite_endpoint( 'cwebp-on-demand', EP_ROOT );
+			\add_action(
+				'wp',
+				function() {
+
+					if ( isset( $GLOBALS['wp_the_query']->query_vars['cwebp-on-demand'] ) ) {
+
+						\remove_all_actions( 'template_redirect' );
+						\add_action(
+							'template_redirect',
+							function() {
+								\remove_all_filters( 'template_include' );
+								\add_filter(
+									'template_include',
+									function( $template ) {
+
+										$cwebp_on_demand_template = $this->get_path() . '/templates/cwebp-on-demand-template.php';
+										if ( is_file( $cwebp_on_demand_template ) ) {
+											$template = $cwebp_on_demand_template;
+										} else {
+											Lib::error( 'Template file not found: ' . $cwebp_on_demand_template );
+										}
+										return $template;
+									}
+								);
+								return false;
+							}
+						);
+					}
+				}
+			);
+		}
+
+		// phpcs:ignore
+	# endregion
+
+		// phpcs:ignore
+	# region Disable Performance Lab WebP Upload Crap.
+
+		/** Disable Performance Lab WebP Upload Crap. */
+		private function disable_perflab_upload() {
+
+			\add_filter(
+				'pre_update_option',
+				function ( $value, $option ) {
+					switch ( $option ) {
+						case 'perflab_modules_settings':
+							if ( \is_array( $value ) ) {
+								if ( \array_key_exists( 'images/webp-uploads', $value ) ) {
+									if ( $value['images/webp-uploads']['enabled'] ) {
+										$value['images/webp-uploads']['enabled'] = 0;
+									}
+								}
+							}
+							break;
+
+						case 'perflab_generate_webp_and_jpeg':
+							if ( $value ) {
+								$value = 0;
+							}
+							break;
+					}
+
+					return $value;
+				},
+				99,
+				2
+			);
+
+			$perflab = \get_option( 'perflab_modules_settings', 'Not available' );
+			if ( \is_array( $perflab ) ) {
+				if ( \array_key_exists( 'images/webp-uploads', $perflab ) ) {
+					if ( $perflab['images/webp-uploads']['enabled'] ) {
+						$perflab['images/webp-uploads']['enabled'] = 0;
+					}
+					\update_option( 'perflab_modules_settings', $perflab );
+				}
+			}
+			$perflab = \get_option( 'perflab_generate_webp_and_jpeg' );
+			if ( $perflab ) {
+				\update_option( 'perflab_generate_webp_and_jpeg', 0 );
+			}
+
 		}
 
 		// phpcs:ignore

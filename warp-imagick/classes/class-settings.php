@@ -139,6 +139,8 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 			self::validate_checkbox_key( 'webp-images-create', $values );
 
+			self::validate_checkbox_key( 'webp-cwebp-on-demand', $values );
+
 			self::validate_checkbox_key( 'wp-big-image-size-threshold-disabled', $values );
 
 			self::validate_checkbox_key( 'wp-maybe-exif-rotate-disabled', $values );
@@ -297,6 +299,8 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 			$values ['extra-size-same-width']  = false;
 
 			$this->set_dynamic_menu_position( $values );
+
+			self::set_cwebp_on_demand( $values['webp-cwebp-on-demand'] );
 
 			delete_transient( $this->pageslug . '-update-notices' );
 
@@ -559,7 +563,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 				'admin_notices',
 				function() use ( $tested_wp_version, $actual_wp_version ) {
 					$this->plugin->echo_admin_notice(
-						sprintf( __( 'This plugin is tested up to WP %1$s (Now %2$s). Please update.' ), $tested_wp_version, $actual_wp_version ),
+						sprintf( __( 'This version of plugin is tested up to WP %1$s (Now %2$s). Please update.' ), $tested_wp_version, $actual_wp_version ),
 						'notice notice-warning is-dismissible',
 						true
 					);
@@ -838,7 +842,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 			}
 			update_option( $this->get_plugin()->get_option_id() . '-disabled', $fail, $autoload = true );
 
-			self::set_webp_on_demand();
+			self::set_cwebp_on_demand();
 			self::on_manage_plugin( 'activate-failure' );
 			\flush_rewrite_rules();
 		}
@@ -870,7 +874,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 				}
 			}
 
-			self::set_webp_on_demand();
+			self::set_cwebp_on_demand( $values['webp-cwebp-on-demand'] );
 			self::on_manage_plugin( 'activate-success' );
 			\flush_rewrite_rules();
 		}
@@ -889,7 +893,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 			self::clear_ui_state_user_settings( $this->pageslug );
 
-			self::set_webp_on_demand();
+			self::set_cwebp_on_demand();
 			self::on_manage_plugin( 'deactivate' );
 			\flush_rewrite_rules();
 		}
@@ -933,7 +937,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 				}
 			}
 
-			self::set_webp_on_demand();
+			self::set_cwebp_on_demand();
 			self::on_manage_plugin( 'uninstall' );
 			\flush_rewrite_rules();
 
@@ -1022,19 +1026,14 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 		}
 
-		/** Disable WebP On Demand server flag
-		 * Remove warp-imagick-cwebp.php redirect file-flag in home path.
-		 * Handles case of downgrading from 2.+ to 1.9.7 but same .htaccess
+		/** Enable or Disable WebP On Demand via server flag.
+		 * Set (insert/create or remove/delete/unlink) server redirect file-flag in home path.
 		 *
-		 * @param bool $set create (true) or delete (false).
+		 * @param bool $set Server File Flag: create (true) or unlink (!true/false/omit-arg).
 		 */
-		private static function set_webp_on_demand( $set = false ) {
+		private static function set_cwebp_on_demand( $set = false ) {
 
-			$cwebp_flag_file_path = get_home_path() . 'warp-imagick-cwebp.php';
-
-			if ( \file_exists( $cwebp_flag_file_path ) ) {
-				\unlink( $cwebp_flag_file_path );
-			}
+			/** CWEBP: Code is missing here. */
 
 		}
 

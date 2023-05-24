@@ -418,6 +418,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 		 */
 		public static function get_webp_file_name( $source_file_name ) {
 
+			if ( 'webp' === strtolower( pathinfo( $source_file_name, PATHINFO_EXTENSION ) ) ) {
+				return $source_file_name;
+			}
 			return self::append_file_name_extension( $source_file_name, 'webp' );
 		}
 
@@ -469,21 +472,52 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 
 		/** Get editor and make sure it is a warp-imagick editor.
 		 *
+		 * Modified Since Warp iMagick version 1.10.2
+		 * To require presence of 'compress_image' method.
+		 * Regardless of editor priority sequence.
+		 *
 		 * @param string $file name to edit.
 		 * @return object Warp editor or WP_error.
 		 */
 		public static function get_warp_editor( $file ) {
 
-			$editor = wp_get_image_editor( $file );
+			$editor = wp_get_image_editor(
+				$file,
+			);
 
 			if ( is_wp_error( $editor ) ) {
+				$msg = 'Selected editor: none/error';
+				Lib::debug( $msg );
 				return $editor;
 			}
 
 			if ( 'Warp_Image_Editor_Imagick' !== get_class( $editor ) ) {
-				$msg = 'Wrong editor class selected: ' . get_class( $editor );
-				Lib::error( $msg );
-				return new \WP_Error( 'warp-imagick', $msg );
+
+				$msg = 'Selected editor: ' . get_class( $editor );
+				Lib::debug( $msg );
+				$msg = 'Warp_Image_Editor_Imagick not selected for: ' . $file;
+				Lib::debug( $msg );
+
+				$editor = wp_get_image_editor(
+					$file,
+					array(
+						'methods' => array( 'compress_image' ),
+					)
+				);
+
+				if ( is_wp_error( $editor ) ) {
+					$msg = 'Warp_Image_Editor_Imagick & "compress_image" method not found for: ' . $file;
+					Lib::debug( $msg );
+					return $editor;
+				}
+
+				if ( 'Warp_Image_Editor_Imagick' !== get_class( $editor ) ) {
+					$msg = 'Warp_Image_Editor_Imagick & "compress_image" method not found for: ' . $file;
+					Lib::debug( $msg );
+					$msg = 'Selected editor: ' . get_class( $editor );
+					Lib::debug( $msg );
+					return new \WP_Error( 'warp-imagick', $msg );
+				}
 			}
 
 			return $editor;
@@ -512,7 +546,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 		 */
 		public static function copy_file( $arg_source_file_path, $arg_target_file_path, $arg_overwrite = false ) {
 			if ( ! is_readable( $arg_source_file_path ) ) {
-				Lib::error( 'Copy: Source check failed for: ' . $arg_source_file_path );
+				Lib::error( 'Copy: Source is not readable: ' . $arg_source_file_path );
 				return false;
 			}
 			if ( true === $arg_overwrite || ! file_exists( $arg_target_file_path ) ) {
@@ -521,9 +555,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 					if ( file_exists( $arg_target_file_path ) ) {
 						return $arg_target_file_path;
 					}
-					Lib::error( 'Copy: Target check failed for: ' . $arg_target_file_path );
+					Lib::error( 'Copy: Target is not created: ' . $arg_target_file_path );
 				} else {
-					Lib::error( 'Copy: Target write failed for: ' . $arg_target_file_path );
+					Lib::error( 'Copy: Target writing failed: ' . $arg_target_file_path );
 				}
 			}
 			return false;
@@ -535,9 +569,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 		// phpcs:ignore
 	# region Option/Settings defaults and ranges min/max values.
 
-		/** Get default jpeg quality (50). */
+		/** Get default jpeg quality (75). */
 		public static function jpeg_quality_default() {
-			return 60;
+			return 75;
 		}
 
 		/** Get minimal jpeg quality (30). */
@@ -587,17 +621,17 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 
 		/** Get jpeg sharpen image default. */
 		public static function jpeg_sharpen_image_value_default() {
-			return 5;
+			return 0;
 		}
 
 		/** Get jpeg sharpen image default. */
 		public static function jpeg_sharpen_thumbnails_value_default() {
-			return 10;
+			return 0;
 		}
 
 		/** Get png sharpen thumbnails default. */
 		public static function png_sharpen_thumbnails_value_default() {
-			return 10;
+			return 0;
 		}
 
 		/** Get png reduce colors enabled default (true). */
@@ -658,6 +692,19 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 		/** Get webp/jpeg quality default (0=jpeg value [1=webp value]). */
 		public static function webp_jpeg_quality_default() {
 			return 0;
+		}
+
+		/** Get webp convert images default (false). */
+		public static function webp_cwebp_on_demand_default() {
+			return false;
+		}
+
+		/** Get webp convert field type. */
+		public static function webp_cwebp_on_demand_type() {
+			if ( self::can_generate_webp_clones() ) {
+				return 'hidden';
+			}
+			return 'hidden';
 		}
 
 		/** Get default BIG Image Size disabled (true). */
@@ -978,7 +1025,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 		}
 
 		/** All Known & Defined Imagick Image Types */
-		public static function get_imagick_imgtypes() {
+		public static function get_imagick_img_types() {
 
 			$values = array();
 

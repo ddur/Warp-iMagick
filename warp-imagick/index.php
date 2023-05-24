@@ -15,7 +15,7 @@
  * Author:      ddur
  * Author URI:  https://github.com/ddur
  * License:     GPLv2
- * Version:     1.10.1
+ * Version:     1.10.2-beta
  * Text Domain: warp-imagick
  * Domain Path: /languages
  *

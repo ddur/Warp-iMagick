@@ -27,7 +27,7 @@ return array(
 		'requires' => array(
 
 			'wp'         => '5.3',
-			'php'        => '5.6',
+			'php'        => '7.2',
 
 			'extensions' => array(
 				'imagick' => 'PHP Imagick',
@@ -105,22 +105,21 @@ Copy code snippet (below) and paste it into your editor, at the top of /.htacces
 	AddType image/webp .webp
 &lt;/IfModule&gt;
 &lt;ifModule mod_rewrite.c&gt;
-RewriteEngine On
-RewriteBase /
+	RewriteEngine On
+	RewriteBase /
 
-# Request for jpg/png file: WebP file does exists.
-# Transparently serve existing WebP.
-RewriteCond %{HTTP_ACCEPT} image/webp
-RewriteCond %{REQUEST_URI} (?i)(.*)\.(jpe?g|png)$
-RewriteCond %{DOCUMENT_ROOT}%1\.%2.webp -f
-RewriteRule (?i)(.*)\.(jpe?g|png)$ %1\.%2\.webp [T=image/webp,E=webp:1,L]
+	# Request for JPEG/PNG file.
+	# Transparently serve existing WebP.
+	RewriteCond %{HTTP_ACCEPT} image/webp
+	RewriteCond %{REQUEST_URI} ^(.+)\.(?i)(JPE?G|PNG)$
+	RewriteCond %{DOCUMENT_ROOT}%1\.%2.webp -f
+	RewriteRule .+ %1\.%2\.webp [T=image/webp,E=webp:1,L]
 
 	&lt;IfModule mod_headers.c&gt
 		Header append Vary Accept env=REDIRECT_webp
-		Header append X-Powered-By https://warp-imagick.pagespeed.club/
 	&lt;/IfModule&gt
-&lt;/IfModule&gt;
 
+&lt;/IfModule&gt;
 # END Warp-iMagick
 
 </code>
@@ -232,7 +231,7 @@ you may disable warning notice by setting checkbox to "on".</p>
 					'label'   => __( 'Compression Quality', 'warp-imagick' ) . ' (' . Shared::jpeg_quality_default() . '%*)',
 					'type'    => 'range',
 					'style'   => 'width:200px',
-					'title'   => __( 'Compression Quality in percentage. WordPress Default is 82%.', 'warp-imagick' ),
+					'title'   => __( 'Compression Quality in percentage. WordPress Default is 82%. For large or high details (difficult to compress) images or low quality and sharper JPEG settings, compression may result in smaller JPEG file size thumbnails than cloned WebP thumbnails.', 'warp-imagick' ),
 					'default' => Shared::jpeg_quality_default(),
 					'options' => array(
 						'min'   => Shared::jpeg_quality_value_min(),
@@ -242,11 +241,11 @@ you may disable warning notice by setting checkbox to "on".</p>
 				),
 
 				'jpeg-sharpen-image'       => array(
-					'label'   => __( 'Sharpen JPEG Full Size Image', 'warp-imagick' ),
+					'label'   => __( 'Sharpen Full Size Thumbnail', 'warp-imagick' ),
 					'type'    => 'select',
 					'style'   => 'width:200px',
 					'default' => Shared::jpeg_sharpen_image_value_default(),
-					'title'   => __( 'Sharpen Image over WP Default sharpening. Select WP Default (unsharpMaskImage) or WP Default + SharpenImage( 0, $sigma ). Sharper image will produce larger file size. Small sigma or none recommended for full size. Default value is "WP Default" (no extra sharpening).', 'warp-imagick' ),
+					'title'   => __( 'Sharpen Image after WP Default "bluring". Select WP Default (unsharpMaskImage) or WP Default + SharpenImage( 0, $sigma ). Sharper image will be larger than WP default file size and and WebP clone on smallest thumbnails may be larger than JPEG image. WP default or small sigma recommended for full size. Default value is ' . ( 0 === Shared::jpeg_sharpen_image_value_default() ? 'WP Default' : Shared::jpeg_sharpen_image_value_default() / 10 ) . '.', 'warp-imagick' ),
 					'options' => array(
 						'source'   => 'callback',
 						'callback' => 'get_form_sharpen_image',
@@ -254,11 +253,11 @@ you may disable warning notice by setting checkbox to "on".</p>
 				),
 
 				'jpeg-sharpen-thumbnails'  => array(
-					'label'   => __( 'Sharpen JPEG Thumbnails', 'warp-imagick' ),
+					'label'   => __( 'Sharpen Other Thumbnails', 'warp-imagick' ),
 					'type'    => 'select',
 					'style'   => 'width:200px',
 					'default' => Shared::jpeg_sharpen_thumbnails_value_default(),
-					'title'   => __( 'Sharpen Thumbnails over WP Default sharpening. Select WP Default (unsharpMaskImage) or WP Default + SharpenImage( 0, $sigma ). Sharper image will produce larger file size. Test to find your optimal $sigma or disable. Default value is "WP Default" (no extra sharpening).', 'warp-imagick' ),
+					'title'   => __( 'Sharpen Thumbnails after WP Default "bluring". Select WP Default (unsharpMaskImage) or WP Default + SharpenImage( 0, $sigma ). Sharper image will be larger than WP default file size and WebP clone on smallest thumbnails may be larger than JPEG image. Test to find your optimal $sigma or disable. Default value is ' . ( 0 === Shared::jpeg_sharpen_thumbnails_value_default() ? 'WP Default' : Shared::jpeg_sharpen_thumbnails_value_default() / 10 ) . '.', 'warp-imagick' ),
 					'options' => array(
 						'source'   => 'callback',
 						'callback' => 'get_form_sharpen_thumbnails',
@@ -389,7 +388,7 @@ you may disable warning notice by setting checkbox to "on".</p>
 					'label'   => __( 'Generate WebP Images', 'warp-imagick' ),
 					'type'    => 'checkbox',
 					'default' => Shared::webp_images_create_default(),
-					'title'   => __( 'If enabled, for every JPEG/PNG media image/thumbnail, a WebP clone (converted copy) will be added. See Help Tab at the right-top of the page, section "WebP Images" for "how to serve instructions".', 'warp-imagick' ),
+					'title'   => __( 'If enabled, for every JPEG/PNG media image/thumbnail, a WebP clone (converted copy) will be added. See Help Tab at the right-top of the page, section "WebP Images".', 'warp-imagick' ),
 					'options' => array(
 						'disabled' => ! Shared::can_generate_webp_clones(),
 					),
@@ -400,7 +399,7 @@ you may disable warning notice by setting checkbox to "on".</p>
 					'style'   => 'width:200px',
 					'default' => Shared::webp_quality_default(),
 					// Translators: %s is default compression quality value.
-					'title'   => sprintf( __( 'Applies to WebP image clones when converted from PNG & JPEG images. This value can be overridden when converting from JPEG (see JPEG to WebP compression quality below). This is a Lossy Compression. Default value is %s. Default cwebp command value is 75. Max value to pass Google Page Speed Test is 75+10%% (about 82%%).', 'warp-imagick' ), Shared::webp_quality_default() ),
+					'title'   => sprintf( __( 'Applies to WebP image clones when converted from PNG & JPEG images. This value can be overridden when converting from JPEG (see JPEG to WebP compression quality below). This is a Lossy Compression. Default value is %s. Default cwebp command value is 75. Max value to pass Google Page Speed Test is 75+10%% (about 82%%). For large or high details (difficult to compress) images or low quality and sharper JPEG settings, compression may result in smaller JPEG file size thumbnails than cloned WebP thumbnails. If you want WebP thumbnail file-sizes always smaller than JPEG thumbnails, set WebP compression quality lower than JPEG compression quality.', 'warp-imagick' ), Shared::webp_quality_default() ),
 					'options' => array(
 						'min'   => Shared::webp_quality_value_min(),
 						'max'   => Shared::webp_quality_value_max(),
@@ -413,14 +412,22 @@ you may disable warning notice by setting checkbox to "on".</p>
 					'type'    => 'select',
 					'style'   => 'width:200px',
 					// Translators: %s is maximal WebP compression quality value.
-					'title'   => sprintf( __( 'Applies to WebP compression quality when converting from JPEG to WebP image clone. Use JPEG specific compression quality or default WebP compression quality (see above settings). Not using JPEG settings may result in larger WebP image file sizes than matching JPEG source image file size. This is a Lossy Compression. Default value is to use JPEG compression quality, up to (%s).', 'warp-imagick' ), Shared::webp_quality_value_max() ),
+					'title'   => sprintf( __( 'Applies to WebP compression quality when converting from JPEG to WebP image clone. Use JPEG settings compression quality or default WebP compression quality (see above settings). Using JPEG settings may sometimes result in larger WebP image file sizes than matching JPEG source image file size. This is a Lossy Compression. Default value is to use JPEG compression quality (up to %s%%). For large or high details (difficult to compress) images or low quality and sharper JPEG settings, compression may result in smaller JPEG file size thumbnails than cloned WebP thumbnails. If you want WebP thumbnail file-sizes always smaller than JPEG thumbnails, set WebP compression quality lower than JPEG compression quality.', 'warp-imagick' ), Shared::webp_quality_value_max() ),
 					'default' => Shared::webp_jpeg_quality_default(),
 					'options' => array(
 						'source'   => 'callback',
 						'callback' => 'get_form_jpeg_to_webp_compression_quality',
 					),
 				),
-
+				'webp-cwebp-on-demand'          => array(
+					'label'   => __( 'Convert to WebP On Demand', 'warp-imagick' ),
+					'type'    => Shared::webp_cwebp_on_demand_type(),
+					'default' => Shared::webp_cwebp_on_demand_default(),
+					'title'   => __( 'When this is enabled, missing WebP Clones will be created "on-the-fly" from JPEG/PNG images when requested by WebP enabled browser (On Demand), except if image is in /wp-admin/ or /wp-includes/. See Help Tab at the right-top of the page, section "WebP Images" for "how to serve instructions".', 'warp-imagick' ),
+					'options' => array(
+						'disabled' => ! Shared::can_generate_webp_clones(),
+					),
+				),
 			),
 		),
 
@@ -460,7 +467,7 @@ you may disable warning notice by setting checkbox to "on".</p>
 					'label'   => __( 'Disable "BIG Image Size Threshold" filter introduced in WordPress 5.3.', 'warp-imagick' ),
 					'type'    => 'checkbox',
 					'default' => Shared::big_image_size_threshold_disabled_default(),
-					'title'   => __( 'Disabled by default. When checked (on), prevents BIG JPEG image to be downsized and reduced to thumbnail quality. WordPress (version 5.3+) "Big Image Size Threshold" filter (defaults to 2560x2560 pixels).', 'warp-imagick' ),
+					'title'   => __( 'Disabled by default. When checked (on), prevents BIG JPEG image to be downsized and reduced to thumbnail quality. WordPress (version 5.3+) "Big Image Size Threshold" filter defaults to 2560x2560 pixels.', 'warp-imagick' ),
 					'options' => array(),
 				),
 				'wp-big-image-size-threshold-value'    => array(
@@ -506,7 +513,7 @@ you may disable warning notice by setting checkbox to "on".</p>
 					'class'   => 'code',
 					'style'   => 'width:19em;color:darkred',
 					'default' => wp_parse_url( home_url(), PHP_URL_HOST ),
-					'title'   => __( 'Enter or paste this Hostname as "Application Name" to create free plugin-update-password in your profile at Update Server (https://warp-imagick.pagespeed.club/)', 'warp-imagick' ),
+					'title'   => __( 'Select & copy this Hostname, go to Update Server (https://warp-imagick.pagespeed.club/user/) (register and) login. Paste your Hostname into "Application Name" field. Press "Add New Application Password" button and you will be presented with your new password. Then select & copy new password and paste it back here into "Plugin Update Password" field below.', 'warp-imagick' ),
 					'options' => array(
 						'readonly' => true,
 					),
@@ -518,7 +525,7 @@ you may disable warning notice by setting checkbox to "on".</p>
 					'class'       => 'code',
 					'style'       => 'width:19em;color:darkblue',
 					'default'     => '',
-					'title'       => __( 'Enter or paste update password from your User Profile at Update Server (https://warp-imagick.pagespeed.club/)', 'warp-imagick' ),
+					'title'       => __( 'Paste update password from your User Profile at Update Server (https://warp-imagick.pagespeed.club/user/) as described in Hostname field above.', 'warp-imagick' ),
 					'placeholder' => 'xxxx xxxx xxxx xxxx xxxx xxxx',
 				),
 

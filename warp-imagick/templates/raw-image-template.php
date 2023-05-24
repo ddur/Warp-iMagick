@@ -34,20 +34,20 @@ defined( 'ABSPATH' ) || die( -1 );
  */
 function get_attachment_image_files( $id ) {
 
-	$img_meta = \wp_get_attachment_metadata( $id );
-	if ( ! is_array( $img_meta ) ) {
+	$metadata = \wp_get_attachment_metadata( $id );
+	if ( ! is_array( $metadata ) ) {
 		return false;
 	}
-	if ( ! isset( $img_meta ['file'] ) ) {
+	if ( ! isset( $metadata ['file'] ) ) {
 		return false;
 	}
-	if ( ! is_string( $img_meta ['file'] ) ) {
+	if ( ! is_string( $metadata ['file'] ) ) {
 		return false;
 	}
-	if ( ! isset( $img_meta ['sizes'] ) ) {
+	if ( ! isset( $metadata ['sizes'] ) ) {
 		return false;
 	}
-	if ( ! is_array( $img_meta ['sizes'] ) ) {
+	if ( ! is_array( $metadata ['sizes'] ) ) {
 		return false;
 	}
 
@@ -68,12 +68,12 @@ function get_attachment_image_files( $id ) {
 		$query_value = 'all';
 	}
 
-	$main_img_path = \trailingslashit( \wp_upload_dir() ['basedir'] ) . $img_meta ['file'];
+	$main_img_path = \trailingslashit( \wp_upload_dir() ['basedir'] ) . $metadata ['file'];
 	$base_dir_path = \trailingslashit( dirname( $main_img_path ) );
 
 	$distinct_files = array();
 
-	$sizes = $img_meta ['sizes'];
+	$sizes = $metadata ['sizes'];
 
 	uksort(
 		$sizes,
@@ -97,8 +97,8 @@ function get_attachment_image_files( $id ) {
 	$height = 0;
 
 	if ( in_array( $query_value, array( 'raw', 'all', 'webp' ), true ) ) {
-		foreach ( $sizes as $size_name => $img_meta_data ) {
-			$distinct_file = $base_dir_path . $img_meta_data ['file'];
+		foreach ( $sizes as $size_name => $metadata_data ) {
+			$distinct_file = $base_dir_path . $metadata_data ['file'];
 			if ( ! file_exists( $distinct_file ) ) {
 				continue;
 			}
@@ -164,7 +164,7 @@ function get_attachment_image_files( $id ) {
 	$width  = 0;
 	$height = 0;
 
-	if ( \function_exists( '\\wp_get_original_image_path' ) && ! empty( $img_meta ['original_image'] ) ) {
+	if ( \function_exists( '\\wp_get_original_image_path' ) && ! empty( $metadata ['original_image'] ) ) {
 		if ( in_array( $query_value, array( 'full', 'all' ), true ) ) {
 			$distinct_file = \wp_get_original_image_path( $id );
 			if ( file_exists( $distinct_file ) ) {
@@ -221,8 +221,11 @@ function get_img_html_elements() {
 		return '';
 	}
 
-	$html      = '';
-	$break     = 0;
+	$img_files = array_reverse( $img_files );
+
+	$html  = '';
+	$break = 0;
+
 	$root_path = wp_normalize_path( untrailingslashit( ABSPATH ) );
 	foreach ( $img_files as $size_name => $size_data ) {
 
@@ -246,8 +249,9 @@ function get_img_html_elements() {
 			$size_name = esc_attr( $size_name );
 			switch ( $mime_type ) {
 				case 'image/webp':
-					/** See: https://wordpress.org/support/article/giving-wordpress-its-own-directory/ */
-					$src = esc_url_raw( site_url( substr( $file_path, strlen( $root_path ) ) ) );
+					// phpcs:ignore
+					$src = 'data:' . $mime_type . ';base64,' . base64_encode( file_get_contents( $file_path ) );
+
 					break;
 				default:
 					// phpcs:ignore
@@ -262,6 +266,23 @@ function get_img_html_elements() {
 			$title     = esc_attr( "WP Size Name: $size_name\nWidth&Height: ${width}x${height}px\nFile Basename: $basename\nFile Byte-size: $file_size ($byte_size bytes)" );
 			$html     .= "<img data-file-size='$byte_size' data-size-name='$size_name' src='$src' width='$width' height='$height' title='$title'>" . PHP_EOL;
 		}
+	}
+
+	if ( Lib::is_debug() ) {
+
+		if ( Shared::get_option( 'preview_thumbnails_show_metadata', true ) ) {
+			$metadata = \wp_get_attachment_metadata( $my_wp_query->post->ID );
+			// phpcs:ignore
+			$html .= '<p>Image Metadata:</p><p><pre>' . print_r( $metadata, true ) . '</pre></p>';
+		}
+
+		$perflab = get_option( 'perflab_modules_settings', 'Not available' );
+		// phpcs:ignore
+		$html .= '<p>PerfLab modules settings:</p><p><pre>' . print_r( $perflab, true ) . '</pre></p>';
+
+		$perflab = \get_option( 'perflab_generate_webp_and_jpeg', 'Not available' );
+		// phpcs:ignore
+		$html .= '<p>PerfLab generate WebP and JPEG:<pre>' . print_r( $perflab, true ) . '</pre></p>';
 	}
 
 	return $html;

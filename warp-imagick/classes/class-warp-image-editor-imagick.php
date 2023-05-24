@@ -52,6 +52,10 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 		}
 
 		/**
+		 * No need to derive multi_resize method because it uses make_subsize method.
+		 */
+
+		/**
 		 * Override parent to prevent overwriting image subsize file
 		 * created within <intermediate_image_sizes_advanced> filter
 		 *
@@ -231,7 +235,7 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 							}
 
 							$current_imgtype = $this->image->getImageType();
-							if ( ! array_key_exists( $current_imgtype, Shared::get_imagick_imgtypes() ) ) {
+							if ( ! array_key_exists( $current_imgtype, Shared::get_imagick_img_types() ) ) {
 								$current_imgtype = false;
 							} else {
 

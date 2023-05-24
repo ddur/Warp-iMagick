@@ -4,24 +4,12 @@ Author: © 2017-2022, Dragan Đurić. All rights reserved.
 License: GPLv2
 Requires PHP: 7.2
 Tested up to: 6.2
-Stable tag: 1.10.1
+Stable tag: 1.10.2-beta
 Requires at least: 5.3
 
 Optimize Images On-Site. No Cloud-Service/Signup. Convert to WebP On Upload/Regenerate. Resize Uploads. Set Sharpness, Quality & Big-Image-Threshold.
 
 == Description ==
-
-* **NEW: Tested with WP 6.0 RC-1. Plugin updates are now served from [Updates Server](https://warp-imagick.pagespeed.club/) (NOT from WordPress.org).**
-Check & Update (one-click or enable auto-update) from your site admin Dashboard requires Update Password. Login on Updates Server to manage Free Update Passwords in your User Profile.
-
-
-* **VERSION 2.+: WebP On Demand (on-the-fly) Convert JPEG/PNG images to WebP for the whole site.**
-When modern (WebP enabled) browser request for JPEG/PNG image, if WebP Clone does not exists, plugin will respond with On Demand (on-the-fly) converted WebP Clone.
-Converted WebP Clone images will be permanently available for subsequent requests. Anywhere on the site, including images in Media, WP Core, Plugins, Themes, etc. As on Theme, Plugin and Core updates, directories are removed and replaced with newer version, converted WebP Clones are removed along. New WebP Clones are again created on the first demand/request.
-You don't have to, but still, you may regenerate old Media for better compression and sharpness of JPEG images, with or without generating WebP Clones.
-Available only to users registered on [Updates Server](https://warp-imagick.pagespeed.club/).
-
-
 
 * **Warp iMagick | Optimize Images: EASY to use, PRIVATE and FREE.**
 Install, activate, configure and start uploading new media images. To bulk (re)compress existing media images use ["Regenerate Thumbnails Plugin"](https://wordpress.org/plugins/regenerate-thumbnails/) or ["WP CLI media regenerate" command](https://developer.wordpress.org/cli/commands/media/regenerate/).
@@ -29,7 +17,7 @@ Image Optimization is performed on-site, free and at the "expense" of your site 
 
 
 * **Warp iMagick | Convert WebP: enables your site to serve images in next-gen formats.**
-Original upload JPEG/PNG images are copied into compressed & optimized JPEG/PNG/WebP media types of original size and subsizes/thumbnails. WebP images are served by default. JPEG/PNG images are served only for older (NO-WebP compatible) browsers.
+Original upload JPEG/PNG images are copied into compressed & optimized JPEG/PNG/WebP media types of original size and subsizes/thumbnails. WebP images are served by Apache/Nginx configuration. JPEG/PNG images are served only for older (NO-WebP compatible) browsers.
 
 
 * **Warp iMagick | Image Compression Quality: flexible, easy to configure.**
@@ -37,7 +25,7 @@ Set JPEG/WebP compression quality % / image file-size ratio that best suits your
 
 
 * **Warp iMagick | Sharpen Image: enables you to sharpen blurry WordPress subsize/thumbnail images.**
-Original JPEG/PNG images are copied into compressed & optimized JPEG/PNG/WebP media types, of original size and subsizes/thumbnails. WebP images are served by default. Original & optimized JPEG/PNG images are served only for older, NO-WebP compatible, browsers.
+Original JPEG/PNG images are copied into compressed & optimized JPEG/PNG/WebP media types, of original size and subsizes/thumbnails. WebP images are served by Apache/Nginx configuration. Original & optimized JPEG/PNG images are served only for older, NO-WebP compatible, browsers.
 
 
 * **Warp iMagick | Resize on Uploads: enables you to set limit for Big image geometry, reduce file size and save disk space.**
@@ -77,7 +65,7 @@ JPEG image optimization is speed & pagespeed/SEO score efficient even without We
 **Important Note:** Since WordPress 5.3, BIG JPEG images reduced to 2560x2560 (by "Big Image Size Threshold" feature) and then manually edited by user, on regenerate, will be restored back to original (unedited) version. User edited modifications will be lost, unless this plugin is used. See [GitHub issue](https://github.com/Automattic/regenerate-thumbnails/issues/102). Same bug/issue applies both to ["WP CLI media regenerate" command](https://developer.wordpress.org/cli/commands/media/regenerate/) and ["Regenerate Thumbnails plugin"](https://wordpress.org/plugins/regenerate-thumbnails/). To fix that bug/issue, install or upgrade Warp iMagick plugin to version 1.6.2 or above.
 
 
-* **Compatible up to PHP 8.1.* and tested against WP (PHP 7.4) coding standards.**
+* **Tested against WordPress Coding Standards.**
 Tested with [PHP_CodeSniffer (phpcs)](https://github.com/squizlabs/PHP_CodeSniffer) using [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/) [GitHub](https://github.com/WordPress/WordPress-Coding-Standards) rules and [PHPCompatibility ](https://github.com/PHPCompatibility/PHPCompatibility) rules.
 
 
@@ -96,14 +84,6 @@ Warp iMagick Image Compressor plugin does not collect nor send any identifiable 
 * **Known conflicts**
 Due to use of [bfi_thumb library](https://github.com/bfintal/bfi_thumb) which completely takes over wordpress WP_Image_Editor classes, in [Ajax Search Lite](https://wordpress.org/plugins/ajax-search-lite/) plugin and in [Circles Gallery](https://wordpress.org/plugins/circles-gallery/) plugin, Warp iMagick plugin may fail to activate while those plugins are active. Activating those plugins after Warp iMagick is activated, may cause malfunction. Plugin [WP Email Users](https://wordpress.org/plugins/wp-email-users/) (tested with version 1.7.6.) causes fatal submit error when saving Warp-iMagick settings.
 Recognized known conflict will automatically issue administrator warning notice.
-
-
-* **Plugin reviews.**
-[What Are the Best WordPress Plugins for Using WebP Images?](https://www.cloudzat.com/webp-images-wordpress-plugins/). BTW, Apache configuration is just Copy/Paste from plugin to plugin.
-
-
-* **Plugin tests.**
-[Latest PluginTests.com result](https://plugintests.com/plugins/wporg/warp-imagick/latest).
 
 
 = Features =
@@ -246,11 +226,10 @@ In order to modify/resize/crop photos or images, Wordpress requires at least PHP
 
 = Do I have both required PHP extensions installed? =
 
-1. WordPress 5.2 and above: Administrator: Menu -> Tools -> Site Health -> Info -> Expand "Media Handling" and check if "ImageMagick version string" and "GD version" have values.
-2. WordPress 5.1 and below: Install [Health Check & Troubleshooting](https://wordpress.org/plugins/health-check/) plugin. Open "Health Check" plugin page and click on "PHP Information" tab. You will find there all PHP extensions installed and enabled. Search (Ctrl-F) on page for "Imagick" and "GD".
-3. WordPress Editor class must be WP_Image_Editor_Imagick (or Warp_Image_Editor_Imagick) but **NOT** WP_Image_Editor_GD.
-4. PHP-Imagick extension must be linked with ImageMagick library version **6.3.2** or newer.
-5. PHP-GD extension version must be at least 2.0.0 to be accepted by WordPress Image Editor.
+1. Administrator: Menu -> Tools -> Site Health -> Info -> Expand "Media Handling" and check if "ImageMagick version string" and "GD version" have values.
+2. WordPress Editor class must be WP_Image_Editor_Imagick (or Warp_Image_Editor_Imagick) but **NOT** WP_Image_Editor_GD.
+3. PHP-Imagick extension must be linked with ImageMagick library version **6.3.2** or newer.
+4. PHP-GD extension version must be at least 2.0.0 to be accepted by WordPress Image Editor.
 
 = Does my web hosting service provide PHP-Imagick and PHP-GD extensions? =
 
@@ -292,4 +271,9 @@ Because your server has no PHP-Imagick extension installed or has too old versio
 
 = Current Version =
 
-* NEW: Plugin Updater
+* Default JPEG quality increased from 60% to 75%.
+* Support for WP-CLI version 2.7.1 "wp media regenerate".
+* Resolved conflicts with Performance Lab plugin v2.2.0.
+* Preview Thumbnails is now in reverse order, largest first.
+* Preview Thumbnails embeds WebP images too, into HTML now.
+  Because browser may keep previous version in site cache.
