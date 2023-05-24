@@ -718,6 +718,10 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 			 * WP-CLI 2.7.1 (> 2.5.0) media regenerate
 			 * may call this filter twice. Once with previous attachment ID,
 			 * just before calling wp_create_image_subsizes with next attachment ID.
+			 *
+			 * WP-CLI 2.7.1 (> 2.5.0) media regenerate
+			 * may call this filter twice. Once with previous attachment ID,
+			 * just before calling wp_create_image_subsizes with next attachment ID.
 			 */
 			if ( $this->my_gen_attach_id !== $attachment_id ) {
 				if ( Lib::is_wp_cli() ) {
