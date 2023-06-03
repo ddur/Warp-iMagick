@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2022 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2022. All rights reserved.
+ * @copyright © 2017-2023. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -276,13 +276,12 @@ function get_img_html_elements() {
 			$html .= '<p>Image Metadata:</p><p><pre>' . print_r( $metadata, true ) . '</pre></p>';
 		}
 
-		$perflab = get_option( 'perflab_modules_settings', 'Not available' );
 		// phpcs:ignore
-		$html .= '<p>PerfLab modules settings:</p><p><pre>' . print_r( $perflab, true ) . '</pre></p>';
+		
 
-		$perflab = \get_option( 'perflab_generate_webp_and_jpeg', 'Not available' );
+
 		// phpcs:ignore
-		$html .= '<p>PerfLab generate WebP and JPEG:<pre>' . print_r( $perflab, true ) . '</pre></p>';
+		
 	}
 
 	return $html;

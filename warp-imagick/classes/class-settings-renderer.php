@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2022 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2022. All rights reserved.
+ * @copyright © 2017-2023. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -32,7 +32,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings_Renderer' ) ) {
 
 			$pluginbox = Lib::safe_key_value( $this->settings->get_settings(), array( 'plugin', 'metabox' ), array() );
 			$image_lnk = Lib::safe_key_value( $pluginbox, 'logo', $this->plugin->get_url_path() . '\/assets/warp-logo.png' );
-			$click_lnk = Lib::safe_key_value( $pluginbox, 'link', 'https://warp-imagick.pagespeed.club/' );
+			$click_lnk = Lib::safe_key_value( $pluginbox, 'link', 'https://github.com/ddur/Warp-iMagick/' );
 			$box_title = Lib::safe_key_value( $pluginbox, 'name', wp_parse_url( $click_lnk, PHP_URL_HOST ) );
 			$this->render_hard_meta_box( $image_lnk, $click_lnk, $box_title, 'logo' );
 
@@ -69,6 +69,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings_Renderer' ) ) {
 				) . '">' . esc_html( __( 'Click here to find, install and/or activate "Regenerate Thumbnails" plugin.', 'warp-imagick' ) ) . '</a></div>';
 			}
 
+			echo '<p></p><div>' . esc_html( __( 'If you have any problem, question or idea, please visit ', 'warp-imagick' ) );
+			echo sprintf( '<a target=_blank rel="noopener noreferrer" href="https://github.com/ddur/Warp-iMagick/issues">%s</a> or <a target=_blank rel="noopener noreferrer" href="https://github.com/ddur/Warp-iMagick/discussions">%s</a>.</div>', esc_html( __( 'GitHub Issues', 'warp-imagick' ) ), esc_html( __( 'GitHub Discussions', 'warp-imagick' ) ) );
+			echo '<p></p><div>' . esc_html( __( 'For older questions and answers, you may also browse a', 'warp-imagick' ) ) . ' ' . sprintf( '<a target=_blank rel="noopener noreferrer" href="https://wordpress.org/support/plugin/warp-imagick"/>%s</a>', esc_html( __( 'WordPress Support Forum', 'warp-imagick' ) ) ) . '.</div>';
 		}
 
 		/** Section Terms renderer.

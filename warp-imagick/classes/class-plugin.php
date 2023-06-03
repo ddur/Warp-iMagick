@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2022 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2022. All rights reserved.
+ * @copyright © 2017-2023. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -345,13 +345,13 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 			$scope = in_array( 'wp_create_image_subsizes', $calls_stack, true );
 
 			if ( true === $scope ) {
-				Lib::debug( 'Metadata update within "wp_create_image_subsizes" scope - $attachment_id: ' . $attachment_id );
+				Lib::debug( 'Metadata update WITHIN "wp_create_image_subsizes" scope - $attachment_id: ' . $attachment_id );
 			} else {
-				Lib::debug( 'Metadata update out of "wp_create_image_subsizes" scope - $attachment_id: ' . $attachment_id );
+				Lib::debug( 'Metadata update OUT-OF "wp_create_image_subsizes" scope - $attachment_id: ' . $attachment_id );
 			}
 
 			Lib::debug_var( $calls_stack, 'Calls:' );
-			Lib::debug_var( $metadata, '$metadata:' );
+			Lib::debug_var( $metadata, 'arg:$metadata:' );
 
 			if ( true !== $scope ) {
 				return $metadata;
@@ -1100,6 +1100,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 
 					$edited_source = $old_file_path;
 
+					Lib::debug( 'WebP Cloning User Edited Image: ' . _wp_relative_upload_path( $edited_source ) );
 					$this->webp_clone_image( $edited_source, $this->my_mime_type );
 
 					break;
@@ -1118,6 +1119,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 					 */
 
 					$source = $this->get_absolute_upload_file_path( $metadata['file'] );
+					Lib::debug( 'WebP Cloning Scaled Image: ' . _wp_relative_upload_path( $source ) );
 					$this->webp_clone_image( $source, $this->my_mime_type );
 
 					break;
@@ -1143,11 +1145,13 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 					 */
 					if ( 2500 < $metadata['width'] || 2500 < $metadata['height'] ) {
 						Lib::debug( 'Rotated image can\'t fit within 2500x2500 pixels (' . $metadata['file'] . '.' );
+						Lib::debug( 'WebP Cloning Rotated Image: ' . _wp_relative_upload_path( $source ) );
 						$this->webp_clone_image( $source, $this->my_mime_type );
 						break;
 					}
 
 					try {
+						Lib::debug( 'Compressing Rotated Image: ' . _wp_relative_upload_path( $source ) );
 						$editor = Shared::get_warp_editor( $source );
 						if ( \is_wp_error( $editor ) ) {
 							Lib::error( 'Function get_warp_editor() returned an error: ' . $editor->get_error_message() );
@@ -1160,11 +1164,14 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 								if ( \is_wp_error( $saved ) ) {
 									Lib::error( '$editor::save() failed with error: ' . $saved->get_error_message() );
 								}
+								$target = $saved['path'];
 							}
 						}
 					} catch ( Exception $e ) {
 						Lib::error( 'Exception caught: ' . $e->getMessage() );
 					}
+
+					Lib::debug( 'Rotated Image Compressed: ' . _wp_relative_upload_path( $target ) );
 
 					if ( isset( $editor ) ) {
 						is_callable( array( $editor, '__destruct' ) ) && $editor->__destruct();
@@ -1185,6 +1192,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 					 */
 
 					$source = $this->get_absolute_upload_file_path( $metadata['file'] );
+					Lib::debug( 'WebP Cloning PNG Image: ' . _wp_relative_upload_path( $source ) );
 					$this->webp_clone_image( $source, $this->my_mime_type );
 					break;
 
@@ -1200,7 +1208,9 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 					$source = $this->get_absolute_upload_file_path( $metadata['file'] );
 
 					if ( $this->get_option( 'compress-jpeg-original-disabled', Shared::compress_jpeg_original_disabled_default() ) ) {
+						Lib::debug( 'Compressing Original to Attached image is disabled.' );
 
+						Lib::debug( 'WebP Cloning Original Image: ' . _wp_relative_upload_path( $source ) );
 						$this->webp_clone_image( $source, $this->my_mime_type );
 						break;
 					}
@@ -1211,13 +1221,15 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 					 * resources and hang response until timeout.
 					 */
 					if ( 2500 < $metadata['width'] || 2500 < $metadata['height'] ) {
-						Lib::debug( 'Source image can\'t fit within 2500x2500 pixels (' . $metadata['file'] . '.' );
+						Lib::debug( 'Original image can\'t fit within 2500x2500 pixels (' . _wp_relative_upload_path( $source ) . '.' );
+						Lib::debug( 'WebP Cloning Original Image: ' . _wp_relative_upload_path( $source ) );
 						$this->webp_clone_image( $source, $this->my_mime_type );
 						break;
 					}
 
 					try {
 
+						Lib::debug( 'Compressing Original to Attached Image: ' . _wp_relative_upload_path( $source ) );
 						$editor = Shared::get_warp_editor( $source );
 						if ( \is_wp_error( $editor ) ) {
 							Lib::error( 'Function get_warp_editor() returned an error: ' . $editor->get_error_message() );
@@ -1235,17 +1247,20 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 							Lib::error( '$editor::save() failed with error: ' . $saved->get_error_message() );
 							return $sizes;
 						}
+						$target = $saved['path'];
 
-						$metadata['file']           = _wp_relative_upload_path( $saved['path'] );
+						$metadata['file']           = _wp_relative_upload_path( $target );
 						$metadata['original_image'] = wp_basename( $source );
 
-						if ( filesize( $saved['path'] ) > filesize( $source ) ) {
+						if ( filesize( $target ) > filesize( $source ) ) {
 
-							Lib::debug( 'Attached file-size > Original file-size ( ' . filesize( $saved['path'] ) . ' > ' . filesize( $source ) . '): ' . _wp_relative_upload_path( $source ) );
-							Shared::copy_file( $source, $saved['path'], $overwrite = true );
+							Lib::debug( 'Attached file-size > Original file-size ( ' . filesize( $target ) . ' > ' . filesize( $source ) . '): ' . _wp_relative_upload_path( $source ) );
+							Shared::copy_file( $source, $target, $overwrite = true );
 							Lib::debug( 'Attached file is overwritten with Original file.' );
 						}
-						$this->webp_clone_image( $saved['path'], $this->my_mime_type );
+						Lib::debug( 'Attached Image Compressed: ' . _wp_relative_upload_path( $target ) );
+						Lib::debug( 'WebP Cloning Attached Image: ' . _wp_relative_upload_path( $target ) );
+						$this->webp_clone_image( $target, $this->my_mime_type );
 
 					} catch ( Exception $e ) {
 						Lib::error( 'Exception caught: ' . $e->getMessage() );
@@ -1315,6 +1330,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 			}
 
 			if ( $new_orig_path ) {
+				Lib::debug( 'WebP Cloning Original Image: ' . _wp_relative_upload_path( $new_orig_path ) );
 				$this->webp_clone_image( $new_orig_path, $this->my_mime_type );
 
 			}
@@ -1366,7 +1382,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 						$rotated = $editor->maybe_exif_rotate();
 
 						if ( \is_wp_error( $rotated ) ) {
-							Lib::error( '$editor->maybe_exif_rotate() failed with error: ' . $rotated->get_error_message() );
+							Lib::debug( '$editor->maybe_exif_rotate() failed with error: ' . $rotated->get_error_message() );
 						}
 					}
 
@@ -1374,7 +1390,6 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 
 						Lib::debug_var( $sizes, 'Sizes to create' );
 						Lib::debug( 'Method: $editor->make_subsize' );
-
 						foreach ( $sizes as $new_size_name => $new_size_data ) {
 							$new_size_meta = $editor->make_subsize( $new_size_data );
 
@@ -1430,16 +1445,16 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 
 			}
 
-			switch ( $this->do_generate_webp_clones() ) {
-				case false:
-				case 0:
-				case 2:
-					foreach ( $tracked_files as $collected_name => $ignore ) {
-						$item_path = \path_join( dirname( $metadata['file'] ), $collected_name );
-						$item_path = $this->get_absolute_upload_file_path( $item_path );
-						$this->webp_clone_image( $item_path, $this->my_mime_type );
-					}
+			$clone_action = $this->do_generate_webp_clones();
+			switch ( $clone_action ) {
+				case 1:
+					$clone_action = 2;
 					break;
+			}
+			foreach ( $tracked_files as $collected_name => $ignore ) {
+				$item_path = \path_join( dirname( $metadata['file'] ), $collected_name );
+				$item_path = $this->get_absolute_upload_file_path( $item_path );
+				$this->webp_clone_image( $item_path, $this->my_mime_type, $clone_action );
 			}
 
 			$this->my_gen_attach_id = 0;
@@ -1455,7 +1470,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 		 *
 		 * Replace wp_generate_attachment_metadata() functionality for JPEG/PNG images between
 		 * intermediate_image_sizes_advanced and wp_generate_attachment_metadata hooks
-		 * Late priority (+99) will allow other hookoverwrite RT plugin returned sizes.
+		 * Late priority (+99) will allow other hook overwrite RT plugin returned sizes.
 		 *
 		 * @param array  $metadata - attachment meta data.
 		 * @param int    $attachment_id - number.
@@ -1463,13 +1478,49 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 		 */
 		public function on_wp_generate_attachment_metadata_99_filter( $metadata, $attachment_id = false, $context = false ) {
 
+			Lib::debug( 'Fixing $metadata sizes in context of: ' . $context );
+
+			// phpcs:ignore
+			$trace_stack = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 10 );
+			$calls_stack = array();
+
+			foreach ( array_reverse( $trace_stack ) as $item ) {
+				if ( isset( $item ['function'] ) ) {
+					$calls_stack[] = $item ['function'];
+				}
+			}
+
+			$trace_stack = array();
+
+			Lib::debug_var( $calls_stack, 'Calls:' );
+			Lib::debug_var( $metadata, 'arg:$metadata:' );
+
 			if ( 'create' !== $context ) {
+				Lib::debug( 'Invalid Context: ' . $context );
 				return $metadata;
 			}
 
 			$this->my_generate_meta = false;
 
 			if ( is_array( $this->my_metadata_done ) ) {
+
+				/** Support for Dominant Color Class Methods
+				 * Support for Performance Lab Dominant Color Module.
+				 * This plugin/code is expected to be compatible with Dominant Color,
+				 * even after Dominant Color is merged into Core Class WP_Image_Editor.
+				 * Because Warp_Image_Editor_Imagick will inherit methods from parent class.
+				 */
+				if ( ! array_key_exists( 'dominant_color', $this->my_metadata_done ) ) {
+					if ( array_key_exists( 'dominant_color', $metadata ) ) {
+						$this->my_metadata_done ['dominant_color'] = $metadata ['dominant_color'];
+					}
+				}
+
+				if ( ! array_key_exists( 'has_transparency', $this->my_metadata_done ) ) {
+					if ( array_key_exists( 'has_transparency', $metadata ) ) {
+						$this->my_metadata_done ['has_transparency'] = $metadata ['has_transparency'];
+					}
+				}
 
 				$metadata = $this->my_metadata_done;
 			}
@@ -1628,8 +1679,26 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 		/** Generate webp clones? */
 		public function do_generate_webp_clones() {
 			if ( true === $this->can_generate_webp_clones() ) {
+				$return = $this->get_option( 'webp-images-create', Shared::webp_images_create_default() );
 
-				return $this->get_option( 'webp-images-create', Shared::webp_images_create_default() );
+				if ( false === $return ) {
+					$return = 0;
+				}
+				if ( true === $return ) {
+					$return = 1;
+				}
+				switch ( $return ) {
+					case 0:
+					case 1:
+					case 2:
+					case 3:
+						break;
+					default:
+						Lib::debug( 'Option "webp-images-create" returned an invalid value: ' . $return . '(' . gettype( $return ) . ')' );
+						$return = 3;
+
+				}
+				return $return;
 			}
 			return 3;
 		}
@@ -1665,34 +1734,39 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 			return $this->my_can_do_webp;
 		}
 
-		/** Create webp clone.
+		/** Create WebP Clone.
 		 *
-		 * @param string   $image_path to clone.
-		 * @param string   $mime_type of $image_path.
+		 * @param string   $orig_path to clone.
+		 * @param string   $mime_type of $orig_path.
 		 * @param bool|int $do_generate_webp_clones status/choice.
 		 */
-		public function webp_clone_image( $image_path, $mime_type = '', $do_generate_webp_clones = null ) {
+		public function webp_clone_image( $orig_path, $mime_type = '', $do_generate_webp_clones = null ) {
 
-			if ( ! is_string( $image_path ) || empty( trim( $image_path ) ) ) {
+			if ( ! is_string( $orig_path ) || empty( trim( $orig_path ) ) ) {
 				return false;
 			}
 
-			$webp_path = Shared::get_webp_file_name( $image_path );
+			$webp_path = Shared::get_webp_file_name( $orig_path );
 
 			if ( null === $do_generate_webp_clones ) {
 				$do_generate_webp_clones = $this->do_generate_webp_clones();
 			}
 
+			if ( false === $do_generate_webp_clones ) {
+				$do_generate_webp_clones = 0;
+			}
+			if ( true === $do_generate_webp_clones ) {
+				$do_generate_webp_clones = 1;
+			}
+
 			switch ( $do_generate_webp_clones ) {
 
-				case false:
 				case 0:
 					if ( \file_exists( $webp_path ) ) {
 						\wp_delete_file( $webp_path );
 					}
 					return false;
 
-				case true:
 				case 1:
 					break;
 
@@ -1704,6 +1778,10 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 
 				case 3:
 					return false;
+
+				default:
+					Lib::debug( 'Invalid $do_generate_webp_clones value: ' . $do_generate_webp_clones . '(' . gettype( $do_generate_webp_clones ) . ')' );
+					return false;
 			}
 
 			if ( false === $this->can_generate_webp_clones() ) {
@@ -1711,14 +1789,15 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 				return false;
 			}
 
-			if ( ! is_readable( $image_path ) ) {
+			if ( ! is_readable( $orig_path ) ) {
 
-				Lib::debug( 'Image file is not readable: ' . _wp_relative_upload_path( $image_path ) );
+				Lib::debug( 'Source Image File is not readable: ' . _wp_relative_upload_path( $orig_path ) );
 				return false;
 			}
+			$orig_size = \filesize( $orig_path );
 
 			if ( ! is_string( $mime_type ) || empty( trim( $mime_type ) ) ) {
-				$mime_type = wp_get_image_mime( $image_path );
+				$mime_type = wp_get_image_mime( $orig_path );
 			}
 
 			switch ( $mime_type ) {
@@ -1746,11 +1825,30 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 
 			switch ( $mime_type ) {
 				case 'image/jpeg':
-					$gd_jpeg = \imagecreatefromjpeg( $image_path );
+					$gd_jpeg = \imagecreatefromjpeg( $orig_path );
 					if ( false === $gd_jpeg ) {
-						Lib::debug( 'Failed imagecreatefromjpeg: ' . _wp_relative_upload_path( $image_path ) );
+						Lib::debug( 'Failed imagecreatefromjpeg: ' . _wp_relative_upload_path( $orig_path ) );
 						break;
 					}
+
+					$use_quality = $this->get_option( 'webp-jpeg-compression-quality', Shared::webp_jpeg_quality_default() );
+					$jpg_quality = $this->get_option( 'jpeg-compression-quality', Shared::jpeg_quality_default() );
+					switch ( $use_quality ) {
+						case -3:
+							$webp_quality = $jpg_quality - 15;
+							break;
+						case -2:
+							$webp_quality = $jpg_quality - 10;
+							break;
+						case -1:
+							$webp_quality = $jpg_quality - 5;
+							break;
+						case 0:
+							$webp_quality = $jpg_quality;
+							break;
+						default:
+					}
+					Lib::debug( 'WebP Compression Quality: ' . $webp_quality );
 					if ( 0 === $this->get_option( 'webp-jpeg-compression-quality', Shared::webp_jpeg_quality_default() ) ) {
 						$webp_quality = $this->get_option( 'jpeg-compression-quality', Shared::jpeg_quality_default() );
 					}
@@ -1767,9 +1865,9 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 					break;
 
 				case 'image/png':
-					$gd_png = \imagecreatefrompng( $image_path );
+					$gd_png = \imagecreatefrompng( $orig_path );
 					if ( false === $gd_png ) {
-						Lib::error( 'Failed imagecreatefrompng: ' . _wp_relative_upload_path( $image_path ) );
+						Lib::debug( 'Failed imagecreatefrompng: ' . _wp_relative_upload_path( $orig_path ) );
 						break;
 					}
 					if ( \imageistruecolor( $gd_png ) ) {
@@ -1786,7 +1884,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 
 					$gd_truecolor = \imagecreatetruecolor( \imagesx( $gd_png ), \imagesy( $gd_png ) );
 					if ( false === $gd_truecolor ) {
-						Lib::debug( 'Failed imagecreatetruecolor: ' . _wp_relative_upload_path( $image_path ) );
+						Lib::debug( 'Failed imagecreatetruecolor: ' . _wp_relative_upload_path( $orig_path ) );
 						if ( false !== $gd_png ) {
 							\imagedestroy( $gd_png );
 							$gd_png = false;
@@ -1795,7 +1893,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 					}
 
 					if ( false === \imagealphablending( $gd_truecolor, false ) ) {
-						Lib::debug( 'Failed imagealphablending: ' . _wp_relative_upload_path( $image_path ) );
+						Lib::debug( 'Failed imagealphablending: ' . _wp_relative_upload_path( $orig_path ) );
 						if ( false !== $gd_png ) {
 							\imagedestroy( $gd_png );
 							$gd_png = false;
@@ -1821,7 +1919,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 					}
 
 					if ( false === \imagefilledrectangle( $gd_truecolor, 0, 0, imagesx( $gd_png ), imagesy( $gd_png ), $is_allocated ) ) {
-						Lib::debug( 'Failed imagefilledrectangle: ' . _wp_relative_upload_path( $image_path ) );
+						Lib::debug( 'Failed imagefilledrectangle: ' . _wp_relative_upload_path( $orig_path ) );
 						if ( false !== $gd_png ) {
 							\imagedestroy( $gd_png );
 							$gd_png = false;
@@ -1834,7 +1932,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 					}
 
 					if ( false === \imagealphablending( $gd_truecolor, true ) ) {
-						Lib::debug( 'Failed imagealphablending 2: ' . _wp_relative_upload_path( $image_path ) );
+						Lib::debug( 'Failed imagealphablending 2: ' . _wp_relative_upload_path( $orig_path ) );
 						if ( false !== $gd_png ) {
 							\imagedestroy( $gd_png );
 							$gd_png = false;
@@ -1846,7 +1944,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 						break;
 					};
 					if ( false === \imagecopy( $gd_truecolor, $gd_png, 0, 0, 0, 0, \imagesx( $gd_png ), \imagesy( $gd_png ) ) ) {
-						Lib::debug( 'Failed imagecopy: ' . _wp_relative_upload_path( $image_path ) );
+						Lib::debug( 'Failed imagecopy: ' . _wp_relative_upload_path( $orig_path ) );
 						if ( false !== $gd_png ) {
 							\imagedestroy( $gd_png );
 							$gd_png = false;
@@ -1858,7 +1956,7 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 						break;
 					}
 					if ( false !== $gd_png ) {
-						Lib::debug( '$gd_png reference not released: ' . _wp_relative_upload_path( $image_path ) );
+						Lib::debug( '$gd_png reference not released: ' . _wp_relative_upload_path( $orig_path ) );
 						$gd_png = false;
 					}
 					if ( false !== $gd_truecolor ) {
@@ -1869,17 +1967,17 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 			}
 
 			if ( $gd_jpeg ) {
-				Lib::debug( 'Var $gd_jpeg is not released at: ' . _wp_relative_upload_path( $image_path ) );
+				Lib::debug( 'Var $gd_jpeg is not released at: ' . _wp_relative_upload_path( $orig_path ) );
 				$gd_jpeg = false;
 			}
 
 			if ( $gd_png ) {
-				Lib::debug( 'Var $gd_png is not released at: ' . _wp_relative_upload_path( $image_path ) );
+				Lib::debug( 'Var $gd_png is not released at: ' . _wp_relative_upload_path( $orig_path ) );
 				$gd_png = false;
 			}
 
 			if ( $gd_truecolor ) {
-				Lib::debug( 'Var $gd_truecolor is not released at: ' . _wp_relative_upload_path( $image_path ) );
+				Lib::debug( 'Var $gd_truecolor is not released at: ' . _wp_relative_upload_path( $orig_path ) );
 				$gd_truecolor = false;
 			}
 
@@ -1899,6 +1997,10 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 							$perms = $stat['mode'] & 0000666;
 							chmod( $webp_path, $perms );
 							\imagedestroy( $gd_convert );
+							$webp_size = \filesize( $webp_path );
+							if ( $orig_size && $orig_size < $webp_size ) {
+								Lib::debug( 'imagewebp: WebP Clone file is larger than original: ' . _wp_relative_upload_path( $orig_path ) );
+							}
 							return $webp_path;
 						} else {
 							Lib::debug( 'imagewebp: file not created: ' . _wp_relative_upload_path( $webp_path ) );

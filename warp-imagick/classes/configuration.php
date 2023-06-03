@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2022 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2022. All rights reserved.
+ * @copyright © 2017-2023. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -45,13 +45,11 @@ return array(
 			'constants'  => array(),
 		),
 
-		'update'   => array(
-			'host' => 'warp-imagick.pagespeed.club',
-		),
+
 
 		'metabox'  => array(
-			'link' => 'https://warp-imagick.pagespeed.club/',
-			'name' => 'Plugin Home Page',
+			'name' => __( 'Plugin Home Page', 'warp-imagick' ),
+
 		),
 
 
@@ -245,7 +243,8 @@ you may disable warning notice by setting checkbox to "on".</p>
 					'type'    => 'select',
 					'style'   => 'width:200px',
 					'default' => Shared::jpeg_sharpen_image_value_default(),
-					'title'   => __( 'Sharpen Image after WP Default "bluring". Select WP Default (unsharpMaskImage) or WP Default + SharpenImage( 0, $sigma ). Sharper image will be larger than WP default file size and and WebP clone on smallest thumbnails may be larger than JPEG image. WP default or small sigma recommended for full size. Default value is ' . ( 0 === Shared::jpeg_sharpen_image_value_default() ? 'WP Default' : Shared::jpeg_sharpen_image_value_default() / 10 ) . '.', 'warp-imagick' ),
+					// Translators: %s is default value.
+					'title'   => sprintf( __( 'Sharpen Image after WP Default \'bluring\'. Select WP Default (unsharpMaskImage) or WP Default + SharpenImage( 0, $sigma ). Sharper image will be larger than WP default file size and and WebP clone on smallest thumbnails may be larger than JPEG image. WP default or small sigma recommended for full size. Default value is %s*.', 'warp-imagick' ), ( 0 === Shared::jpeg_sharpen_image_value_default() ? 'WP Default' : Shared::jpeg_sharpen_image_value_default() / 10 ) ),
 					'options' => array(
 						'source'   => 'callback',
 						'callback' => 'get_form_sharpen_image',
@@ -257,7 +256,8 @@ you may disable warning notice by setting checkbox to "on".</p>
 					'type'    => 'select',
 					'style'   => 'width:200px',
 					'default' => Shared::jpeg_sharpen_thumbnails_value_default(),
-					'title'   => __( 'Sharpen Thumbnails after WP Default "bluring". Select WP Default (unsharpMaskImage) or WP Default + SharpenImage( 0, $sigma ). Sharper image will be larger than WP default file size and WebP clone on smallest thumbnails may be larger than JPEG image. Test to find your optimal $sigma or disable. Default value is ' . ( 0 === Shared::jpeg_sharpen_thumbnails_value_default() ? 'WP Default' : Shared::jpeg_sharpen_thumbnails_value_default() / 10 ) . '.', 'warp-imagick' ),
+					// Translators: %s is default value.
+					'title'   => sprintf( __( 'Sharpen Thumbnails after WP Default \'bluring\'. Select WP Default (unsharpMaskImage) or WP Default + SharpenImage( 0, $sigma ). Sharper image will be larger than WP default file size and WebP clone on smallest thumbnails may be larger than JPEG image. Test to find your optimal $sigma or disable. Default value is %s*.', 'warp-imagick' ), ( 0 === Shared::jpeg_sharpen_image_value_default() ? 'WP Default' : Shared::jpeg_sharpen_image_value_default() / 10 ) ),
 					'options' => array(
 						'source'   => 'callback',
 						'callback' => 'get_form_sharpen_thumbnails',

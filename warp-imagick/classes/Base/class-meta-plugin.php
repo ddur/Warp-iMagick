@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2022 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2022. All rights reserved.
+ * @copyright © 2017-2023. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -29,15 +29,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Meta_Plugin' ) ) {
 	 */
 	abstract class Meta_Plugin extends Base_Plugin {
 
-		/** Authorization Basic Head.
-		 *
-		 * @var string $head_auth contains auth header .
-		 */
-		private $head_auth = false;
-
 		/** Instantiate plugin upgrade checker client.
 		 *
-		 * @param string $uplink updates link (https://[host.]domain.tld/updates/).
+		 * @param string $uplink updates link (https://[host.]domain.tld/[updates/]).
 		 */
 		public function plugin_upgrade_checker( $uplink = '' ) {
 			if ( empty( $uplink ) ) {
@@ -109,52 +103,64 @@ if ( ! class_exists( __NAMESPACE__ . '\Meta_Plugin' ) ) {
 			);
 
 			$host = wp_parse_url( home_url(), PHP_URL_HOST );
-			$pass = preg_replace( '/[^a-z\d]/i', '', $this->get_option( 'plugin-app-update-password', '' ) );
+			$pass = preg_replace( '/[^a-z\d]/i', '', $this->get_option( 'plugin-app-update-password', 'xxxx xxxx xxxx xxxx xxxx xxxx' ) );
 
-			if ( $host && $pass ) {
-				$this->head_auth = 'Basic ' . base64_encode( $host . ':' . $pass); // phpcs:ignore
-			}
+			$head_auth = 'Basic ' . base64_encode( $host . ':' . $pass); // phpcs:ignore
 
 			\add_filter(
 				$my_update_checker->getUniqueName( 'request_update_result' ),
 				function( $update, $http_result = null ) {
+
 					return $update;
 				},
 				10,
 				2
 			);
 
-			if ( $this->head_auth ) {
-				\add_filter(
-					'http_request_args',
-					function ( $parsed_args, $url ) use ( $host, $uplink ) {
+			\add_filter(
+				'http_request_args',
+				function ( $parsed_args, $url ) use ( $uplink, $head_auth, $host ) {
 
-						if ( ! Lib::starts_with( $url, $uplink ) ) {
-							return $parsed_args;
-						}
+					$remote_host = wp_parse_url( $url, PHP_URL_HOST );
+					$uplink_host = wp_parse_url( $uplink, PHP_URL_HOST );
 
-						if ( false === strpos( $url, '?action=', strlen( $uplink ) - 1 ) ) {
-							return $parsed_args;
-						}
+					Lib::debug( '(Client) $remote_host: ' . $remote_host );
+					Lib::debug( '(Client) $uplink_host: ' . $uplink_host );
+					Lib::debug( '(Client) $_local_host: ' . $host );
 
-						$parsed_args ['headers'] = array_merge(
-							is_array( $parsed_args ['headers'] ) ? $parsed_args ['headers'] : array(),
-							array( 'Authorization' => $this->head_auth )
-						);
-
-						$remote_host = wp_parse_url( $uplink, PHP_URL_HOST );
-
-						if ( $host === $remote_host ) {
-							Lib::debug( 'Loopback' );
-
-						}
-
+					if ( $remote_host !== $uplink_host ) {
+						Lib::debug( '(Client) Remote host ignored.' );
 						return $parsed_args;
-					},
-					10,
-					2
-				);
-			}
+					}
+					Lib::debug( '(Client) $remote_host accepted( ' . $remote_host . ' ) == ( ' . $uplink_host . ' )' );
+
+					if ( $remote_host === $host ) {
+						Lib::debug( '(Client) Update server is on local host.' );
+					} else {
+						Lib::debug( '(Client) Update server is on remote host.' );
+
+						if ( false === strpos( $url, '?action=' ) ) {
+							Lib::debug( '(Client) missing ?action=' );
+							return $parsed_args;
+						}
+
+						if ( false === strpos( $url, '&slug=' ) ) {
+							Lib::debug( '(Client) missing &slug=' );
+							return $parsed_args;
+						}
+					}
+
+					$parsed_args ['headers'] = array_merge(
+						is_array( $parsed_args ['headers'] ) ? $parsed_args ['headers'] : array(),
+						array( 'Authorization' => $head_auth )
+					);
+					Lib::debug( '(Client) Authorization header added: ' . $head_auth );
+
+					return $parsed_args;
+				},
+				10,
+				2
+			);
 		}
 	}
 }

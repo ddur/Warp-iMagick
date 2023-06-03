@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2022 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2022. All rights reserved.
+ * @copyright © 2017-2023. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -525,9 +525,12 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 		/** Get sampling factor choices for the form */
 		public function get_form_jpeg_to_webp_compression_quality() {
-			$values     = array();
-			$values [0] = __( 'Use JPEG quality *', 'warp-imagick' );
-			$values [1] = __( 'Use WebP quality', 'warp-imagick' );
+			$values      = array();
+			$values [-3] = __( 'Use JPEG quality -15%% ', 'warp-imagick' );
+			$values [-2] = __( 'Use JPEG quality -10%%', 'warp-imagick' );
+			$values [-1] = __( 'Use JPEG quality -5%%', 'warp-imagick' );
+			$values [0]  = __( 'Use JPEG quality *', 'warp-imagick' );
+			$values [1]  = __( 'Use WebP quality', 'warp-imagick' );
 			return $values;
 		}
 
@@ -552,7 +555,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 			$actual_wp_version = get_bloginfo( 'version' );
 
-			$tested_wp_version = '6.2';
+			$tested_wp_version = '6.2.2';
 			if ( 0 === \strpos( $actual_wp_version, $tested_wp_version . '.' ) ) {
 				return;
 			}
@@ -563,6 +566,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 				'admin_notices',
 				function() use ( $tested_wp_version, $actual_wp_version ) {
 					$this->plugin->echo_admin_notice(
+						// Translators: %s is tested and current WordPress version.
 						sprintf( __( 'This version of plugin is tested up to WP %1$s (Now %2$s). Please update.' ), $tested_wp_version, $actual_wp_version ),
 						'notice notice-warning is-dismissible',
 						true

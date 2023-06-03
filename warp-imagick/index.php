@@ -1,21 +1,21 @@
 <?php
 /**
- * Copyright © 2017-2022 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2022. All rights reserved.
+ * @copyright © 2017-2023. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
  * @wordpress-plugin
  * Plugin Name: Warp iMagick - Image Compressor
- * Plugin URI:  https://warp-imagick.pagespeed.club/
+ * Plugin URI:  https://github.com/ddur/Warp-iMagick
  * Description: Optimize Images. Convert & Serve WebP. Set JPEG quality (file size). Sharpen blurry WP images. Upload & resize BIG images down.
  * Author:      ddur
  * Author URI:  https://github.com/ddur
  * License:     GPLv2
- * Version:     1.10.2-beta
+ * Version:     1.10.3
  * Text Domain: warp-imagick
  * Domain Path: /languages
  *

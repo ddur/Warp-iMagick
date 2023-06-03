@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2022 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2022. All rights reserved.
+ * @copyright © 2017-2023. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -481,9 +481,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 		 */
 		public static function get_warp_editor( $file ) {
 
-			$editor = wp_get_image_editor(
-				$file,
-			);
+			$editor = wp_get_image_editor( $file );
 
 			if ( is_wp_error( $editor ) ) {
 				$msg = 'Selected editor: none/error';
@@ -689,7 +687,13 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 			return self::jpeg_quality_value_max();
 		}
 
-		/** Get webp/jpeg quality default (0=jpeg value [1=webp value]). */
+		/** Get webp/jpeg quality default.
+		 * -3 = jpeg-15%
+		 * -2 = jpeg-10%
+		 * -1 = jpeg-5%
+		 *  0 = jpeg
+		 *  1 = webp
+		 */
 		public static function webp_jpeg_quality_default() {
 			return 0;
 		}
