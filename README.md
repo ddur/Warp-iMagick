@@ -2,9 +2,9 @@
 
 # Warp iMagick - WordPress Image Compressor Plugin. Resize, Optimize, Sharpen, Compress, Regenerate, Clone & Convert to WebP - Next Gen Image Format.
 
-* Unlike most of other WordPress Image Optimizer Plugins, this plugin is __NOT__ just connector to external Image Optimization Service. Image Optimization is performed by your WordPress site server, free and at the "expense" of your hosting provider CPU time. No external image optimization service/signup required. No limits in number or megabytes of optimized images. Plugin uses only PHP extension software installed on your server: PHP-imagick and PHP-GD.
+* Unlike almost all of other WordPress Image Optimizer Plugins, this plugin is __NOT__ just connector to external Image Optimization Service. Image Optimization is performed by your WordPress site server, free and at the "expense" of your hosting provider CPU time. No external image optimization service/signup required. No limits in number or megabytes of optimized images. No risky/external binaries required to install on your site server. Plugin uses only safe PHP extension software available or installed on your server by your hosting provider: PHP-imagick and PHP-GD.
 
-* Unlike some other WordPress Image Optimization Plugins, this plugin allows you to regenerate images to high-compression/low-quality and back to high-quality/low-compression images. You can't overcompress or unrecoverably degrade images quality by regenerating thumbnails again and again. Uploaded original image quality is always preserved. Once original image is (re) compressed to lower compression quality then original and image regenerated thumbnails are permanently degraded in quality. Instead of compressing original, attached image is replaced with optimized version of original, but that  can be disabled if you want to show high quality original photo to site visitors.
+* Unlike some other WordPress Image Optimization Plugins, this plugin allows you to regenerate images to high-compression/low-quality and back to high-quality/low-compression images. You can't overcompress or unrecoverably degrade images quality by regenerating thumbnails again and again. Uploaded original image quality is always preserved. In some other plugins, once original image is (re) compressed to lower compression quality then on next regeneration, original and regenerated thumbnails are permanently degraded in quality. In this plugin, instead of compressing original, attached image is replaced with optimized version of original, but that can be disabled if you want to show high quality original photo to site visitors.
 
 * Unlike any other plugin I have seen, this plugin has real visual size preview of media image and all generated thumbnails, including WebP clones. When mouse hovers over any image in a preview, a tooltip is shown with size-name (webp clone), pixel-size, file-name and byte-size.
 
@@ -26,8 +26,6 @@
 
 * Tested with Apache Server and NGinx Server on [WordOps](https://github.com/WordOps/WordOps) configuration.
 
-* If you like or use this plugin, please award this project with a __GitHub Star__ (see top right on this page) 
-
 * My favorite comment (later removed by someone):
 > WordPress.org Forums <noreply@wordpress.org>
 > Jan 19, 2021, 8:26 PM
@@ -35,17 +33,20 @@
 > 
 > Thank you so much for an amazing plugin, Helped my website from 7 seconds to 2.5 seconds!!! keep up the great work!
 
+* If you like and/or or use this plugin, please share it with your colegues, friends and please award this project with a __GitHub Star__ (see top right on this page).
 
-# Listed on
-
-* [14 Best WordPress Plugins for Using WebP Images](https://www.cloudzat.com/webp-images-wordpress-plugins/)
-* [Awesome WP Speed Up - Image Optimization Plugins](https://github.com/lukecav/awesome-wp-speed-up#image-optimization-plugins)
 
 # Share
 
 * [![Facebook share](https://img.shields.io/badge/Share%20on-Facebook-darkblue)](https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fgithub.com%2Fddur%2FWarp-iMagick%2F)
 
 * [![Twitter share](https://img.shields.io/badge/Share%20on-Twitter-blue)](https://twitter.com/intent/tweet?url=https%3A%2F%2Fgithub.com%2Fddur%2FWarp-iMagick%2F&amp;text=Warp%20iMagick%20WordPress%20Image%20Compressor%20Plugin%3A%20)
+
+
+# Listed on
+
+* [14 Best WordPress Plugins for Using WebP Images](https://www.cloudzat.com/webp-images-wordpress-plugins/)
+* [Awesome WP Speed Up - Image Optimization Plugins](https://github.com/lukecav/awesome-wp-speed-up#image-optimization-plugins)
 
 
 # Install from WordPress - Version 1.9.6:
