@@ -8,7 +8,9 @@
 
 * Unlike any other plugin I have seen, this plugin has real visual size preview of media image and all generated thumbnails, including WebP clones. When mouse hovers over any image in a preview, a tooltip is shown with size-name (webp clone), pixel-size, file-name and byte-size.
 
-* Due to flexible configuration and compression quality, Warp iMagick Plugin is endorsed and recommended by photografic site owners.
+* Because of using server redirection rules, it does't matter if the image is served via HTML <img> tag or CSS background-image style. It works always!
+
+* Due to flexible configuration and compression quality, Warp iMagick Plugin is endorsed and recommended by photografic site owner [KennyLL support post](https://wordpress.org/support/topic/disable-full-size-compressed-version/#post-14381959).
 
 * Resizing images on upload (optional) allows you to reduce uploaded images to maximal number of pixels used on site. Feature is usefull on WordPress multisite/multiowner installs or on mobile-only sites.
 
@@ -16,7 +18,7 @@
 
 * Sharpening images allows you to fix blurry WordPress thumbnails.
 
-* WooCommerce compatible.
+* WooCommerce and any theme compatible.
 
 * Project is active since 2019 and reached almost 20.000 active installs, in February-April 2022 moved out of WordPress cvs repository. Why? Because of [dispute about plugin TITLE LENGTH in README.txt (See the comment)](https://themekraft.com/open-letter-to-the-wordpress-plugin-review-team/).
 
