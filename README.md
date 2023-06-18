@@ -90,7 +90,7 @@
 
 __To serve (from JPEG/PNG converted) WebP clones to WebP enabled browsers, you must configure your Apache server!__
 
-__Configuring server to serve WebP images is fastes (pagespeed) way to deliver WebP images. Server configuration is not done by this plugin because programmatic change could potentially break your site. You will have to DIY (Do It Yourself).__
+__Configuring server to serve WebP images is fastest (page-speed) way to deliver WebP images. Server configuration is not changed by this plugin because programmatic change could potentially break your site. You will have to DIY (Do It Yourself).__
 
 To __safely__ modify your Apache ``/.htaccess`` file, use [Htaccess File Editor plugin](https://wordpress.org/plugins/wp-htaccess-editor/).
 If you use other ways to modify/edit Apache ``/.htaccess`` file, always backup/save your original ``/.htaccess`` file __before__ applying changes!
