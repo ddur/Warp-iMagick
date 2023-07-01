@@ -111,6 +111,7 @@ __Use Copy button at top-right (visible on mouse hover) of code-snippet below an
 	RewriteBase /
 	
 	RewriteCond %{HTTP_ACCEPT} image/webp
+	RewriteCond %{REQUEST_URI} /wp-content/
 	RewriteCond %{REQUEST_URI} (?i)(.*)\.(jpe?g|png)$
 	RewriteCond %{DOCUMENT_ROOT}%1\.%2.webp -f
 
@@ -142,6 +143,9 @@ Below is annotated version of ``/.htaccess`` snippet with options/variations and
 	
 	# If browser accepts WebP files?
 	RewriteCond %{HTTP_ACCEPT} image/webp
+
+	# If request is inside wp-content directory
+	RewriteCond %{REQUEST_URI} /wp-content/
 
 	# If request is for jpg/png file?
 	RewriteCond %{REQUEST_URI} (?i)(.*)\.(jpe?g|png)$
