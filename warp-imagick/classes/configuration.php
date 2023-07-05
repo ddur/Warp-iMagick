@@ -16,6 +16,7 @@
 
 namespace ddur\Warp_iMagick;
 
+use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use \ddur\Warp_iMagick\Shared;
 
 defined( 'ABSPATH' ) || die( -1 );
@@ -27,7 +28,7 @@ return array(
 		'requires' => array(
 
 			'wp'         => '5.3',
-			'php'        => '7.2',
+			'php'        => '7.3',
 
 			'extensions' => array(
 				'imagick' => 'PHP Imagick',
@@ -43,17 +44,14 @@ return array(
 			),
 
 			'constants'  => array(),
+
+			'files'      => array(),
 		),
-
-
 
 		'metabox'  => array(
 			'name' => __( 'Plugin Home Page', 'warp-imagick' ),
 
 		),
-
-
-
 
 	),
 	'menu'            => array(
@@ -62,12 +60,11 @@ return array(
 		'parent-slug'   => 'upload.php',
 		'position'      => 99,
 
-
 		'settings-name' => __( 'Settings', 'warp-imagick' ),
 		'settings-icon' => '⚙',
 	),
 	'page'            => array(
-		'title'     => 'Warp iMagick - Image Compressor',
+		'title'     => trim( 'Warp iMagick - Image Compressor ' . Shared::get_plugin_version() ),
 		'subtitle'  => __( 'Current optimization settings will apply only to new media uploads.', 'warp-imagick' ),
 		'help-tabs' => array(
 			array(
@@ -106,12 +103,12 @@ Copy code snippet (below) and paste it into your editor, at the top of /.htacces
 	RewriteEngine On
 	RewriteBase /
 
-	# Request for JPEG/PNG file.
-	# Transparently serve existing WebP.
 	RewriteCond %{HTTP_ACCEPT} image/webp
-	RewriteCond %{REQUEST_URI} ^(.+)\.(?i)(JPE?G|PNG)$
-	RewriteCond %{DOCUMENT_ROOT}%1\.%2.webp -f
-	RewriteRule .+ %1\.%2\.webp [T=image/webp,E=webp:1,L]
+	RewriteCond %{REQUEST_URI} /wp-content/
+	RewriteCond %{REQUEST_URI} (.*)\.(?i)(jpe?g|png)$
+	RewriteCond %{REQUEST_FILENAME} -f
+	RewriteCond %{REQUEST_FILENAME}.webp -f
+	RewriteRule .* %1\.%2.webp [T=image/webp,E=webp:1,L]
 
 	&lt;IfModule mod_headers.c&gt
 		Header append Vary Accept env=REDIRECT_webp
@@ -137,28 +134,17 @@ document.getElementById("copy-to-clipboard")
 </script>
 <p>Line "<code>AddType image/webp .webp</code>" will enable Apache to respond with Content-Type: "image/webp" for requested WebP images, regardless of rewrite rules below. Only if mod_mime is enabled and image/webp not already recognized by.</p>
 <p>Line "<code>RewriteCond %{HTTP_ACCEPT} image/webp</code>" detects whether browser can accept WebP images or not.</p>
+<p>Line "<code>RewriteCond %{REQUEST_URI} /wp-content/</code>" matches when WebP enabled browser request is inside /wp-content/ directory.</p>
 <p>Line "<code>RewriteCond %{REQUEST_URI} (?i)(.*)\.(jpe?g|png)$</code>" matches when WebP enabled browser has requested for JPEG/PNG image.</p>
 <p>Line "<code>RewriteCond %{DOCUMENT_ROOT}%1\.%2.webp -f</code>" tests if WebP version of JPEG/PNG image exists on the server file system.</p>
 <p>Line "<code>RewriteRule (?i)(.*)\.(jpe?g|png)$ %1\.%2\.webp [T=image/webp,E=webp:1,L]</code>" will make Apache to respond with WebP image content, set environment variable and stop looking for other rewrite rules. Mime type "image/webp" is set regardless if mod_mime is enabled or not.</p>
 <p>Line "<code>Header append Vary Accept env=REDIRECT_webp</code>" will inform your browser and/or CDN that content of JPEG/PNG image response may "vary" based on browser Accept: "content-type" header. Only if mod_headers is enabled. Your CDN may or may not cache response with Vary: "Accept" header.</p>
 <p></p>
-<p>To check if WebP rewrite rules are working after .htaccess modifications:
-<ol>
-<li>Use most recent Chrome browser.</li>
-<li>In plugin settings enable WebP images.</li>
-<li>Upload JPEG/PNG image while WebP images still enabled :).</li>
-<li>Attach media to some page and open that page, or view/open attachment page if your site/theme supports it.</li>
-<li>Open Chrome Development Tools [Ctrl+Shift+I].</li>
-<li>Select Network Tab.</li>
-<li>Press [F5] or [Ctrl-R] to reload page.</li>
-<li>Find image request and click on it to expand Request/Response headers.</li>
-<li>Check Response headers for image. "Content-Type:" should be "webp" or "image/webp", and "Content-Length:" is expected to be smaller than original JPEG/PNG image size (depends on your WebP compression quality configuration).</li>
-</ol>
-</p>
-<p>Instructions on "How to configure server to serve WebP images" for other http-servers, is not difficult to find on internet.</p>
-<p>Good <b>Nginx</b> instructions: <a target=_blank rel="noopener noreferrer" href=https://github.com/uhop/grunt-tight-sprite/wiki/Recipe:-serve-WebP-with-nginx-conditionally>Recipe: serve WebP with nginx conditionally</a>.</p>
+<p>To check if WebP rewrite rules are working after .htaccess modifications, refresh Settings Page and look at WebP Redirect Visual Test at Right column.</p>
+<p></p>
 <p>If you use <a target=_blank rel="noopener noreferrer" href=https://wordops.net/ >WordOps: Free WordPres sites Nginx stack and control CLI for VPS or Dedicated servers</a>, your <a target=_blank rel="noopener noreferrer" href=https://nginx.org/en/ >Nginx Server</a> is already configured to serve WebP converted clones instead original JPEG/PNG uploads & subsizes, but restricted to "wp-content/uploads/" directory only.</p>
-',
+<p>Instructions on "How to configure server to serve WebP images" for other http-servers, is not difficult to find on internet.</p>
+<p>Good <b>Nginx</b> instructions: <a target=_blank rel="noopener noreferrer" href=https://github.com/uhop/grunt-tight-sprite/wiki/Recipe:-serve-WebP-with-nginx-conditionally>Recipe: serve WebP with nginx conditionally</a>.</p>',
 			),
 			array(
 				'id'      => 'jpeg-reduction',
@@ -197,9 +183,6 @@ document.getElementById("copy-to-clipboard")
 				'title'   => __( 'Plugin Options', 'warp-imagick' ),
 				'content' =>
 				'
-<h2>Disable "auto-update" warning</h2>
-<p>If you don\'t want to use WordPress "auto-update" for this plugin or "auto-update" is not detected because it is managed by some plugin,
-you may disable warning notice by setting checkbox to "on".</p>
 <h2>Remove settings on uninstall</h2>
 <p>Set checkbox "on" to <b>remove</b> plugin settings when plugin is deleted.</p>
 <p>Set checkbox "off" to <b>keep</b> plugin settings after plugin is deleted.</p>
@@ -263,8 +246,6 @@ you may disable warning notice by setting checkbox to "on".</p>
 						'callback' => 'get_form_sharpen_thumbnails',
 					),
 				),
-
-
 
 				'jpeg-colorspace'          => array(
 					'label'   => __( 'Convert Colors to "sRGB" Colorspace', 'warp-imagick' ),
@@ -332,8 +313,6 @@ you may disable warning notice by setting checkbox to "on".</p>
 			'title'  => __( 'PNG Sizes/Thumbs', 'warp-imagick' ),
 			'render' => 'render_png_thumb_options',
 			'fields' => array(
-
-
 
 				'png-reduce-colors-enable'    => array(
 					'label'   => __( 'Reduce Colors', 'warp-imagick' ),
@@ -437,11 +416,11 @@ you may disable warning notice by setting checkbox to "on".</p>
 			'fields' => array(
 
 				'image-max-width-enabled' => array(
-					'label'   => __( 'Resize too large images', 'warp-imagick' ),
+					'label'   => __( 'Resize too large images (recommended value on*)', 'warp-imagick' ),
 					'type'    => 'checkbox',
 					'default' => Shared::max_width_enabled_default(),
 					// Translators: %s are configurable max size limit range min & max value.
-					'title'   => sprintf( __( 'When enabled, images wider than maximum width limit (%1$s-%2$s) and/or taller than 2500 pixels will be proportionally downsized to best fit to maximum width and height. Downsizing is executed on image upload. Downsized image will replace "original" and save your disk space. When image upload post processing fails, WordPress suggests to upload image sizes up to 2500 pixels. Default value is ON.', 'warp-imagick' ), Shared::max_width_value_min(), Shared::max_width_value_max() ),
+					'title'   => sprintf( __( 'When enabled (= default and recommended value), images wider than maximum width limit (%1$s-%2$s) and/or taller than 2500 pixels will be proportionally downsized to best fit to maximum width and height. Downsizing is executed on image upload. Downsized image will replace "original" and save your disk space. When image upload post processing fails, WordPress suggests to upload image sizes up to 2500 pixels. Default value is ON.', 'warp-imagick' ), Shared::max_width_value_min(), Shared::max_width_value_max() ),
 				),
 
 				'image-max-width-pixels'  => array(
@@ -464,10 +443,10 @@ you may disable warning notice by setting checkbox to "on".</p>
 			'title'  => __( 'Generate Sizes/Thumbnails', 'warp-imagick' ),
 			'fields' => array(
 				'wp-big-image-size-threshold-disabled' => array(
-					'label'   => __( 'Disable "BIG Image Size Threshold" filter introduced in WordPress 5.3.', 'warp-imagick' ),
+					'label'   => __( 'Disable "BIG Image Size Threshold" filter (recommended value on*)', 'warp-imagick' ),
 					'type'    => 'checkbox',
 					'default' => Shared::big_image_size_threshold_disabled_default(),
-					'title'   => __( 'Disabled by default. When checked (on), prevents BIG JPEG image to be downsized and reduced to thumbnail quality. WordPress (version 5.3+) "Big Image Size Threshold" filter defaults to 2560x2560 pixels.', 'warp-imagick' ),
+					'title'   => __( 'When checked (= disable, default and recommended value), prevents BIG JPEG image to be downsized and reduced to thumbnail quality. WordPress (version 5.3+) "Big Image Size Threshold" filter defaults to 2560x2560 pixels.', 'warp-imagick' ),
 					'options' => array(),
 				),
 				'wp-big-image-size-threshold-value'    => array(
@@ -501,8 +480,6 @@ you may disable warning notice by setting checkbox to "on".</p>
 			),
 		),
 
-
-
 		'plugin-options'              => array(
 			'title'  => __( 'Plugin Settings', 'warp-imagick' ),
 			'fields' => array(
@@ -529,22 +506,6 @@ you may disable warning notice by setting checkbox to "on".</p>
 					'placeholder' => 'xxxx xxxx xxxx xxxx xxxx xxxx',
 				),
 
-				'disable-auto-update-notice' => array(
-					'label'   => __( 'Disable warning notice: "Plugin \'auto-update\' is disabled..."', 'warp-imagick' ),
-					'type'    => 'checkbox',
-					'style'   => 'width:200px',
-					'default' => Shared::disable_auto_update_notice_value_default(),
-					'title'   => __( 'Disable warning notice: "Plugin \'auto-update\' is disabled..."', 'warp-imagick' ),
-				),
-
-				'remove-settings'            => array(
-					'label'   => __( 'Remove settings on uninstall', 'warp-imagick' ),
-					'type'    => 'checkbox',
-					'style'   => 'width:200px',
-					'default' => Shared::remove_plugin_settings_default(),
-					'title'   => __( 'Remove plugin settings when plugin is uninstalled (and deleted)', 'warp-imagick' ),
-				),
-
 				'menu-parent-slug'           => array(
 					'label'   => __( 'Select parent menu', 'warp-imagick' ),
 					'type'    => 'select',
@@ -564,6 +525,30 @@ you may disable warning notice by setting checkbox to "on".</p>
 						),
 					),
 				),
+
+				'remove-settings'            => array(
+					'label'   => __( 'Remove settings on uninstall', 'warp-imagick' ),
+					'type'    => 'checkbox',
+					'style'   => 'width:200px',
+					'default' => Shared::remove_plugin_settings_default(),
+					'title'   => __( 'Remove plugin settings when plugin is uninstalled (and deleted)', 'warp-imagick' ),
+				),
+
+				'disable-img-test-metabox'   => array(
+					'label'   => __( 'Disable WebP Redirect Visual Test.', 'warp-imagick' ),
+					'type'    => 'checkbox',
+					'style'   => 'width:200px',
+					'default' => false,
+					'title'   => __( 'Disable WebP Redirect Visual Test (MetaBox on right Sidebar).', 'warp-imagick' ),
+				),
+
+				'verbose-debug-enabled'      => array(
+					'label'   => __( 'Verbose Debug', 'warp-imagick' ),
+					'type'    => Lib::is_debug() ? 'checkbox' : 'hidden',
+					'style'   => 'width:200px',
+					'default' => Shared::verbose_debug_enabled_value_default(),
+					'title'   => __( 'Allow all debug messages', 'warp-imagick' ),
+				),
 			),
 		),
 
@@ -573,7 +558,6 @@ you may disable warning notice by setting checkbox to "on".</p>
 			'submit' => false,
 			'fields' => array(),
 		),
-
 
 		'terms-of-use'                => array(
 			'title'  => __( 'Copyright, License, Privacy and Disclaimer', 'warp-imagick' ),

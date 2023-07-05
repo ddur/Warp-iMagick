@@ -27,22 +27,4 @@ defined( 'ABSPATH' ) || die( -1 );
 
 /** CWEBP: Code is missing here. */
 
-
-
-
-
-/** CWEBP: Code is missing here. */
-
-
-
-
-
-/** CWEBP: Code is missing here. */
-
-
-
-
-
-/** CWEBP: Code is missing here. */
-
 exit;

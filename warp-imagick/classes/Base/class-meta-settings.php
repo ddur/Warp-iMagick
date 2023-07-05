@@ -22,13 +22,11 @@ use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use \ddur\Warp_iMagick\Base\Base_Settings;
 
 if ( ! class_exists( __NAMESPACE__ . '\Meta_Settings' ) ) {
-
 	/** Meta Settings Class.
 	 *
 	 * Class between Settings and abstract Base_Settings class.
 	 */
 	abstract class Meta_Settings extends Base_Settings {
-
 		// phpcs:ignore
 	# region Static Manage Plugin Functions.
 
@@ -37,7 +35,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Meta_Settings' ) ) {
 		 * @param string $action - one of activate/deactivate/uninstall.
 		 */
 		protected static function on_manage_plugin( $action ) {
-
 		}
 
 		/** Get Plugin ID */

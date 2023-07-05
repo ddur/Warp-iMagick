@@ -26,10 +26,8 @@ use \ddur\Warp_iMagick\Shared;
 require_once ABSPATH . 'wp-admin/includes/file.php';
 
 if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
-
 	/** Implementation of Plugin Settings. */
 	class Settings extends Meta_Settings {
-
 		// phpcs:ignore
 	# region Configuration and Construction
 
@@ -40,7 +38,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 		public function read_configuration() {
 			return require __DIR__ . '/configuration.php';
 		}
-
 
 		/** Settings init. Called immediately after plugin class is constructed. */
 		protected function init() {
@@ -53,7 +50,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 		/** Enqueue admin page scripts. Overridden. */
 		public function enqueue_page_scripts() {
-
 			Lib::enqueue_style( 'abstract-settings-admin-styled' );
 			Lib::enqueue_script( 'abstract-settings-admin-styled' );
 
@@ -117,194 +113,193 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 			return $value;
 		}
 
-		/** Validate (&transform) input values. Overridden.
+		/** Validate (&transform) input options(values). Overridden.
 		 *
 		 * From Settings UI (form&submit) to Options API.
 		 *
-		 * @param array $values to validate.
-		 * @return array $values validated.
+		 * @param array $options to validate.
+		 * @return array $options validated.
 		 */
-		public function validate_options( $values ) {
-
-			if ( ! is_array( $values ) ) {
-				$values = array();
-				$this->add_settings_update_error( "Invalid input type ({$get_type ($values)})" );
+		public function validate_options( $options ) {
+			if ( ! is_array( $options ) ) {
+				$options = array();
+				$this->add_settings_update_error( 'Invalid input type: ' . get_type( $options ) );
 			}
 
-			self::validate_checkbox_key( 'jpeg-colorspace-force', $values );
+			self::validate_checkbox_key( 'jpeg-colorspace-force', $options );
 
-			self::validate_checkbox_key( 'png-reduce-colors-enable', $values );
+			self::validate_checkbox_key( 'png-reduce-colors-enable', $options );
 
-			self::validate_checkbox_key( 'png-reduce-colors-dither', $values );
+			self::validate_checkbox_key( 'png-reduce-colors-dither', $options );
 
-			self::validate_checkbox_key( 'webp-images-create', $values );
+			self::validate_checkbox_key( 'webp-images-create', $options );
 
-			self::validate_checkbox_key( 'webp-cwebp-on-demand', $values );
+			self::validate_checkbox_key( 'webp-cwebp-on-demand', $options );
 
-			self::validate_checkbox_key( 'wp-big-image-size-threshold-disabled', $values );
+			self::validate_checkbox_key( 'wp-big-image-size-threshold-disabled', $options );
 
-			self::validate_checkbox_key( 'wp-maybe-exif-rotate-disabled', $values );
+			self::validate_checkbox_key( 'wp-maybe-exif-rotate-disabled', $options );
 
-			self::validate_checkbox_key( 'compress-jpeg-original-disabled', $values );
+			self::validate_checkbox_key( 'compress-jpeg-original-disabled', $options );
 
-			self::validate_checkbox_key( 'image-max-width-enabled', $values );
+			self::validate_checkbox_key( 'image-max-width-enabled', $options );
 
-			self::validate_checkbox_key( 'image-max-width-backup', $values );
+			self::validate_checkbox_key( 'image-max-width-backup', $options );
 
-			self::validate_checkbox_key( 'extra-size-same-width', $values );
+			self::validate_checkbox_key( 'extra-size-same-width', $options );
 
-			self::validate_checkbox_key( 'remove-settings', $values );
+			self::validate_checkbox_key( 'remove-settings', $options );
 
-			self::validate_checkbox_key( 'disable-auto-update-notice', $values );
+			self::validate_checkbox_key( 'verbose-debug-enabled', $options );
 
-			if ( ! array_key_exists( 'image-max-width-pixels', $values ) ) {
-				$values ['image-max-width-pixels'] = Shared::max_width_value_default();
+			if ( ! array_key_exists( 'image-max-width-pixels', $options ) ) {
+				$options ['image-max-width-pixels'] = Shared::max_width_value_default();
 			} else {
-				$values ['image-max-width-pixels'] = (int) $values ['image-max-width-pixels'];
-				if ( $values ['image-max-width-pixels'] < Shared::max_width_value_min() || $values ['image-max-width-pixels'] > Shared::max_width_value_max() ) {
-					$values ['image-max-width-pixels'] = Shared::max_width_value_default();
+				$options ['image-max-width-pixels'] = (int) $options ['image-max-width-pixels'];
+				if ( $options ['image-max-width-pixels'] < Shared::max_width_value_min() || $options ['image-max-width-pixels'] > Shared::max_width_value_max() ) {
+					$options ['image-max-width-pixels'] = Shared::max_width_value_default();
 				}
 			}
 
-			if ( ! array_key_exists( 'jpeg-sharpen-image', $values ) ) {
-				$values ['jpeg-sharpen-image'] = Shared::jpeg_sharpen_image_value_default();
+			if ( ! array_key_exists( 'jpeg-sharpen-image', $options ) ) {
+				$options ['jpeg-sharpen-image'] = Shared::jpeg_sharpen_image_value_default();
 			} else {
-				$values ['jpeg-sharpen-image'] = (int) $values ['jpeg-sharpen-image'];
-				if ( $values ['jpeg-sharpen-image'] < Shared::sharpen_value_min() || $values ['jpeg-sharpen-image'] > Shared::sharpen_value_max() ) {
-					$values ['jpeg-sharpen-image'] = Shared::jpeg_sharpen_image_value_default();
+				$options ['jpeg-sharpen-image'] = (int) $options ['jpeg-sharpen-image'];
+				if ( $options ['jpeg-sharpen-image'] < Shared::sharpen_value_min() || $options ['jpeg-sharpen-image'] > Shared::sharpen_value_max() ) {
+					$options ['jpeg-sharpen-image'] = Shared::jpeg_sharpen_image_value_default();
 				}
 			}
 
-			if ( ! array_key_exists( 'jpeg-sharpen-thumbnails', $values ) ) {
-				$values ['jpeg-sharpen-thumbnails'] = Shared::jpeg_sharpen_thumbnails_value_default();
+			if ( ! array_key_exists( 'jpeg-sharpen-thumbnails', $options ) ) {
+				$options ['jpeg-sharpen-thumbnails'] = Shared::jpeg_sharpen_thumbnails_value_default();
 			} else {
-				$values ['jpeg-sharpen-thumbnails'] = (int) $values ['jpeg-sharpen-thumbnails'];
-				if ( $values ['jpeg-sharpen-thumbnails'] < Shared::sharpen_value_min() || $values ['jpeg-sharpen-thumbnails'] > Shared::sharpen_value_max() ) {
-					$values ['jpeg-sharpen-thumbnails'] = Shared::jpeg_sharpen_thumbnails_value_default();
+				$options ['jpeg-sharpen-thumbnails'] = (int) $options ['jpeg-sharpen-thumbnails'];
+				if ( $options ['jpeg-sharpen-thumbnails'] < Shared::sharpen_value_min() || $options ['jpeg-sharpen-thumbnails'] > Shared::sharpen_value_max() ) {
+					$options ['jpeg-sharpen-thumbnails'] = Shared::jpeg_sharpen_thumbnails_value_default();
 				}
 			}
 
-			if ( ! array_key_exists( 'jpeg-compression-quality', $values ) ) {
-				$values ['jpeg-compression-quality'] = Shared::jpeg_quality_default();
+			if ( ! array_key_exists( 'jpeg-compression-quality', $options ) ) {
+				$options ['jpeg-compression-quality'] = Shared::jpeg_quality_default();
 			} else {
-				$values ['jpeg-compression-quality'] = (int) $values ['jpeg-compression-quality'];
-				if ( $values ['jpeg-compression-quality'] < Shared::jpeg_quality_value_min() ) {
-					$values ['jpeg-compression-quality'] = Shared::jpeg_quality_default();
+				$options ['jpeg-compression-quality'] = (int) $options ['jpeg-compression-quality'];
+				if ( $options ['jpeg-compression-quality'] < Shared::jpeg_quality_value_min() ) {
+					$options ['jpeg-compression-quality'] = Shared::jpeg_quality_default();
 				}
-				if ( $values ['jpeg-compression-quality'] > Shared::jpeg_quality_value_max() ) {
-					$values ['jpeg-compression-quality'] = Shared::jpeg_quality_default();
+				if ( $options ['jpeg-compression-quality'] > Shared::jpeg_quality_value_max() ) {
+					$options ['jpeg-compression-quality'] = Shared::jpeg_quality_default();
 				}
 			}
 
-			if ( ! array_key_exists( 'jpeg-colorspace', $values ) ) {
-				$values ['jpeg-colorspace'] = Shared::jpeg_colorspace_default();
+			if ( ! array_key_exists( 'jpeg-colorspace', $options ) ) {
+				$options ['jpeg-colorspace'] = Shared::jpeg_colorspace_default();
 			} else {
-				$values ['jpeg-colorspace'] = (int) $values ['jpeg-colorspace'];
-				if ( ! array_key_exists( $values ['jpeg-colorspace'], $this->get_form_jpeg_colorspaces() ) ) {
-					$values ['jpeg-colorspace'] = Shared::jpeg_colorspace_default();
+				$options ['jpeg-colorspace'] = (int) $options ['jpeg-colorspace'];
+				if ( ! array_key_exists( $options ['jpeg-colorspace'], $this->get_form_jpeg_colorspaces() ) ) {
+					$options ['jpeg-colorspace'] = Shared::jpeg_colorspace_default();
 				}
 			}
 
-			if ( ! array_key_exists( 'jpeg-interlace-scheme', $values ) ) {
-				$values ['jpeg-interlace-scheme'] = Shared::jpeg_interlace_scheme_default();
+			if ( ! array_key_exists( 'jpeg-interlace-scheme', $options ) ) {
+				$options ['jpeg-interlace-scheme'] = Shared::jpeg_interlace_scheme_default();
 			} else {
-				$values ['jpeg-interlace-scheme'] = (int) $values ['jpeg-interlace-scheme'];
-				if ( ! array_key_exists( $values ['jpeg-interlace-scheme'], $this->get_form_jpeg_interlace_types() ) ) {
-					$values ['jpeg-interlace-scheme'] = Shared::jpeg_interlace_scheme_default();
+				$options ['jpeg-interlace-scheme'] = (int) $options ['jpeg-interlace-scheme'];
+				if ( ! array_key_exists( $options ['jpeg-interlace-scheme'], $this->get_form_jpeg_interlace_types() ) ) {
+					$options ['jpeg-interlace-scheme'] = Shared::jpeg_interlace_scheme_default();
 				}
 			}
 
-			if ( ! array_key_exists( 'jpeg-sampling-factor', $values ) ) {
-				$values ['jpeg-sampling-factor'] = Shared::jpeg_sampling_factor_default();
+			if ( ! array_key_exists( 'jpeg-sampling-factor', $options ) ) {
+				$options ['jpeg-sampling-factor'] = Shared::jpeg_sampling_factor_default();
 			} else {
 				$valid_sampling_factors = $this->get_form_jpeg_sampling_factors();
-				if ( ! array_key_exists( $values ['jpeg-sampling-factor'], $valid_sampling_factors ) ) {
-					$values ['jpeg-sampling-factor'] = Shared::jpeg_sampling_factor_default();
+				if ( ! array_key_exists( $options ['jpeg-sampling-factor'], $valid_sampling_factors ) ) {
+					$options ['jpeg-sampling-factor'] = Shared::jpeg_sampling_factor_default();
 				}
 			}
 
-			if ( ! array_key_exists( 'jpeg-strip-meta', $values ) ) {
-				$values ['jpeg-strip-meta'] = Shared::jpeg_strip_meta_default();
+			if ( ! array_key_exists( 'jpeg-strip-meta', $options ) ) {
+				$options ['jpeg-strip-meta'] = Shared::jpeg_strip_meta_default();
 			} else {
-				$values ['jpeg-strip-meta'] = (int) $values ['jpeg-strip-meta'];
-				if ( ! array_key_exists( $values ['jpeg-strip-meta'], $this->get_form_strip_metadata() ) ) {
-					$values ['jpeg-strip-meta'] = Shared::jpeg_strip_meta_default();
+				$options ['jpeg-strip-meta'] = (int) $options ['jpeg-strip-meta'];
+				if ( ! array_key_exists( $options ['jpeg-strip-meta'], $this->get_form_strip_metadata() ) ) {
+					$options ['jpeg-strip-meta'] = Shared::jpeg_strip_meta_default();
 				}
 			}
 
-			if ( ! array_key_exists( 'png-sharpen-thumbnails', $values ) ) {
-				$values ['png-sharpen-thumbnails'] = Shared::png_sharpen_thumbnails_value_default();
+			if ( ! array_key_exists( 'png-sharpen-thumbnails', $options ) ) {
+				$options ['png-sharpen-thumbnails'] = Shared::png_sharpen_thumbnails_value_default();
 			} else {
-				$values ['png-sharpen-thumbnails'] = (int) $values ['png-sharpen-thumbnails'];
-				if ( $values ['png-sharpen-thumbnails'] < Shared::sharpen_value_min() || $values ['png-sharpen-thumbnails'] > Shared::sharpen_value_max() ) {
-					$values ['png-sharpen-thumbnails'] = Shared::png_sharpen_thumbnails_value_default();
+				$options ['png-sharpen-thumbnails'] = (int) $options ['png-sharpen-thumbnails'];
+				if ( $options ['png-sharpen-thumbnails'] < Shared::sharpen_value_min() || $options ['png-sharpen-thumbnails'] > Shared::sharpen_value_max() ) {
+					$options ['png-sharpen-thumbnails'] = Shared::png_sharpen_thumbnails_value_default();
 				}
 			}
 
-			if ( ! array_key_exists( 'png-reduce-max-colors-count', $values ) ) {
-				$values ['png-reduce-max-colors-count'] = Shared::png_max_colors_value_default();
+			if ( ! array_key_exists( 'png-reduce-max-colors-count', $options ) ) {
+				$options ['png-reduce-max-colors-count'] = Shared::png_max_colors_value_default();
 			} else {
-				$values ['png-reduce-max-colors-count'] = (int) $values ['png-reduce-max-colors-count'];
-				if ( $values ['png-reduce-max-colors-count'] < Shared::png_max_colors_value_min() ) {
-					$values ['png-reduce-max-colors-count'] = Shared::png_max_colors_value_default();
+				$options ['png-reduce-max-colors-count'] = (int) $options ['png-reduce-max-colors-count'];
+				if ( $options ['png-reduce-max-colors-count'] < Shared::png_max_colors_value_min() ) {
+					$options ['png-reduce-max-colors-count'] = Shared::png_max_colors_value_default();
 				}
-				if ( $values ['png-reduce-max-colors-count'] > Shared::png_max_colors_value_max() ) {
-					$values ['png-reduce-max-colors-count'] = Shared::png_max_colors_value_default();
+				if ( $options ['png-reduce-max-colors-count'] > Shared::png_max_colors_value_max() ) {
+					$options ['png-reduce-max-colors-count'] = Shared::png_max_colors_value_default();
 				}
 			}
 
-			if ( ! array_key_exists( 'png-strip-meta', $values ) ) {
-				$values ['png-strip-meta'] = Shared::png_strip_meta_default();
+			if ( ! array_key_exists( 'png-strip-meta', $options ) ) {
+				$options ['png-strip-meta'] = Shared::png_strip_meta_default();
 			} else {
-				$values ['png-strip-meta'] = (int) $values ['png-strip-meta'];
-				if ( ! array_key_exists( $values ['png-strip-meta'], $this->get_form_strip_metadata() ) ) {
-					$values ['png-strip-meta'] = Shared::png_strip_meta_default();
+				$options ['png-strip-meta'] = (int) $options ['png-strip-meta'];
+				if ( ! array_key_exists( $options ['png-strip-meta'], $this->get_form_strip_metadata() ) ) {
+					$options ['png-strip-meta'] = Shared::png_strip_meta_default();
 				}
 			}
 
-			if ( ! array_key_exists( 'webp-compression-quality', $values ) ) {
-				$values ['webp-compression-quality'] = Shared::webp_quality_default();
+			if ( ! array_key_exists( 'webp-compression-quality', $options ) ) {
+				$options ['webp-compression-quality'] = Shared::webp_quality_default();
 			} else {
-				$values ['webp-compression-quality'] = (int) $values ['webp-compression-quality'];
-				if ( $values ['webp-compression-quality'] < Shared::webp_quality_value_min() ) {
-					$values ['webp-compression-quality'] = Shared::webp_quality_default();
+				$options ['webp-compression-quality'] = (int) $options ['webp-compression-quality'];
+				if ( $options ['webp-compression-quality'] < Shared::webp_quality_value_min() ) {
+					$options ['webp-compression-quality'] = Shared::webp_quality_default();
 				}
-				if ( $values ['webp-compression-quality'] > Shared::webp_quality_value_max() ) {
-					$values ['webp-compression-quality'] = Shared::webp_quality_default();
+				if ( $options ['webp-compression-quality'] > Shared::webp_quality_value_max() ) {
+					$options ['webp-compression-quality'] = Shared::webp_quality_default();
 				}
 			}
 
-			if ( ! array_key_exists( 'webp-jpeg-compression-quality', $values ) ) {
-				$values ['webp-jpeg-compression-quality'] = Shared::webp_jpeg_quality_default();
+			if ( ! array_key_exists( 'webp-jpeg-compression-quality', $options ) ) {
+				$options ['webp-jpeg-compression-quality'] = Shared::webp_jpeg_quality_default();
 			} else {
-				$values ['webp-jpeg-compression-quality'] = (int) $values ['webp-jpeg-compression-quality'];
-				if ( ! array_key_exists( $values ['webp-jpeg-compression-quality'], $this->get_form_jpeg_to_webp_compression_quality() ) ) {
-					$values ['webp-jpeg-compression-quality'] = Shared::webp_jpeg_quality_default();
+				$options ['webp-jpeg-compression-quality'] = (int) $options ['webp-jpeg-compression-quality'];
+				if ( ! array_key_exists( $options ['webp-jpeg-compression-quality'], $this->get_form_jpeg_to_webp_compression_quality() ) ) {
+					$options ['webp-jpeg-compression-quality'] = Shared::webp_jpeg_quality_default();
 				}
 			}
 
-			if ( ! array_key_exists( 'wp-big-image-size-threshold-value', $values ) ) {
-				$values ['wp-big-image-size-threshold-value'] = Shared::big_image_size_threshold_value_default();
+			if ( ! array_key_exists( 'wp-big-image-size-threshold-value', $options ) ) {
+				$options ['wp-big-image-size-threshold-value'] = Shared::big_image_size_threshold_value_default();
 			} else {
-				$values ['wp-big-image-size-threshold-value'] = (int) $values ['wp-big-image-size-threshold-value'];
-				if ( $values ['wp-big-image-size-threshold-value'] < Shared::big_image_size_threshold_value_min() ) {
-					$values ['wp-big-image-size-threshold-value'] = Shared::big_image_size_threshold_value_default();
+				$options ['wp-big-image-size-threshold-value'] = (int) $options ['wp-big-image-size-threshold-value'];
+				if ( $options ['wp-big-image-size-threshold-value'] < Shared::big_image_size_threshold_value_min() ) {
+					$options ['wp-big-image-size-threshold-value'] = Shared::big_image_size_threshold_value_default();
 				}
-				if ( $values ['wp-big-image-size-threshold-value'] > Shared::big_image_size_threshold_value_max() ) {
-					$values ['wp-big-image-size-threshold-value'] = Shared::big_image_size_threshold_value_default();
+				if ( $options ['wp-big-image-size-threshold-value'] > Shared::big_image_size_threshold_value_max() ) {
+					$options ['wp-big-image-size-threshold-value'] = Shared::big_image_size_threshold_value_default();
 				}
 			}
 
-			$values ['image-max-width-backup'] = false;
-			$values ['extra-size-same-width']  = false;
+			$options ['image-max-width-backup'] = false;
+			$options ['extra-size-same-width']  = false;
 
-			$this->set_dynamic_menu_position( $values );
+			$this->set_dynamic_menu_position( $options );
 
-			self::set_cwebp_on_demand( $values['webp-cwebp-on-demand'] );
+			self::set_cwebp_on_demand( $options['webp-cwebp-on-demand'] );
 
 			delete_transient( $this->pageslug . '-update-notices' );
 
-			return $values;
+			return $options;
 		}
 
 		// phpcs:ignore
@@ -315,7 +310,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 		/** Get possible JPEG Sharpen Image values for the form */
 		public function get_form_sharpen_image() {
-
 			$values = array();
 
 			$values [0] = __( 'WP Default (unsharpMaskImage) *', 'warp-imagick' );
@@ -354,7 +348,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 		/** Get possible JPEG Sharpen Thumbnail values for the form */
 		public function get_form_sharpen_thumbnails() {
-
 			$values = array();
 
 			$values [0] = __( 'WP Default (unsharpMaskImage) *', 'warp-imagick' );
@@ -393,7 +386,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 		/** Get possible JPEG compression types for the form */
 		public function get_form_jpeg_compression_types() {
-
 			$values = array();
 
 			$values [0] = __( 'WordPress Default', 'warp-imagick' );
@@ -407,7 +399,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 		/** Get some available JPEG colorspaces for the form */
 		public function get_form_jpeg_colorspaces() {
-
 			$values = array();
 
 			$values [0] = __( 'OFF (WP Default)', 'warp-imagick' );
@@ -422,7 +413,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 		/** Get sampling factor choices for the form */
 		public function get_form_jpeg_sampling_factors() {
-
 			$is_callable_set_image_property = false;
 
 			$magic_test = false;
@@ -447,7 +437,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 			}
 
 			if ( $is_callable_set_image_property ) {
-
 				return array(
 					''      => 'WordPress Default',
 					'4:1:0' => '4:1:0 - Smallest file size',
@@ -461,7 +450,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 				);
 
 			} else {
-
 				return array(
 					'' => 'Not Available. ImageMagick is missing or below version 6.3.2',
 				);
@@ -470,7 +458,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 		/** Get strip metadata options for the form */
 		public function get_form_strip_metadata() {
-
 			$values = array();
 
 			$values [0] = __( 'WordPress Default', 'warp-imagick' );
@@ -501,7 +488,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 		/** Get available JPEG interlace types for the form */
 		public function get_form_jpeg_interlace_types() {
-
 			$values = array();
 
 			$values [0] = __( 'WordPress Default', 'warp-imagick' );
@@ -526,9 +512,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 		/** Get sampling factor choices for the form */
 		public function get_form_jpeg_to_webp_compression_quality() {
 			$values      = array();
-			$values [-3] = __( 'Use JPEG quality -15%% ', 'warp-imagick' );
-			$values [-2] = __( 'Use JPEG quality -10%%', 'warp-imagick' );
-			$values [-1] = __( 'Use JPEG quality -5%%', 'warp-imagick' );
+			$values [-3] = __( 'Use JPEG quality -15% ', 'warp-imagick' );
+			$values [-2] = __( 'Use JPEG quality -10%', 'warp-imagick' );
+			$values [-1] = __( 'Use JPEG quality -5%', 'warp-imagick' );
 			$values [0]  = __( 'Use JPEG quality *', 'warp-imagick' );
 			$values [1]  = __( 'Use WebP quality', 'warp-imagick' );
 			return $values;
@@ -540,19 +526,23 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 		// phpcs:ignore
 	# region Settings Extended
 
-		/** Fields Extended. With default values */
+		/** Extended option fields.
+		 * Fields that will be added/accepted by update options.
+		 * Fields not defined in configuration.php.
+		 * Fields with value modified or forced.
+		 * With optional default values.
+		 *
+		 * Called on POST/Form and on Activation Success.
+		 */
 		protected function get_all_fields_extended() {
 			return array(
 				'configuration'  => array(),
-				'plugin-version' => $this->get_plugin()->read_plugin_version(),
+				'plugin-version' => Shared::get_plugin_version(),
 			);
 		}
 
 		/** On prepare settings page. Overridden. */
 		protected function on_prepare_settings_page() {
-
-			$this->auto_update_disabled_warning();
-
 			$actual_wp_version = get_bloginfo( 'version' );
 
 			$tested_wp_version = '6.2.2';
@@ -567,7 +557,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 				function() use ( $tested_wp_version, $actual_wp_version ) {
 					$this->plugin->echo_admin_notice(
 						// Translators: %s is tested and current WordPress version.
-						sprintf( __( 'This version of plugin is tested up to WP %1$s (Now %2$s). Please update.' ), $tested_wp_version, $actual_wp_version ),
+						sprintf( __( 'This version of plugin is tested up to WP %1$s (Now %2$s). Please update.', 'warp-imagick' ), $tested_wp_version, $actual_wp_version ),
 						'notice notice-warning is-dismissible',
 						true
 					);
@@ -575,42 +565,8 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 			);
 		}
 
-		/** Hook warning notice when plugin auto update is disabled */
-		private function auto_update_disabled_warning() {
-
-			if ( ! \function_exists( '\\wp_is_auto_update_enabled_for_type' ) ) {
-				Lib::debug( 'WP Auto update is not supported in current WP version.' );
-				return;
-			}
-			if ( ! \wp_is_auto_update_enabled_for_type( 'plugin' ) ) {
-				Lib::debug( 'WP Auto updates are disabled for all plugins.' );
-				return;
-			}
-			if ( true === $this->get_option( 'disable-auto-update-notice', false ) ) {
-				Lib::debug( 'WP Auto update warning notice is disabled by user.' );
-				return;
-			}
-			if ( true === Shared::is_this_plugin_wp_auto_update_enabled() ) {
-				Lib::debug( 'WP Auto update is enabled for this plugin.' );
-				return;
-			}
-			\add_action(
-				'admin_notices',
-				function() {
-					$this->plugin->echo_admin_notice(
-						__( 'Warp iMagick plugin \'auto-update\' is disabled or automatic plugin update is not managed by WordPress automatic updater.' ) .
-						'<a style="float:right" target=_blank href="' . admin_url( 'plugins.php' ) . '">' . __( 'Open Plugins page.' ) . '</a>' .
-						'<div>' . __( 'You may either enable WordPress \'auto-update\' for Warp iMagick or disable this message in \'Plugin Settings\' section (\'General Settings\' Tab).' ) . '</div>',
-						'notice notice-warning is-dismissible',
-						false
-					);
-				}
-			);
-		}
-
 		/** Hook admin error-notices when conflicting plugins detected. */
 		public function check_conflicting_plugins() {
-
 			$known_conflict_slugs = array(
 				'wp-email-users',
 				'ajax-search-lite',
@@ -680,7 +636,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 		/** Before render settings page. Overridden. */
 		protected function on_render_settings_page() {
-
 			$this->renderer->render_page_subtitle();
 		}
 
@@ -700,15 +655,13 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 		 * @return array empty or containing (exit) [$message/s] to abort activation
 		 */
 		protected function on_check_activate_requirements( $networkwide, $settings ) {
-
-			delete_option( $this->get_plugin()->get_option_id() . '-disabled' );
+			delete_option( $this->optionid . '-disabled' );
 
 			$fail = array();
 
 			$imagick_required = false;
 
 			if ( class_exists( '\Imagick' ) ) {
-
 				try {
 					$imagick_required = new \Imagick();
 				} catch ( Exception $e ) {
@@ -749,7 +702,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 						$fail[] = 'Please ask your host service provider to downgrade ImageMagick library to version lower than 8 (6.3.2+ or 7+).';
 					}
 				} elseif ( is_string( $current_version ) ) {
-
 					$fail[] = 'ImageMagick library version is unknown.';
 				} else {
 					$fail[] = 'ImageMagick library version is not available.';
@@ -777,15 +729,12 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 			}
 
 			if ( empty( $fail ) ) {
-
 				add_filter(
 					'wp_image_editors',
 					function( $editors ) {
-
 						$wp_editors = array( 'WP_Image_Editor_Imagick', 'WP_Image_Editor_GD' );
 
 						if ( class_exists( 'Warp_Image_Editor_Imagick' ) ) {
-
 							$wp_editors = array( 'Warp_Image_Editor_Imagick', 'WP_Image_Editor_Imagick', 'WP_Image_Editor_GD' );
 						}
 
@@ -813,7 +762,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 					$imagick_required = null;
 
 				} catch ( \Exception $e ) {
-					Lib::error( 'Exception caught: ' . $e->getMessage() );
 					$fail [] = $e->getMessage();
 				}
 			} elseif ( is_object( $imagick_required ) ) {
@@ -822,7 +770,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 					unset( $imagick_required );
 
 				} catch ( \Exception $e ) {
-					Lib::error( 'Exception caught: ' . $e->getMessage() );
 					$fail [] = $e->getMessage();
 				}
 			}
@@ -839,16 +786,16 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 		 * @return void
 		 */
 		protected function on_activate_plugin_failure( $fail ) {
-
 			if ( ! is_array( $fail ) ) {
-				Lib::debug( 'Var $fail must be an array here.' );
 				$fail = array( 'Unknown reason.' );
 			}
-			update_option( $this->get_plugin()->get_option_id() . '-disabled', $fail, $autoload = true );
+			\update_option( $this->optionid . '-disabled', $fail, $autoload = true );
+
+			\flush_rewrite_rules();
 
 			self::set_cwebp_on_demand();
+
 			self::on_manage_plugin( 'activate-failure' );
-			\flush_rewrite_rules();
 		}
 
 		/** On plugin activation (success).
@@ -861,26 +808,29 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 		 * @return void
 		 */
 		protected function on_activate_plugin_success( $networkwide, $user = false ) {
+			$that = $this->get_plugin();
 
-			delete_option( $this->get_plugin()->get_option_id() . '-disabled' );
+			delete_option( $this->optionid . '-disabled' );
 
-			self::clear_ui_state_user_settings( $this->pageslug );
+			delete_transient( $that->get_slug() . '-update-version' );
+
+			self::clear_ui_state_user_settings( $that->get_slug() );
 
 			$this->init_all_options( $networkwide );
 
 			if ( is_object( $user ) ) {
+				/** On manual activate: whatever required */
+				$option_values = $this->get_option();
 
-				$option_values = $this->read_options();
-				if ( isset( $option_values['disable-auto-update-notice'] )
-				&& true === $option_values['disable-auto-update-notice'] ) {
-					$option_values['disable-auto-update-notice'] = false;
-					$this->save_options( $option_values );
-				}
 			}
 
-			self::set_cwebp_on_demand( $values['webp-cwebp-on-demand'] );
-			self::on_manage_plugin( 'activate-success' );
+			self::copy_test_images_to_test_dir( $that->get_path() . '/assets/clone-test', 'warp-imagick' );
+
 			\flush_rewrite_rules();
+
+			self::set_cwebp_on_demand( $this->get_option( 'webp-cwebp-on-demand', false ) );
+
+			self::on_manage_plugin( 'activate-success' );
 		}
 
 		/** On Plugin deactivate, action handler
@@ -888,8 +838,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 		 * @param bool $networkwide flag.
 		 */
 		protected function on_deactivate_plugin( $networkwide ) {
-
-			\delete_option( $this->get_plugin()->get_option_id() . '-disabled' );
+			\delete_option( $this->optionid . '-disabled' );
 
 			\delete_transient( $this->pageslug . '-reactivate' );
 			\delete_transient( $this->pageslug . '-reactivate-todo' );
@@ -897,18 +846,21 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 			self::clear_ui_state_user_settings( $this->pageslug );
 
-			self::set_cwebp_on_demand();
-			self::on_manage_plugin( 'deactivate' );
+			self::remove_test_images_from_site( $this->pageslug );
+
 			\flush_rewrite_rules();
+
+			self::set_cwebp_on_demand();
+
+			self::on_manage_plugin( 'deactivate' );
 		}
 
 		/** On Plugin uninstall, action handler */
 		protected static function on_uninstall_plugin() {
-
-			$instance = self::instance();
-			if ( $instance ) {
-				if ( $instance->get_plugin()->get_option( 'remove-settings', Shared::remove_plugin_settings_default() ) ) {
-					self::remove_all_options( $instance->optionid );
+			$settings = self::instance();
+			if ( $settings ) {
+				if ( $settings->get_option( 'remove-settings', Shared::remove_plugin_settings_default() ) ) {
+					self::remove_all_options( $settings->optionid );
 				}
 
 				if ( \is_multisite() ) {
@@ -916,34 +868,46 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 					foreach ( $sites as $site ) {
 						\switch_to_blog( $site->blog_id );
 
-						\delete_option( $instance->get_plugin()->get_option_id() . '-disabled' );
+						\delete_option( $settings->optionid . '-disabled' );
 
-						\delete_transient( $instance->pageslug . '-reactivate' );
-						\delete_transient( $instance->pageslug . '-reactivate-todo' );
-						\delete_transient( $instance->pageslug . '-conflict-errors' );
+						\delete_transient( $settings->pageslug . '-reactivate' );
+						\delete_transient( $settings->pageslug . '-reactivate-todo' );
+						\delete_transient( $settings->pageslug . '-conflict-errors' );
+						\delete_transient( $settings->pageslug . '-update-version' );
 
-						self::clear_ui_state_user_settings( $instance->pageslug );
+						self::clear_ui_state_user_settings( $settings->pageslug );
 
-						\delete_transient( $instance->pageslug . '-obsolete-usermeta-cleared' );
+						\delete_transient( $settings->pageslug . '-obsolete-usermeta-cleared' );
+
+						\flush_rewrite_rules();
+
+						self::set_cwebp_on_demand();
 					}
 					\restore_current_blog();
 				} else {
+					\delete_option( $settings->optionid . '-disabled' );
 
-					\delete_option( $instance->get_plugin()->get_option_id() . '-disabled' );
+					\delete_transient( $settings->pageslug . '-reactivate' );
+					\delete_transient( $settings->pageslug . '-reactivate-todo' );
+					\delete_transient( $settings->pageslug . '-conflict-errors' );
 
-					\delete_transient( $instance->pageslug . '-reactivate' );
-					\delete_transient( $instance->pageslug . '-reactivate-todo' );
-					\delete_transient( $instance->pageslug . '-conflict-errors' );
+					self::clear_ui_state_user_settings( $settings->pageslug );
 
-					self::clear_ui_state_user_settings( $instance->pageslug );
+					\delete_transient( $settings->pageslug . '-obsolete-usermeta-cleared' );
 
-					\delete_transient( $instance->pageslug . '-obsolete-usermeta-cleared' );
+					\flush_rewrite_rules();
+
+					self::set_cwebp_on_demand();
 				}
+
+				self::remove_test_images_from_site( $settings->pageslug );
 			}
 
-			self::set_cwebp_on_demand();
-			self::on_manage_plugin( 'uninstall' );
 			\flush_rewrite_rules();
+
+			self::set_cwebp_on_demand();
+
+			self::on_manage_plugin( 'uninstall' );
 
 		}
 
@@ -952,7 +916,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 		 * @param string $pageslug page slug.
 		 */
 		protected static function clear_ui_state_user_settings( $pageslug ) {
-
 			/** Force clear/remove user's settings page ui-state cookie.
 			 *
 			 * Not really needed to clear the cookie because it is a session cookie
@@ -960,7 +923,10 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 			 * and won't be set again after deactivation and/or uninstall.
 			 */
 			unset( $_COOKIE[ $pageslug ] );
-			setcookie( $pageslug, ' ', time() - YEAR_IN_SECONDS );
+			/** Since 1.10.4: check headers_sent() as PHP >= 8.0 may report fatal error. */
+			if ( ! headers_sent() ) {
+				setcookie( $pageslug, ' ', time() - YEAR_IN_SECONDS );
+			}
 
 			/** Clear obsolete wp_usermeta, set by user using settings-page of older versions of this plugin.
 			 *
@@ -985,7 +951,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 			$user_ids_to_clear_ui_settings = $wpdb->get_col( "SELECT user_id FROM $wpdb->usermeta WHERE meta_key = 'wp_user-settings'" );
 
 			foreach ( $user_ids_to_clear_ui_settings as $user_id ) {
-
 				if ( ! $user_id ) {
 					continue;
 				}
@@ -1007,7 +972,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 				}
 
 				if ( true === $update_user_settings ) {
-
 					$settings = '';
 					foreach ( $updated_user_settings as $name => $value ) {
 						$_name  = preg_replace( '/[^A-Za-z0-9_-]+/', '', $name );
@@ -1030,13 +994,64 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 
 		}
 
+		/** Copy "clone redirect test" images to site test directory.
+		 *
+		 * @param string $source directory to copy from.
+		 * @param string $subdir to copy to wp-content/uploads/$subdir.
+		 */
+		private static function copy_test_images_to_test_dir( $source, $subdir ) {
+			if ( ! is_dir( $source ) ) {
+				return;
+			}
+
+			$source_dir = $source;
+			$target_dir = path_join( wp_upload_dir()['basedir'], $subdir );
+
+			if ( ! is_dir( $target_dir ) ) {
+				wp_mkdir_p( $target_dir );
+				if ( ! is_dir( $target_dir ) ) {
+					return;
+				}
+			}
+
+			WP_Filesystem();
+
+			ob_start();
+			$error = copy_dir( $source_dir, $target_dir );
+			ob_end_clean();
+
+			if ( is_wp_error( $error ) ) {
+				;
+			}
+
+		}
+
+		/** Remove "clone redirect test" images from site test directory
+		 *
+		 * @param string $subdir in wp-content/uploads/$subdir.
+		 */
+		private static function remove_test_images_from_site( $subdir ) {
+			$target_dir = path_join( wp_upload_dir()['basedir'], $subdir );
+
+			if ( ! is_dir( $target_dir ) ) {
+				return;
+			}
+
+			WP_Filesystem();
+			global $wp_filesystem;
+			$wp_filesystem->rmdir(
+				$target_dir,
+				$recursive = true
+			);
+
+		}
+
 		/** Enable or Disable WebP On Demand via server flag.
 		 * Set (insert/create or remove/delete/unlink) server redirect file-flag in home path.
 		 *
 		 * @param bool $set Server File Flag: create (true) or unlink (!true/false/omit-arg).
 		 */
 		private static function set_cwebp_on_demand( $set = false ) {
-
 			/** CWEBP: Code is missing here. */
 
 		}

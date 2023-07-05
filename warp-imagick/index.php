@@ -15,7 +15,7 @@
  * Author:      ddur
  * Author URI:  https://github.com/ddur
  * License:     GPLv2
- * Version:     1.10.3
+ * Version:     1.10.4
  * Text Domain: warp-imagick
  * Domain Path: /languages
  *
@@ -27,7 +27,7 @@
 
 defined( 'ABSPATH' ) || die( -1 );
 
-if ( ( version_compare( phpversion(), '7.2', '>=' ) && version_compare( phpversion(), '7.999', '<=' ) )
+if ( ( version_compare( phpversion(), '7.3', '>=' ) && version_compare( phpversion(), '7.999', '<=' ) )
 || ( version_compare( phpversion(), '8.0', '>=' ) && version_compare( phpversion(), '8.999', '<=' ) ) ) {
 	require_once __DIR__ . '/plugin.php';
 } else {
@@ -56,12 +56,12 @@ function warp_imagick_php_version_error_deactivate_plugin() {
 
 /** Plugin Deactivated notice */
 function warp_imagick_php_version_error_admin_notice_plugin_deactivated() {
-	echo '<div class="notice notice-error is-dismissible"><p><strong>Warp iMagick</strong> plugin has been <strong>deactivated</strong>, please use PHP version 7.2+ or 8.0+.</p></div>';
+	echo '<div class="notice notice-error is-dismissible"><p><strong>Warp iMagick</strong> plugin has been <strong>deactivated</strong>, please use PHP version 7.3+ or 8.0+.</p></div>';
 	// phpcs:ignore
 	unset( $_GET ['activate'] );
 }
 
 /** Please Deactivate notice */
 function warp_imagick_php_version_error_admin_notice_please_deactivate() {
-	echo '<div class="notice notice-error is-dismissible"><p>Please deactivate <strong>Warp iMagick</strong> plugin and use PHP version 7.2+ or 8.0+.</p></div>';
+	echo '<div class="notice notice-error is-dismissible"><p>Please deactivate <strong>Warp iMagick</strong> plugin and use PHP version 7.3+ or 8.0+.</p></div>';
 }

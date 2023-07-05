@@ -22,7 +22,6 @@ use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use \ddur\Warp_iMagick\Base\Base_Settings_Renderer;
 
 if ( ! class_exists( __NAMESPACE__ . '\Meta_Settings_Renderer' ) ) {
-
 	/** Meta Settings Renderer class.
 	 *
 	 * Class between Settings Renderer and abstract Base_Settings_Renderer.

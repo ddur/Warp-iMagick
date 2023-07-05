@@ -19,13 +19,10 @@ namespace ddur\Warp_iMagick\Base\Plugin\v1;
 defined( 'ABSPATH' ) || die( -1 );
 
 if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
-
-
 	require __DIR__ . '/inc/getallheaders.php';
 
 	/** Static helper class/methods for Plugin subpackage.*/
 	class Lib {
-
 		// phpcs:ignore
 	# region Admin notices
 
@@ -70,7 +67,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		 * @param string $html to echo.
 		 */
 		public static function echo_html( $html ) {
-
 			// phpcs:disable
 			echo $html;
 			// phpcs:enable
@@ -249,7 +245,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 			return 'Unknown';
 		}
 
-
 		/** Operating System is Linux?
 		 *
 		 * @access public
@@ -393,7 +388,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		 * @param array  not empty array of not empty $suffix strings.
 		 */
 		public static function auto_hook( $object, $prefix = 'on', $suffix = array( 'hook', 'action', 'filter', 'event' ) ) {
-
 			if ( ! is_object( $object ) ) {
 				$msg = __METHOD__ . ': argument $object is not an object-type.';
 				self::error( $msg );
@@ -423,13 +417,11 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 			$methods = get_class_methods( $object );
 
 			foreach ( $methods as $method ) {
-
 				$method_items = explode( '_', $method );
 
 				if ( count( $method_items ) >= 3
 				&& ( array_shift( $method_items ) === $prefix )
 				&& in_array( strtolower( array_pop( $method_items ) ), $suffix, true ) ) {
-
 					$priority = false;
 					if ( count( $method_items ) > 1 ) {
 						$priority_item = end( $method_items );
@@ -627,7 +619,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 			if ( is_array( $haystack ) ) {
 				$result = array();
 				if ( is_array( $needle ) ) {
-
 					$needles = array();
 					foreach ( $needle as $key ) {
 						$needles [ $key ] = null;
@@ -737,7 +728,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		 * @return string $response.
 		 */
 		public static function private_request( $url, $ip = '127.0.0.1' ) {
-
 			$url_parts = wp_parse_url( $url );
 			$scheme    = $url_parts ['scheme'];
 			$host      = self::is_ip_private( $ip ) ? $ip : '127.0.0.1';
@@ -769,7 +759,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		 * @return string $response.
 		 */
 		public static function private_ajax_request( $action, $ip = '127.0.0.1' ) {
-
 			$ajax_url = admin_url( 'admin-ajax.php' ) . '?' . http_build_query( array( 'action' => $action ) );
 
 			$url_parts = wp_parse_url( $ajax_url );

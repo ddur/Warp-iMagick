@@ -22,11 +22,8 @@ use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use \ddur\Warp_iMagick\Plugin;
 
 if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
-
 	/** Shared class */
 	class Shared {
-
-
 		// phpcs:ignore
 	# region Plugin Instance Services
 
@@ -71,6 +68,18 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 			return $default;
 		}
 
+		/** Get plugin version from plugin entry (index.php) file.
+		 *
+		 * @return string|false value.
+		 */
+		public static function get_plugin_version() {
+			$plugin = self::plugin( 'get_file' );
+			if ( $plugin ) {
+				return get_file_data( $plugin->get_file(), array( 'version' => 'Version' ) )['version'];
+			}
+			return '';
+		}
+
 		/** Can generate webp clones. */
 		public static function can_generate_webp_clones() {
 			$plugin = self::plugin( 'can_generate_webp_clones' );
@@ -103,7 +112,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 			return false;
 		}
 
-		/** Get private property  */
+		/** Get private property (Unused TODO: Remove) */
 		public static function intermediate_metadata() {
 			$plugin = self::plugin( 'get_my_metadata_done' );
 			if ( $plugin ) {
@@ -125,6 +134,47 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 	# endregion
 
 		// phpcs:ignore
+	# region Public Static Wrap Debug actions.
+
+		/** Error log and admin feedback if option is enabled.
+		 * Use for verbose errors.
+		 *
+		 * @param string $message error to log and show as admin notice.
+		 */
+		public static function error( $message ) {
+			if ( self::get_option( 'verbose-debug-enabled', false ) ) {
+				return Lib::error( $message );
+			}
+		}
+
+		/** Debug log and display debug message if option is enabled..
+		 * Use for verbose debugs.
+		 *
+		 * @param string $message to log & show.
+		 * @param bool   $trace flag, set to true to dump calling function list.
+		 */
+		public static function debug( $message, $trace = false ) {
+			if ( self::get_option( 'verbose-debug-enabled', false ) ) {
+				return Lib::debug( $message, $trace );
+			}
+		}
+
+		/** Debug variable value, log & show if option is enabled.
+		 * Use for verbose debug_vars.
+		 *
+		 * @param mixed  $var reference.
+		 * @param string $name to prefix value.
+		 */
+		public static function debug_var( &$var, $name = '' ) {
+			if ( self::get_option( 'verbose-debug-enabled', false ) ) {
+				return Lib::debug_var( $var, $name );
+			}
+		}
+
+		// phpcs:ignore
+	# endregion
+
+		// phpcs:ignore
 	# region Public Static Services.
 
 		/** Resize image (maybe).
@@ -136,7 +186,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 		 * @return array|bool  geometry if image geometry changed, else false.
 		 */
 		public static function check_resize_image_width( $source_file_path, $target_file_path, $max_image_width ) {
-
 			$success = false;
 
 			$resize_w = false;
@@ -145,7 +194,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 			$source_geometry = self::get_geometry( $source_file_path );
 
 			if ( is_array( $source_geometry ) ) {
-
 				$source_w = (int) $source_geometry ['width'];
 				$source_h = (int) $source_geometry ['height'];
 
@@ -155,35 +203,30 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 			}
 
 			if ( false !== $resize_w ) {
-
 				try {
-
 					$imagick = new \Imagick( $source_file_path );
 					if ( $imagick instanceof \Imagick ) {
-
 						if ( defined( '\\Imagick::FILTER_LANCZOS' ) ) {
-
 							if ( true !== $imagick->resizeImage( $resize_w, 2500, \Imagick::FILTER_LANCZOS, 1.0, true ) ) {
-								Lib::debug( 'Resize image failed, trying to scale image ...' );
 								if ( true !== $imagick->scaleImage( $resize_w, 2500, true ) ) {
-									Lib::debug( 'Scale image failed.' );
+									Lib::error( 'Scale image failed.' );
 									return false;
 								}
 							}
 						} else {
 							if ( true !== $imagick->scaleImage( $resize_w, 2500, true ) ) {
-								Lib::debug( 'Scale image failed.' );
+								Lib::error( 'Scale image failed.' );
 								return false;
 							}
 						}
 
 						wp_mkdir_p( dirname( $target_file_path ) );
 						if ( true !== $imagick->writeImage( $target_file_path ) ) {
-							Lib::debug( 'Write image failed.' );
+							Lib::error( 'Write image failed.' );
 						} else {
 							$success = $imagick->getImageGeometry();
 							if ( false === $success ) {
-								Lib::debug( 'getImageGeometry failed.' );
+								Lib::error( 'getImageGeometry failed.' );
 							}
 						}
 
@@ -191,7 +234,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 						$imagick->destroy();
 						$imagick = null;
 					} else {
-						Lib::debug( 'PHP-imagick failed to load image.' );
+						Lib::error( 'PHP-imagick failed to load image.' );
 					}
 				} catch ( Exception $e ) {
 					Lib::error( 'Exception: ' . $e->getMessage() );
@@ -235,10 +278,8 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 		 * @param string $mime_type of image.
 		 */
 		public static function get_image_file_transparency( $file_path, $mime_type ) {
-
 			$is_transparent_image_file = null;
 			if ( is_readable( $file_path ) && 'image/png' === $mime_type ) {
-
 				try {
 					$im_image = new \Imagick( $file_path );
 					if ( $im_image instanceof \Imagick ) {
@@ -260,31 +301,29 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 		 * @param string $extension to replace with.
 		 */
 		public static function replace_file_name_extension( $file_name_path, $extension ) {
-
 			if ( ! is_string( $file_name_path ) ) {
-				Lib::debug( 'Invalid argument: $file_name_path' );
+				Lib::error( 'Invalid argument: $file_name_path' );
 				return false;
 			}
 			$file_name_path = trim( $file_name_path );
 			if ( '' === $file_name_path ) {
-				Lib::debug( 'Empty argument: $file_name_path' );
+				Lib::error( 'Empty argument: $file_name_path' );
 				return false;
 			}
 
 			if ( ! is_string( $extension ) ) {
-				Lib::debug( 'Invalid argument: $extension' );
+				Lib::error( 'Invalid argument: $extension' );
 				return false;
 			}
 			$extension = trim( $extension );
 			if ( '' === $extension ) {
-				Lib::debug( 'Empty argument: $extension' );
+				Lib::error( 'Empty argument: $extension' );
 				return false;
 			}
 
 			$pathinfo = pathinfo( $file_name_path );
 
 			if ( array_key_exists( 'filename', $pathinfo ) ) {
-
 				return ( array_key_exists( 'dirname', $pathinfo ) ? trailingslashit( $pathinfo ['dirname'] ) : '' )
 
 					. $pathinfo ['filename']
@@ -300,31 +339,29 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 		 * @param string $extension to replace with.
 		 */
 		public static function append_file_name_extension( $file_name_path, $extension ) {
-
 			if ( ! is_string( $file_name_path ) ) {
-				Lib::debug( 'Invalid argument: $file_name_path' );
+				Lib::error( 'Invalid argument: $file_name_path' );
 				return false;
 			}
 			$file_name_path = trim( $file_name_path );
 			if ( '' === $file_name_path ) {
-				Lib::debug( 'Empty argument: $file_name_path' );
+				Lib::error( 'Empty argument: $file_name_path' );
 				return false;
 			}
 
 			if ( ! is_string( $extension ) ) {
-				Lib::debug( 'Invalid argument: $extension' );
+				Lib::error( 'Invalid argument: $extension' );
 				return false;
 			}
 			$extension = trim( $extension );
 			if ( '' === $extension ) {
-				Lib::debug( 'Empty argument: $extension' );
+				Lib::error( 'Empty argument: $extension' );
 				return false;
 			}
 
 			$pathinfo = pathinfo( $file_name_path );
 
 			if ( array_key_exists( 'basename', $pathinfo ) ) {
-
 				return ( array_key_exists( 'dirname', $pathinfo ) ? trailingslashit( $pathinfo ['dirname'] ) : '' )
 					. $pathinfo ['basename']
 					. '.' . $extension;
@@ -338,31 +375,29 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 		 * @param string $extension to prepend with.
 		 */
 		public static function prepend_file_name_extension( $file_name_path, $extension ) {
-
 			if ( ! is_string( $file_name_path ) ) {
-				Lib::debug( 'Invalid argument: $file_name_path' );
+				Lib::error( 'Invalid argument: $file_name_path' );
 				return false;
 			}
 			$file_name_path = trim( $file_name_path );
 			if ( '' === $file_name_path ) {
-				Lib::debug( 'Empty argument: $file_name_path' );
+				Lib::error( 'Empty argument: $file_name_path' );
 				return false;
 			}
 
 			if ( ! is_string( $extension ) ) {
-				Lib::debug( 'Invalid argument: $extension' );
+				Lib::error( 'Invalid argument: $extension' );
 				return false;
 			}
 			$extension = trim( $extension );
 			if ( '' === $extension ) {
-				Lib::debug( 'Empty argument: $extension' );
+				Lib::error( 'Empty argument: $extension' );
 				return false;
 			}
 
 			$pathinfo = pathinfo( $file_name_path );
 
 			if ( array_key_exists( 'filename', $pathinfo ) ) {
-
 				return (
 					( array_key_exists( 'dirname', $pathinfo ) ? trailingslashit( $pathinfo ['dirname'] ) : '' )
 					. $pathinfo ['filename']
@@ -379,31 +414,29 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 		 * @param string $suffix to append at the end of $file_name_path filename.
 		 */
 		public static function append_suffix_to_file_name( $file_name_path, $suffix ) {
-
 			if ( ! is_string( $file_name_path ) ) {
-				Lib::debug( 'Invalid argument: $file_name_path' );
+				Lib::error( 'Invalid argument: $file_name_path' );
 				return false;
 			}
 			$file_name_path = trim( $file_name_path );
 			if ( '' === $file_name_path ) {
-				Lib::debug( 'Empty argument: $file_name_path' );
+				Lib::error( 'Empty argument: $file_name_path' );
 				return false;
 			}
 
 			if ( ! is_string( $suffix ) ) {
-				Lib::debug( 'Invalid argument: $suffix' );
+				Lib::error( 'Invalid argument: $suffix' );
 				return false;
 			}
 			$suffix = trim( $suffix );
 			if ( '' === $suffix ) {
-				Lib::debug( 'Empty argument: $suffix' );
+				Lib::error( 'Empty argument: $suffix' );
 				return false;
 			}
 
 			$pathinfo = pathinfo( $file_name_path );
 
 			if ( array_key_exists( 'filename', $pathinfo ) ) {
-
 				return ( array_key_exists( 'dirname', $pathinfo ) && '.' !== $pathinfo ['dirname'] ? trailingslashit( $pathinfo ['dirname'] ) : '' )
 					. $pathinfo ['filename'] . $suffix
 					. ( array_key_exists( 'extension', $pathinfo ) ? '.' . $pathinfo ['extension'] : '' );
@@ -417,7 +450,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 		 * @param string $source_file_name to convert to webp name.
 		 */
 		public static function get_webp_file_name( $source_file_name ) {
-
 			if ( 'webp' === strtolower( pathinfo( $source_file_name, PATHINFO_EXTENSION ) ) ) {
 				return $source_file_name;
 			}
@@ -429,7 +461,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 		 * @param string $image_file_name to get geometry from.
 		 */
 		public static function get_geometry( $image_file_name ) {
-
 			$image_geometry = function_exists( '\\getimagesize' ) && file_exists( $image_file_name ) ? \getimagesize( $image_file_name ) : false;
 			if ( is_array( $image_geometry )
 			&& array_key_exists( 0, $image_geometry )
@@ -480,21 +511,16 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 		 * @return object Warp editor or WP_error.
 		 */
 		public static function get_warp_editor( $file ) {
-
 			$editor = wp_get_image_editor( $file );
 
 			if ( is_wp_error( $editor ) ) {
 				$msg = 'Selected editor: none/error';
-				Lib::debug( $msg );
 				return $editor;
 			}
 
 			if ( 'Warp_Image_Editor_Imagick' !== get_class( $editor ) ) {
-
 				$msg = 'Selected editor: ' . get_class( $editor );
-				Lib::debug( $msg );
 				$msg = 'Warp_Image_Editor_Imagick not selected for: ' . $file;
-				Lib::debug( $msg );
 
 				$editor = wp_get_image_editor(
 					$file,
@@ -505,15 +531,12 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 
 				if ( is_wp_error( $editor ) ) {
 					$msg = 'Warp_Image_Editor_Imagick & "compress_image" method not found for: ' . $file;
-					Lib::debug( $msg );
 					return $editor;
 				}
 
 				if ( 'Warp_Image_Editor_Imagick' !== get_class( $editor ) ) {
 					$msg = 'Warp_Image_Editor_Imagick & "compress_image" method not found for: ' . $file;
-					Lib::debug( $msg );
 					$msg = 'Selected editor: ' . get_class( $editor );
-					Lib::debug( $msg );
 					return new \WP_Error( 'warp-imagick', $msg );
 				}
 			}
@@ -776,27 +799,10 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 			return '';
 		}
 
-		/** Get dismiss auto update notice default (false). */
-		public static function disable_auto_update_notice_value_default() {
-			return false;
+		/** Default value */
+		public static function verbose_debug_enabled_value_default() {
+			return true;
 		}
-
-		/** Is auto update enabled? */
-		public static function is_this_plugin_wp_auto_update_enabled() {
-			$plugin = self::plugin();
-			if ( is_object( $plugin ) ) {
-				$auto_updates = (array) get_site_option( 'auto_update_plugins', array() );
-				$plugins_info = get_site_transient( 'update_plugins' );
-				if ( 0 !== count( $auto_updates ) ) {
-
-					if ( in_array( $plugin->get_basename(), $auto_updates, true ) ) {
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-
 
 		// phpcs:ignore
 	# endregion
@@ -806,7 +812,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 
 		/** All Known & Defined Imagick Compression Types */
 		public static function get_imagick_commpression_types() {
-
 			$values = array();
 
 			if ( defined( '\\Imagick::COMPRESSION_UNDEFINED' ) ) {
@@ -881,7 +886,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 
 		/** All Known & Defined Imagick Interlace Types */
 		public static function get_imagick_interlace_types() {
-
 			$values = array();
 
 			if ( defined( '\\Imagick::INTERLACE_UNDEFINED' ) ) {
@@ -915,7 +919,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 
 		/** All Known & Defined Imagick Colorspaces */
 		public static function get_imagick_colorspaces() {
-
 			$values = array();
 
 			if ( defined( '\\Imagick::COLORSPACE_UNDEFINED' ) ) {
@@ -1030,7 +1033,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 
 		/** All Known & Defined Imagick Image Types */
 		public static function get_imagick_img_types() {
-
 			$values = array();
 
 			if ( defined( '\\Imagick::IMGTYPE_UNDEFINED' ) ) {

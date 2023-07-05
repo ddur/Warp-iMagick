@@ -23,12 +23,28 @@ use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use \ddur\Warp_iMagick\Shared;
 
 if ( ! class_exists( __NAMESPACE__ . '\Settings_Renderer' ) ) {
-
 	/** Admin-Setting page renderer (separated rendering code) */
 	class Settings_Renderer extends Meta_Settings_Renderer {
-
 		/** Render Sidebar (Logo). */
 		public function render_settings_page_sidebar() {
+			if ( ! Shared::get_option( 'disable-img-test-metabox' ) ) {
+				$root_path = wp_normalize_path( untrailingslashit( ABSPATH ) );
+				$directory = path_join( wp_get_upload_dir()['basedir'], $this->pageslug );
+				if ( file_exists( $directory . '/test-webp.png' )
+					&& file_exists( $directory . '/test-webp.jpg' )
+					&& file_exists( $directory . '/test-webp.png.webp' )
+					&& file_exists( $directory . '/test-webp.jpg.webp' )
+				) {
+					$id          = 'visual-redirect-test';
+					$title       = __( 'WebP Redirect Visual Test', 'warp-imagick' );
+					$tooltip     = __( 'Original png/jpg images have red background, WebP Clones have green background. If you see images with green background color, your server WebP redirection is configured and you may disable this MetaBox in Plugin Settings section. If you see images with the red background, first hard refresh your browser (Hold down Ctrl and press F5 or Reload Button) because images with red background may be still in your browser memory cache. After browser refresh, if you still see images with the red background, either your browser is not supporting WebP image format or your server WebP Redirection is not yet configured. To read instructions about configuring your server after installing Warp iMagick plugin, click on images with red background.', 'warp-imagick' );
+					$click_link  = 'https://github.com/ddur/Warp-iMagick/#post-install-apache-server-webp-configuration';
+					$clones_url  = site_url( substr( $directory, strlen( $root_path ) ) );
+					$img_png_src = $clones_url . '/test-webp.png';
+					$img_jpg_src = $clones_url . '/test-webp.jpg';
+					$this->render_test_meta_box( $id, $title, $tooltip, $click_link, $img_png_src, $img_jpg_src );
+				}
+			}
 
 			$pluginbox = Lib::safe_key_value( $this->settings->get_settings(), array( 'plugin', 'metabox' ), array() );
 			$image_lnk = Lib::safe_key_value( $pluginbox, 'logo', $this->plugin->get_url_path() . '\/assets/warp-logo.png' );
@@ -36,13 +52,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings_Renderer' ) ) {
 			$box_title = Lib::safe_key_value( $pluginbox, 'name', wp_parse_url( $click_lnk, PHP_URL_HOST ) );
 			$this->render_hard_meta_box( $image_lnk, $click_lnk, $box_title, 'logo' );
 
-			$donatebox = Lib::safe_key_value( $this->settings->get_settings(), array( 'plugin', 'donate' ), array(), false );
-			if ( is_array( $donatebox ) ) {
-				$image_lnk = Lib::safe_key_value( $donatebox, 'logo', $this->plugin->get_url_path() . '/assets/zizou-art-ring.jpg' );
-				$click_lnk = Lib::safe_key_value( $donatebox, 'link', 'https://www.etsy.com/shop/ZizouArT?ref=' . $this->pageslug . '-donate-yourself' );
-				$box_title = Lib::safe_key_value( $donatebox, 'name', 'Donate yourself - ZizouArT' );
-				$this->render_hard_meta_box( $image_lnk, $click_lnk, $box_title, 'donate', 'donate', 5000 );
-			}
 		}
 
 		/** Render Settings Page Subtitle.
@@ -79,7 +88,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings_Renderer' ) ) {
 		 * @access public
 		 */
 		public function render_section_terms() {
-
 			$copyright_notice = $this->plugin->get_path();
 			if ( property_exists( $this, 'copyright_notice' ) ) {
 				$copyright_notice .= $this->copyright_notice;
@@ -96,7 +104,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings_Renderer' ) ) {
 		 * @access public
 		 */
 		public function render_section_max_width() {
-
 			$sizes_max_width      = 0;
 			$sizes_max_width_name = '';
 			$sizes_max_width_from = 'WordPress';
@@ -183,7 +190,6 @@ Widest image size used in responsive "srcset" is 2048 pixels (as seen in WordPre
 		 * @access public
 		 */
 		public function render_png_thumb_options() {
-
 			$magic_test = false;
 			if ( class_exists( '\\Imagick' ) ) {
 				try {
@@ -196,7 +202,6 @@ Widest image size used in responsive "srcset" is 2048 pixels (as seen in WordPre
 			$warning_message = '';
 
 			if ( $magic_test ) {
-
 				if ( ! is_callable( array( $magic_test, 'getImageColors' ) ) ) {
 					$warning_message .= PHP_EOL . 'Imagick::getImageColors function is not available.';
 				}
@@ -213,7 +218,6 @@ Widest image size used in responsive "srcset" is 2048 pixels (as seen in WordPre
 					$warning_message .= PHP_EOL . 'Imagick::posterizeImage function is not available.';
 				}
 			} else {
-
 				$warning_message = 'PHP-Imagick module is not available.';
 			}
 

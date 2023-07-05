@@ -21,13 +21,11 @@ defined( 'ABSPATH' ) || die( -1 );
 use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 
 if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
-
 	/** Abstract Settings Class
 	 *
 	 * Renders Admin Settings Page and handles Options
 	 */
 	abstract class Abstract_Settings {
-
 		// phpcs:ignore
 	# region Properties (private with getters)
 
@@ -88,7 +86,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 */
 		protected $pageslug;
 
-		/** Plugin Option API ID == $plugin->get_option_id().
+		/** Plugin Option API ID.
+		 * Replaces call to $plugin->get_option_id().
+		 * Caches return value
 		 *
 		 * @var string $optionid
 		 */
@@ -196,7 +196,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return bool true. At debug time true/false if arguments are valid or not.
 		 */
 		public static function is_valid_constructor_args( $plugin, $renderer ) {
-
 			if ( ! is_object( $plugin ) ) {
 				Lib::error( '$plugin argument must be an object instance' );
 				return false;
@@ -224,7 +223,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 */
 		public static function is_valid_settings_configuration( $settings, $renderer ) {
 			if ( is_array( $settings ) ) {
-
 				if ( array_key_exists( 'menu', $settings ) ) {
 					if ( ! is_string( $settings ['menu']['title'] ) ||
 						trim( $settings ['menu']['title'] ) === '' ) {
@@ -279,9 +277,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @param object $renderer instance that implements rendering methods.
 		 */
 		protected function __construct( $plugin, $renderer = null ) {
-
 			if ( self::is_valid_constructor_args( $plugin, $renderer ) ) {
-
 				$this->plugin   = $plugin;
 				$this->path     = $this->plugin->get_path();
 				$this->prefix   = $this->plugin->get_prefix();
@@ -294,7 +290,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				$this->settings = $this->read_configuration();
 
 				if ( $this->is_valid_settings_configuration( $this->settings, $this->renderer ) ) {
-
 					$this->usercaps = ( array_key_exists( 'capability', $this->settings )
 					&& is_string( $this->settings ['capability'] ) )
 					? $this->settings ['capability'] : $this->usercaps;
@@ -333,7 +328,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return void
 		 */
 		public function on_user_activate_plugin( $networkwide ) {
-
 			if ( ! self::current_user_can_activate_plugins() ) {
 				wp_die( esc_html__( 'You do not have sufficient permissions to activate plugin.', 'warp-imagick' ) );
 			}
@@ -351,7 +345,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return void
 		 */
 		public function on_abstract_activate_plugin( $networkwide, $user = false ) {
-
 			$fail = $this->check_activate_requirements( $networkwide, $this->settings );
 
 			$custom_fail = $this->on_check_activate_requirements( $networkwide, $this->settings );
@@ -359,10 +352,8 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				$fail = array_merge( $fail, $custom_fail );
 			}
 			if ( is_array( $fail ) && ! empty( $fail ) ) {
-
 				$this->on_activate_plugin_failure( $fail );
 			} else {
-
 				$this->on_activate_plugin_success( $networkwide, $user );
 			}
 		}
@@ -387,7 +378,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return array with errors or empty.
 		 */
 		public function check_activate_requirements( $networkwide, $settings ) {
-
 			$fail = array();
 			if ( ! is_array( $settings ) ) {
 				$fail [] = __( 'Invalid settings [].', 'warp-imagick' );
@@ -410,7 +400,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 								$fail [] = __( 'Invalid settings [plugin][requires][wp] value.', 'warp-imagick' );
 							} else {
 								if ( 'latest' === $requires ['wp'] ) {
-
 									$version = ( json_decode( wp_safe_remote_get( 'https://api.wordpress.org/core/version-check/1.7/' )['body'] )->offers[0]->version );
 									if ( is_string( $version ) && ! version_compare( get_bloginfo( 'version' ), $version, '>=' ) ) {
 										// Translators: %s is WordPress version.
@@ -561,7 +550,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 							}
 						}
 						if ( array_key_exists( 'local-ip', $requires ) ) {
-
 							$local_ip = $requires ['local-ip'];
 							if ( is_bool( $local_ip ) ) {
 								if ( true === $local_ip ) {
@@ -582,7 +570,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 								$local_ip = false;
 							}
 							if ( false !== $local_ip ) {
-
 								$response = Lib::private_ajax_request( 'heartbeat', $local_ip );
 								if ( is_array( $response )
 								&& ! is_wp_error( $response )
@@ -660,7 +647,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 										} else {
 											$version = '0';
 											if ( array_key_exists( 'Version', $plugin_data ) ) {
-
 												$version = $data ['Version'];
 											}
 											if ( ! version_compare( $version, $requires_plugin ['version'], '>=' ) ) {
@@ -718,7 +704,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			return $fail;
 		}
 
-		/** User Deactivate plugin.
+		/** On User Deactivate plugin.
 		 *
 		 * Final, not intended to be overridden from derived class.
 		 * Access is public because it is registered via register_deactivation_hook.
@@ -748,7 +734,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			return self::current_user_can_activate_plugins();
 		}
 
-		/** User Uninstall plugin.
+		/** On User Uninstall plugin.
 		 *
 		 * Static, not intended to be overridden from derived class.
 		 * Access is public because it must be for register_uninstall_hook.
@@ -798,7 +784,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return void or exit/die([$message]) to abort activation.
 		 */
 		protected function on_activate_plugin_failure( $fail ) {
-
 			if ( is_array( $fail ) ) {
 				Lib::error( implode( PHP_EOL, $fail ) );
 				foreach ( $fail as $fail_reason ) {
@@ -806,7 +791,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				}
 			}
 			// phpcs:ignore -- Using Debug and Silencing notice and warning is intentional.
-			@trigger_error( esc_html( 'Activation failed due to missing requirement(s).' ) ); 
+			@trigger_error( esc_html( 'Activation failed due to missing requirement(s).' ) );
 		}
 
 		/** Override to implement custom activation code.
@@ -848,7 +833,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return void
 		 */
 		public function on_abstract_init_action() {
-
 			if ( ! $this->authorized() ) {
 				return;
 			}
@@ -857,7 +841,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			if ( is_array( $server )
 			&& array_key_exists( 'QUERY_STRING', $server )
 			&& false !== strpos( $server['QUERY_STRING'], 'page=' . $this->pageslug ) ) {
-
 				add_action( 'admin_enqueue_scripts', array( $this, 'on_abstract_admin_enqueue_scripts' ) );
 			}
 
@@ -897,7 +880,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return void
 		 */
 		public function on_abstract_admin_enqueue_scripts() {
-
 			if ( ! $this->authorized() ) {
 				return;
 			}
@@ -957,7 +939,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			return self::is_valid_menu_parent_slug( $menu_parent ) ? $menu_parent : false;
 		}
 
-
 		/** Check menu parent slug.
 		 *
 		 * @access public
@@ -992,7 +973,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return void
 		 */
 		public function on_abstract_register_settings_menu() {
-
 			if ( ! $this->authorized() ) {
 				return;
 			}
@@ -1013,7 +993,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$menu_parent = $this->get_menu_parent_slug();
 			if ( $menu_parent ) {
-
 				$this->menuslug = add_submenu_page(
 					$menu_parent,
 					$this->settings ['page']['title'],
@@ -1024,7 +1003,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				);
 
 			} else {
-
 				$menu_position = Lib::safe_key_value( $this->plugin->get_option(), array( 'configuration', 'menu', 'position' ), 0, false );
 				if ( false === $menu_position ) {
 					if ( array_key_exists( 'position', $this->settings ['menu'] ) ) {
@@ -1047,7 +1025,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			}
 
 			if ( false === $this->menuslug ) {
-
 				$this->menuslug = add_options_page(
 					$this->settings ['page']['title'],
 					$this->settings ['menu']['title'],
@@ -1073,7 +1050,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return void
 		 */
 		public function on_abstract_register_settings_page() {
-
 			if ( ! $this->authorized() ) {
 				return;
 			}
@@ -1095,13 +1071,21 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					'type'              => 'array',
 					'group'             => $this->pageslug,
 					'description'       => 'Plugin Settings',
-					'sanitize_callback' => array( $this, 'sanitize_form_fields' ),
+					'sanitize_callback' => array( $this, 'on_sanitize_callback' ),
 					'show_in_rest'      => false,
-					'default'           => $this->get_all_fields_defaults(),
+
 				)
 			);
 
-			add_filter( "pre_update_option_{$this->optionid}", array( $this, 'on_abstract_validate_form_input' ), 10, 3 );
+			// phpcs:ignore
+			if ( isset( $_POST ) ) {
+				\add_filter(
+					"pre_update_option_{$this->optionid}",
+					array( $this, 'on_abstract_validate_form_input' ),
+					10,
+					3
+				);
+			}
 		}
 
 		/** Add Settings Section.
@@ -1114,7 +1098,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return void
 		 */
 		protected function add_settings_section( $section_id, $section_settings ) {
-
 			if ( ! $this->authorized() ) {
 				return;
 			}
@@ -1170,7 +1153,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return bool $success
 		 */
 		protected function add_settings_field( $field_name, $field_settings, $section_id = 'default' ) {
-
 			if ( ! $this->authorized() ) {
 				return false;
 			}
@@ -1194,7 +1176,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			if ( array_key_exists( 'render', $field_settings )
 			&& is_callable( array( $this->renderer, $field_settings ['render'] ) ) ) {
-
 				$render_callable = array( $this->renderer, $field_settings ['render'] );
 
 			} elseif ( array_key_exists( 'type', $field_settings )
@@ -1240,14 +1221,12 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					'</div>';
 			}
 			if ( array_key_exists( 'placeholder', $field_settings ) && is_string( $field_settings ['placeholder'] ) ) {
-
 				$args_settings ['placeholder'] = $field_settings ['placeholder'];
 			}
 			if ( array_key_exists( 'style', $field_settings ) && is_string( $field_settings ['style'] ) ) {
 				$args_settings ['style'] = $field_settings ['style'];
 			}
 			if ( array_key_exists( 'options', $field_settings ) && is_array( $field_settings ['options'] ) ) {
-
 				$args_settings ['options'] = $field_settings ['options'];
 			}
 
@@ -1279,9 +1258,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return array $args [settings]
 		 */
 		private function get_field_settings_args( $args ) {
-
 			if ( Lib::is_debug() ) {
-
 				if ( ! is_array( $args ) ) {
 					Lib::debug( '$args is not an array' );
 					return array();
@@ -1354,7 +1331,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			return ( null === $value && array_key_exists( 'default', $args ) ? $args ['default'] : $value );
 		}
 
-
 		/** CheckBox input-type renderer
 		 *
 		 * @access public
@@ -1362,7 +1338,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return void (echo)
 		 */
 		public function render_checkbox_input_field( $field_args ) {
-
 			$args = $this->get_field_settings_args( $field_args );
 
 			$fn   = $args ['fn'];
@@ -1412,7 +1387,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return void (echo)
 		 */
 		public function render_range_slider_input_field( $field_args ) {
-
 			$args = $this->get_field_settings_args( $field_args );
 
 			$fn   = $args ['fn'];
@@ -1467,7 +1441,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return void (echo)
 		 */
 		public function render_hidden_input_field( $field_args ) {
-
 			$args = $this->get_field_settings_args( $field_args );
 
 			$fn   = $args ['fn'];
@@ -1495,7 +1468,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return void (echo)
 		 */
 		public function render_text_input_field( $field_args ) {
-
 			$args = $this->get_field_settings_args( $field_args );
 
 			$fn   = $args ['fn'];
@@ -1527,7 +1499,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$args ['value'] = $this->get_form_field_option_value( $fn, $args );
 
 			if ( $multiple ) {
-
 				$name         .= '[]';
 				$args ['name'] = $name;
 
@@ -1535,7 +1506,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					$args ['value'] = array( $args ['value'] );
 				}
 			} else {
-
 				if ( is_array( $args ['value'] ) ) {
 					$args ['value'] = array_shift( $args ['value'] );
 				}
@@ -1571,7 +1541,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$html = '';
 			if ( $multiple ) {
-
 				$html_value = esc_attr( array_shift( $value ) );
 				$item_html  = $this->apply_field_html_filters( "<input type=\"$type\" id=\"$id\" name=\"$name\" value=\"$html_value\"$attrs>", $args, $fn );
 
@@ -1585,7 +1554,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				}
 
 				if ( $sortable ) {
-
 					$item_data = $item_head . "<input type=\"$type\" name=\"$name\"$attrs>" . $item_tail;
 
 					$html .= '<span class="multiple-input multiple-append dashicons-before dashicons-plus" style="margin:initial;padding:initial;cursor:pointer" data-append="' . esc_attr( $item_data ) . '"></span>' . $item_html;
@@ -1594,7 +1562,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				}
 
 				if ( $sortable ) {
-
 					$html .= '<ul class="multiple-input ui-sortable" style="margin:initial;padding:initial">';
 				}
 				foreach ( $value as $item_value ) {
@@ -1606,7 +1573,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					$html .= '</ul>';
 				}
 			} else {
-
 				$value = esc_attr( $args ['value'] );
 				$html .= $this->apply_field_html_filters( "<input type=\"$type\" id=\"$id\" name=\"$name\" value=\"$value\"$attrs>", $args, $fn );
 			}
@@ -1622,7 +1588,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return void (echo)
 		 */
 		public function render_textarea_input_field( $field_args ) {
-
 			$args = $this->get_field_settings_args( $field_args );
 
 			$fn   = $args ['fn'];
@@ -1676,7 +1641,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return void (echo)
 		 */
 		public function render_upload_file_input_field( $field_args ) {
-
 			$args = $this->get_field_settings_args( $field_args );
 
 			$fn   = $args ['fn'];
@@ -1692,7 +1656,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$accept        = array_key_exists( 'accept', $field_options ) ? $accept = ( is_string( $field_options ['accept'] ) ? $field_options ['accept'] : '' ) : '';
 
 			if ( $multiple ) {
-
 				$name         .= '[]';
 				$args ['name'] = $name;
 			}
@@ -1740,7 +1703,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return void (echo)
 		 */
 		public function render_select_option_input_field( $field_args ) {
-
 			$args = $this->get_field_settings_args( $field_args );
 
 			$fn   = $args ['fn'];
@@ -1757,7 +1719,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$args ['value'] = $this->get_form_field_option_value( $fn, $args );
 
 			if ( $multiple ) {
-
 				$name         .= '[]';
 				$args ['name'] = $name;
 
@@ -1765,7 +1726,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					$args ['value'] = array( $args ['value'] );
 				}
 			} else {
-
 				if ( is_array( $args ['value'] ) ) {
 					$args ['value'] = array_shift( $args ['value'] );
 				}
@@ -1916,7 +1876,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			'title' => 'Save All Changes in All Tabs And Sections.',
 			'value' => 'Save Changes',
 		) ) {
-
 			$fn          = $args ['fn'];
 			$args ['id'] = esc_attr( $args ['id'] . uniqid( '-' ) );
 			$id          = $args ['id'];
@@ -1998,7 +1957,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$fields_sections   = Lib::safe_key_value( $wp_settings_fields, $this->pageslug, array() );
 			$fields_in_section = Lib::safe_key_value( $fields_sections, $section_id, array() );
 			if ( count( $fields_in_section ) > 0 ) {
-
 				$fields_in_section_hidden = array();
 				foreach ( $fields_in_section as $field_in_section_key => $field_in_section_val ) {
 					if ( isset( $field_in_section_val ['args']['settings']['type'] )
@@ -2033,7 +1991,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					$this->render_submit_field( $tab_index, $section_id, $args );
 				}
 			} elseif ( 1 !== $sections_todo ) {
-
 				Lib::echo_html( Lib::debug_eol_tabs( 3 + $push_tabs ) );
 				$this->render_submit_field( $tab_index, $section_id );
 			}
@@ -2098,7 +2055,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @param int   $push_tabs - add X tabs for debug formatting.
 		 */
 		private function render_tab_close_elements( $tab_index, $tab_settings, $tab_sections, $push_tabs = 0 ) {
-
 			Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . '</div><!--nav-tab-page-content-->' );
 			Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . '<div class="nav-tab-page-footer">' );
 
@@ -2139,7 +2095,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return void
 		 */
 		public function on_abstract_prepare_settings_page() {
-
 			if ( ! $this->authorized() ) {
 				Lib::debug( 'Not authorized!' );
 				return;
@@ -2176,7 +2131,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					&& array_key_exists( 'id', $help_tab_args ) && is_string( $help_tab_args ['id'] )
 					&& array_key_exists( 'title', $help_tab_args ) && is_string( $help_tab_args ['title'] )
 					) {
-
 						$content  = array_key_exists( 'content', $help_tab_args ) && is_string( $help_tab_args ['content'] )
 							? $help_tab_args ['content'] : '';
 						$callback = array_key_exists( 'callback', $help_tab_args ) && is_string( $help_tab_args ['callback'] )
@@ -2310,11 +2264,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$last_tab_index = count( $tabs_settings ) - 1;
 
 			if ( count( $tabs_settings ) === 0 ) {
-
 				Lib::echo_html( Lib::debug_eol_tabs( 5 ) . '<div class="nav-tab-wrapper" role="tablist"></div>' );
 
 			} else {
-
 				Lib::echo_html( Lib::debug_eol_tabs( 5 ) . '<style>' );
 				Lib::echo_html( Lib::debug_eol_tabs( 6 ) . '.nav-tab-page{display:none}' );
 				Lib::echo_html( Lib::debug_eol_tabs( 6 ) . 'input[type=radio][name=nav-tab-state].nav-tab-state{display:none!important;position:absolute;left:-9999px}' );
@@ -2373,7 +2325,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			}
 
 			if ( count( $tabs_settings ) !== 0 ) {
-
 				$tab_index     = 0;
 				$section_index = 0;
 				$tab_settings  = $tabs_settings [ $tabs_keyindex[ $tab_index ] ];
@@ -2395,9 +2346,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				$this->render_tab_open_elements( $tab_index, $tab_settings, $tab_sections, 8 );
 
 				foreach ( $wp_sections as $wp_section ) {
-
 					while ( $sections_todo <= 0 && $tab_index < $last_tab_index ) {
-
 						$this->render_tab_close_elements( $tab_index, $tab_settings, $tab_sections, 8 );
 
 						++ $tab_index;
@@ -2411,7 +2360,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 						if ( $tab_index === $last_tab_index ) {
 							if ( 0 === $sections_todo ) {
-
 								$sections_todo = count( $wp_sections ) - $sections_done;
 							} elseif ( $sections_todo < 0 ) {
 								$sections_todo = 0;
@@ -2448,12 +2396,10 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				Lib::echo_html( Lib::debug_eol_tabs( 7 ) . '</div><!--nav-tab-pages-->' );
 
 			} else {
-
 				$tab_index     = 0;
 				$section_index = 0;
 				$sections_todo = 0;
 				foreach ( $wp_sections as $wp_section ) {
-
 					$section_is_open = ( isset( $open_sections [ $section_index ] ) ? $open_sections [ $section_index ] : true );
 					$this->render_section_elements( $wp_section, $section_is_open, $sections_todo, $tab_index, 7 );
 					++$section_index;
@@ -2504,28 +2450,31 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		// phpcs:ignore
 	# region Form Submit handlers (Validation & File Uploads)
 
-		/** Form-submit (sanitize_option_{$option}) event handler.
-		 * Sanitizes form input values.
-		 * Form input values are later sanitized just before saving.
-		 * Override this method for custom/specialized sanitization.
-		 * WP BUG: Sanitize Callback add_filter registers no arguments (default one).
+		/** On Sanitize Callback, after Form Submitted.
+		 *  By WP obsoleted and added for back-compatibility.
+		 *  It actually calls here by:
+		 *      add_filter(
+		 *         "sanitize_option_{$option_name}",
+		 *          array( $this, 'on_sanitize_callback' )
+		 *      );
+		 *  with only one argument (default one).
 		 *
-		 * @see \register_setting
+		 * Form input values are sanitized later, just before saving.
+		 * Hook form validation filter later, when is actually needed.
+		 *
+		 * @see register_setting
 		 * @access public
 		 * @internal callback
-		 * @param array  $value from submitted form (pre-sanitized?).
-		 * @param string $option_id WP BUG: missing, must have default value.
-		 * @param array  $original_value WP BUG: missing, must have default value.
-		 * @return array: $value - sanitized.
+		 * @param string|array $value of form-submitted option(s).
+		 * @return string|array: $value unchanged.
 		 */
-		public function sanitize_form_fields( $value, $option_id = '', $original_value = array() ) {
+		public function on_sanitize_callback( $value ) {
 			return $value;
 		}
 
-
 		/** Form-submit (pre_update_option_{$option}) event handler.
 		 *
-		 * Validates input keys (field-name=>value).
+		 * Validates form submit keys (field-name=>value).
 		 * Validates $upload file descriptors from $_FILES and stores them into fields.
 		 * Invokes derived&custom validation callbacks (if configured and is_callable).
 		 *
@@ -2541,11 +2490,16 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return array: $new_value validated
 		 */
 		public function on_abstract_validate_form_input( $new_value, $old_value, $option_id ) {
-
 			if ( $this->optionid !== $option_id ) {
 				Lib::error( 'Option id mismatch' );
 				return $new_value;
 			}
+
+			\remove_filter(
+				"pre_update_option_{$this->optionid}",
+				array( $this, 'on_abstract_validate_form_input' ),
+				10,
+			);
 
 			if ( ! is_array( $new_value ) ) {
 				Lib::error( 'Options Input is not an array' );
@@ -2570,18 +2524,15 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			 * Sanitizes field values.
 			 */
 			foreach ( array_keys( $output ) as $field_name ) {
-
 				$input_value  = null;
 				$input_accept = false;
 
 				if ( array_key_exists( $field_name, $new_value )
 				&& array_key_exists( $field_name, $fields ) ) {
-
 					$field_type = array_key_exists( 'type', $fields [ $field_name ] )
 						? $fields [ $field_name ]['type'] : false;
 
 					if ( false !== $field_type ) {
-
 						$input_value = $new_value [ $field_name ];
 						$input_type  = gettype( $input_value );
 
@@ -2607,7 +2558,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 									$input_accept = true;
 									foreach ( $input_value as &$input_item_value ) {
 										if ( \is_array( $input_item_value ) ) {
-
 											$input_item_value = \count( $input_item_value ) === 2 ? true : false;
 										} else {
 											Lib::debug( "Multiplied Checkbox '$field_name' value is not an array but '$input_type'?" );
@@ -2616,7 +2566,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 									}
 								} else {
 									if ( \is_array( $input_value ) ) {
-
 										$input_value  = \count( $input_value ) === 2 ? true : false;
 										$input_accept = true;
 									} else {
@@ -2627,7 +2576,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 							case 'select':
 								if ( true === $is_multiple ) {
-
 									if ( \is_array( $input_value ) ) {
 										\array_pop( $input_value );
 
@@ -2649,7 +2597,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 										Lib::debug( "Select multiple '$field_name' value is not an array but '$input_type'?" );
 									}
 								} else {
-
 									if ( \is_string( $input_value ) ) {
 										if ( true === $is_integer ) {
 											$input_value = \intval( $input_value );
@@ -2757,11 +2704,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			if ( isset( $_FILES ) ) {
 				$unslash_files = \wp_unslash( $_FILES );
 				if ( array_key_exists( $this->optionid, $unslash_files ) ) {
-
 					$uploads = $unslash_files [ $this->optionid ];
 					if ( array_key_exists( 'name', $uploads ) && is_array( $uploads ['name'] ) ) {
 						foreach ( $uploads ['name'] as $field_name => $file_name ) {
-
 							if ( ! array_key_exists( $field_name, $output ) ) {
 								Lib::debug( 'Unregistered field name: ' . $field_name );
 								continue;
@@ -2809,7 +2754,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			return $output;
 		}
 
-
 		/** Validates single file upload.
 		 * Checks for php reported errors.
 		 * Compares reported file size with real file size.
@@ -2838,18 +2782,13 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 						$err_num = 999;
 						$err_msg = 'Empty upload file: "' . $upload_info ['tmp_name'] . '".';
 					} else {
-
 						if ( is_uploaded_file( $upload_info ['tmp_name'] ) ) {
-
 							if ( filesize( $upload_info ['tmp_name'] ) === $upload_info ['size'] ) {
-
 								$allowed_mime_types = get_allowed_mime_types();
 								if ( in_array( $upload_info ['type'], \array_values( $allowed_mime_types ), true ) ) {
-
 									$file_extension = pathinfo( $upload_info ['name'], PATHINFO_EXTENSION );
 									if ( ! empty( $file_extension )
 									&& false !== strpos( $allowed_mime_types[ $upload_info ['type'] ], $file_extension ) ) {
-
 										unset( $upload_info ['error'] );
 										return $upload_info;
 									} else {
@@ -2956,7 +2895,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @param string $type - default 'error', anything else defaults to 'updated'.
 		 */
 		private function add_settings_update_message( $msg, $code = '', $type = 'error' ) {
-
 			$type = is_string( $type ) && 'error' === trim( $type ) ? $type : 'updated';
 			$msg  = is_string( $msg ) && '' !== trim( $msg ) ? trim( $msg ) : ucfirst( $type );
 			$code = is_string( $code ) && '' !== trim( $code ) ? $code : uniqid();
@@ -2974,7 +2912,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			if ( is_array( $wp_settings_errors ) ) {
 				foreach ( $wp_settings_errors as $error ) {
-
 					if ( array_key_exists( 'setting', $error ) ) {
 						if ( array_key_exists( 'type', $error ) ) {
 							if ( $error ['setting'] === $this->pageslug
@@ -3005,8 +2942,20 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @param mixed $default - optional.
 		 * @return mixed or $default when [$key] has no value.
 		 */
-		protected function get_option( $key, $default = null ) {
-			return $this->plugin->get_option( $key, $default = null );
+		protected function get_option( $key = null, $default = null ) {
+			return $this->plugin->get_option( $key, $default );
+		}
+
+		/** Shortcut to $this->plugin->set_option().
+		 *
+		 * @access protected
+		 * @param string $key to value.
+		 * @param string $value of key.
+		 * @param array  $options to modify, if omitted use get_option().
+		 * @return array updated $options.
+		 */
+		protected function set_option( $key, $value = null, $options = null ) {
+			return $this->plugin->set_option( $key, $value, $options );
 		}
 
 		/** Get private plugin $path variable.
@@ -3197,7 +3146,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			return $options;
 		}
 
-
 		/** On form-submit & file upload (default) handler.
 		 *
 		 * On form-submit & file upload (default) handler.
@@ -3244,7 +3192,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return array $args
 		 */
 		private function apply_field_args_filters( $args, $fn ) {
-
 			return apply_filters( $this->prefix . '_field_args', $args, $fn );
 		}
 
@@ -3408,7 +3355,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @param array $args - get_post( $args ).
 		 */
 		public function get_select_custom_type_posts( $args = null ) {
-
 			$custom_posts      = array();
 			$custom_post_types = $this->get_select_custom_post_types();
 			$default           = array(
@@ -3421,7 +3367,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				$args = array_merge( $default, $args );
 			}
 			if ( array_key_exists( 'post_type', $args ) ) {
-
 				if ( is_string( $args ['post_type'] ) && in_array( $args ['post_type'], $custom_post_types, true ) ) {
 					$custom_post_types = array( $args ['post_type'] => $args ['post_type'] );
 				}
@@ -3504,7 +3449,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @param array  $callback_filter - filter to match directory.
 		 */
 		private static function scandirs_top( $dir, $callback_filter = false ) {
-
 			$files = array();
 
 			if ( ! is_string( $dir ) ) {

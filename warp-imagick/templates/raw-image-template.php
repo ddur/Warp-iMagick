@@ -33,7 +33,6 @@ defined( 'ABSPATH' ) || die( -1 );
  * @return array|false [$size-name => $file-path]
  */
 function get_attachment_image_files( $id ) {
-
 	$metadata = \wp_get_attachment_metadata( $id );
 	if ( ! is_array( $metadata ) ) {
 		return false;
@@ -196,7 +195,6 @@ function get_attachment_image_files( $id ) {
 
 	$files = array();
 	foreach ( $distinct_files as $file_path => $size_data ) {
-
 		$new_array_key = $size_data[0];
 		$size_data[0]  = $file_path;
 
@@ -208,7 +206,6 @@ function get_attachment_image_files( $id ) {
 
 /** Return <img> elements */
 function get_img_html_elements() {
-
 	if ( ! is_callable( '\\getimagesize' ) ) {
 		Lib::error( 'Function is not callable: \getimagesize' );
 		return '';
@@ -228,14 +225,12 @@ function get_img_html_elements() {
 
 	$root_path = wp_normalize_path( untrailingslashit( ABSPATH ) );
 	foreach ( $img_files as $size_name => $size_data ) {
-
 		$file_path = \wp_normalize_path( $size_data[0] );
 		$byte_size = $size_data[3];
 		$mime_type = $size_data[4];
 		$file_size = \size_format( $byte_size );
 
 		if ( Lib::starts_with( $file_path, $root_path ) ) {
-
 			$breakname = \wp_basename( $file_path, '.webp' );
 			if ( $break ) {
 				if ( $break !== $breakname ) {
@@ -259,17 +254,17 @@ function get_img_html_elements() {
 					break;
 
 			}
+			$href      = esc_url_raw( site_url( substr( $file_path, strlen( $root_path ) ) ) );
 			$width     = esc_attr( $size_data [1] );
 			$height    = esc_attr( $size_data [2] );
 			$basename  = basename( $file_path );
 			$byte_size = esc_attr( $byte_size );
-			$title     = esc_attr( "WP Size Name: $size_name\nWidth&Height: ${width}x${height}px\nFile Basename: $basename\nFile Byte-size: $file_size ($byte_size bytes)" );
-			$html     .= "<img data-file-size='$byte_size' data-size-name='$size_name' src='$src' width='$width' height='$height' title='$title'>" . PHP_EOL;
+			$title     = esc_attr( "WP Size Name: $size_name\nWidth&Height: {$width}x{$height}px\nFile Basename: $basename\nFile Byte-size: $file_size ($byte_size bytes)" );
+			$html     .= "<a target='_blank' href='$href'><img data-file-size='$byte_size' data-size-name='$size_name' src='$src' width='$width' height='$height' title='$title'></a>" . PHP_EOL;
 		}
 	}
 
 	if ( Lib::is_debug() ) {
-
 		if ( Shared::get_option( 'preview_thumbnails_show_metadata', true ) ) {
 			$metadata = \wp_get_attachment_metadata( $my_wp_query->post->ID );
 			// phpcs:ignore
@@ -277,11 +272,7 @@ function get_img_html_elements() {
 		}
 
 		// phpcs:ignore
-		
 
-
-		// phpcs:ignore
-		
 	}
 
 	return $html;

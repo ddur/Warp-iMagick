@@ -2,9 +2,9 @@
 Plugin URI: https://github.com/ddur/Warp-iMagick
 Author: © 2017-2023, Dragan Đurić. All rights reserved.
 License: GPLv2
-Requires PHP: 7.2
+Requires PHP: 7.3
 Tested up to: 6.2.2
-Stable tag: 1.10.3
+Stable tag: 1.10.4
 Requires at least: 5.3
 
 Optimize Images On-Site. No Cloud-Service/Signup. Convert to WebP On Upload/Regenerate. Resize Uploads. Set Sharpness, Quality & Big-Image-Threshold.
@@ -269,17 +269,26 @@ Because your server has no PHP-Imagick extension installed or has too old versio
 
 == Changelog ==
 
-= Current Version =
+= 1.10.4 (Current Version) =
+* Mute most of debug messages.
+* Prevent PHP 8.0+ warnings/errors.
+* Apache Visual WebP redirection test.
+* Display plugin version in Plugin Title.
+* Preview Thumbnails: add link to image URL.
+* Upgrade PUC 4.11 (PHP7) to PUC 5.11 (PHP8).
+* Add "attach" metadata (Regenerate Thumbnails).
+* Removed warning when auto-update is not enabled.
+* Info notice when new version is ready to upgrade.
+  (Only when plugin auto-update is disabled.)
 
-* Update Checker sync. to new version of Update Server.
-
-= 1.10.2 =
+= 1.10.3 (including 1.10.2-beta) =
+* Update Checker in sync-with Update server.
 * Re-generate is faster (skip existing clones).
 * Default JPEG quality increased from 60% to 75%.
 * New WebP-JPEG compression values: -5%, -10%, -15%
-* Support for WP-CLI version 2.7.1 "wp media regenerate".
+* Support for WP-CLI version 2.7.1 "media regenerate".
+* Resolved conflict with Performance Lab plugin v2.2.0.
 * Support future Dominant Color (Now in Performance Lab).
-* Resolved conflicts with Performance Lab plugin v2.2.0.
-* Preview Thumbnails is now in reverse order, largest first.
-* Preview Thumbnails embeds WebP in addition to JPEG/PNG.
+* Preview Thumbnails is now in reverse order, large first.
+* Preview Thumbnails: embeds WebP in addition to JPEG/PNG.
   Because browser may keep previous version in site cache.

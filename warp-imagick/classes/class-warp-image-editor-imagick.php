@@ -21,7 +21,6 @@ use \ddur\Warp_iMagick\Shared;
 use \ddur\Warp_iMagick\Plugin;
 
 if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
-
 	if ( ! class_exists( '\WP_Image_Editor_Imagick' ) ) {
 		require_once ABSPATH . WPINC . '/class-wp-image-editor.php';
 		require_once ABSPATH . WPINC . '/class-wp-image-editor-gd.php';
@@ -33,8 +32,6 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 	 * Optimization, Optimization control & Plugin integration.
 	 */
 	class Warp_Image_Editor_Imagick extends WP_Image_Editor_Imagick {
-
-
 		/**
 		 * Support & accept only JPEG/PNG media types.
 		 *
@@ -63,14 +60,12 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 		 * @return array|WP_error
 		 */
 		public function make_subsize( $size_data ) {
-
 			if ( Shared::regenerating_metadata()
 				&& ! empty( $size_data['file'] )
 				&& is_string( $size_data['file'] )
 				&& strlen( $size_data['file'] ) > 0
 
 			) {
-
 				return $size_data;
 			}
 
@@ -101,15 +96,11 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 		 * @return bool|WP_Error
 		 */
 		protected function thumbnail_image( $dst_w, $dst_h, $filter_name = 'FILTER_TRIANGLE', $strip_meta = true ) {
-
 			$this->reset_execution_time();
 
 			if ( is_object( Shared::plugin() ) ) {
-
 				try {
-
 					if ( 'image/png' === $this->mime_type ) {
-
 						switch ( Shared::get_option( 'png-strip-meta', Shared::png_strip_meta_default() ) ) {
 							case 0:
 								break;
@@ -123,7 +114,6 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 								break;
 							case 3:
 								if ( is_callable( array( $this->image, 'stripImage' ) ) ) {
-
 									$this->image->stripImage();
 									$strip_meta = false;
 									\add_filter( 'image_strip_meta', '__return_false', 99 );
@@ -136,11 +126,9 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 								break;
 						}
 					} elseif ( 'image/jpeg' === $this->mime_type ) {
-
 						if ( is_callable( array( $this->image, 'transformImageColorspace' ) )
 						&& is_callable( array( $this->image, 'getImageColorspace' ) )
 						&& is_callable( array( $this->image, 'profileImage' ) ) ) {
-
 							$can_transform_colorspace = false;
 							if ( defined( '\\Imagick::COLORSPACE_UNDEFINED' ) && \Imagick::COLORSPACE_UNDEFINED === $this->image->getImageColorspace() ) {
 								$can_transform_colorspace = Shared::get_option( 'jpeg-colorspace-force', false );
@@ -151,9 +139,8 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 								if ( 0 !== $jpeg_colorspace ) {
 									if ( $this->image->getImageColorspace() !== $jpeg_colorspace ) {
 										if ( ! $this->image->transformImageColorspace( $jpeg_colorspace ) ) {
-											Lib::debug( 'Method transformImageColorspace( SRGB ) failed.' );
+											;
 										} else {
-
 											$this->image->profileImage( 'icc', null );
 										}
 									}
@@ -175,11 +162,9 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 							case 3:
 								$can_strip_all = false;
 								if ( \is_callable( array( $this->image, 'getImageColorspace' ) ) ) {
-
 									$can_strip_all = \Imagick::COLORSPACE_SRGB === $this->image->getImageColorspace();
 								}
 								if ( $can_strip_all && \is_callable( array( $this->image, 'stripImage' ) ) ) {
-
 									$this->image->stripImage();
 									$strip_meta = false;
 									\add_filter( 'image_strip_meta', '__return_false', 99 );
@@ -193,7 +178,6 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 						}
 					}
 				} catch ( Exception $e ) {
-
 					Lib::error( 'Exception: ' . $e->getMessage() );
 					return new \WP_Error( 'warp_optimize_error', $e->getMessage() );
 
@@ -212,13 +196,9 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 			$this->reset_execution_time();
 
 			if ( is_object( Shared::plugin() ) ) {
-
 				if ( 'image/png' === $this->mime_type ) {
-
 					try {
-
 						if ( true === Shared::get_option( 'png-reduce-colors-enable', Shared::png_reduce_colors_enabled_default() ) ) {
-
 							$colors_max = Shared::get_option( 'png-reduce-max-colors-count', Shared::png_max_colors_value_default() );
 
 							$colors_max = Shared::png_max_colors_value_min() <= $colors_max && Shared::png_max_colors_value_max() >= $colors_max ? $colors_max : Shared::png_max_colors_value_default();
@@ -238,9 +218,7 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 							if ( ! array_key_exists( $current_imgtype, Shared::get_imagick_img_types() ) ) {
 								$current_imgtype = false;
 							} else {
-
 								switch ( $current_imgtype ) {
-
 									case 2:
 									case 3:
 									case 4:
@@ -259,17 +237,14 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 							}
 
 							if ( $current_imgtype && true === $do_reduce_colors && false === $colors_reduced ) {
-
 								$alphachannel_on   = Shared::is_transparent( $this->image );
 								$saved_restore_img = false;
 								if ( $alphachannel_on && $dither_png ) {
-
 									if ( $colors_max <= Shared::png_max_colors_palette() ) {
 										$dither_png = false;
 									} else {
 										$saved_restore_img = $this->image->getImage();
 										switch ( $current_imgtype ) {
-
 											case 4:
 											case 5:
 												break;
@@ -283,12 +258,10 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 								}
 
 								if ( is_callable( array( $this->image, 'quantizeImage' ) ) ) {
-
 									$colors_reduced = $this->image->quantizeImage( $colors_max, $this->image->getImageColorspace(), 0, $dither_png, false );
 								}
 
 								if ( $saved_restore_img instanceof \Imagick ) {
-
 									if ( \Imagick::IMGTYPE_PALETTEMATTE === $this->image->getImageType() ) {
 										$this->image = $saved_restore_img->getImage();
 
@@ -321,7 +294,6 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 						$this->image->setOption( 'png:compression-filter', '' . reset( $png_sizes ) [1] );
 
 					} catch ( Exception $e ) {
-
 						Lib::error( 'Exception: ' . $e->getMessage() );
 						return new \WP_Error( 'warp_optimize_error', $e->getMessage() );
 
@@ -329,18 +301,13 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 				}
 
 				if ( 'image/jpeg' === $this->mime_type ) {
-
 					try {
-
 						if ( is_callable( array( $this->image, 'sharpenImage' ) ) ) {
-
 							if ( $this->image->getImageWidth() === $orig_size['width']
 							&& $this->image->getImageHeight() === $orig_size['height'] ) {
-
 								$jpeg_sharpen_sigma = Shared::get_option( 'jpeg-sharpen-image', Shared::jpeg_sharpen_image_value_default() );
 								0 === $jpeg_sharpen_sigma || $this->image->sharpenImage( 0, $jpeg_sharpen_sigma / 10.0 );
 							} else {
-
 								$jpeg_sharpen_sigma = Shared::get_option( 'jpeg-sharpen-thumbnails', Shared::jpeg_sharpen_thumbnails_value_default() );
 								0 === $jpeg_sharpen_sigma || $this->image->sharpenImage( 0, $jpeg_sharpen_sigma / 10.0 );
 							}
@@ -384,7 +351,6 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 							}
 						}
 					} catch ( Exception $e ) {
-
 						Lib::error( 'Exception: ' . $e->getMessage() );
 						return new \WP_Error( 'warp_optimize_error', $e->getMessage() );
 

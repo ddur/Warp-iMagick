@@ -21,11 +21,9 @@ defined( 'ABSPATH' ) || die( -1 );
 use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 
 if ( ! class_exists( __NAMESPACE__ . '\Abstract_Plugin' ) ) {
-
 	/** Derive your plugin class from this abstract class.
 	 */
 	abstract class Abstract_Plugin {
-
 		const VERSION = '1';
 
 		/** __FILE__ constant from plugin entry file.
@@ -59,6 +57,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Plugin' ) ) {
 		private $prefix = null;
 
 		/** Plugin option ID
+		 * Caches value of get_option_id().
 		 *
 		 * @var string $optionid for plugin Options API.
 		 */
@@ -109,11 +108,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Plugin' ) ) {
 		 * @param string $file Magic __FILE__ constant from/of plugin-entry file.
 		 */
 		protected function __construct( $file ) {
-
 			$this->file = $file;
 
 			if ( Lib::is_debug() ) {
-
 				$msg = array();
 				if ( ! is_string( $file ) ) {
 					$msg [] = __METHOD__ . ': Argument $file is not a string (filename)';
@@ -135,20 +132,23 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Plugin' ) ) {
 
 		/** Get plugin entry-file name.
 		 *
-		 * Get plugin entry-file magic __FILE__ constant.
+		 * Get plugin's entry-file magic __FILE__ constant,
+		 * given to this class constructor.
 		 *
 		 * @access public
-		 * @return string magic __FILE__ constant given in class constructor
+		 * @return string magic __FILE__ constant
 		 */
 		public function get_file() {
-			return $this->file; }
+			return $this->file;
+		}
 
 		/** Get plugin's directory absolute path. Lazy & cached.
 		 *
-		 * Get plugin's directory absolute path, derived from magic __FILE__ constant.
+		 * Get plugin's directory absolute path, equal to
+		 * dirname(__FILE__) constant in plugin entry file.
 		 *
 		 * @access public
-		 * @return string plugin path derived from magic __FILE__ constant given in class constructor
+		 * @return string plugin's directory absolute path.
 		 */
 		public function get_path() {
 			if ( null === $this->path ) {
@@ -213,7 +213,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Plugin' ) ) {
 		 *
 		 * Prefix is identical to plugin directory name (path excluded),
 		 * except not alphanumeric 7-bit characters that are replaced with '_' (underscore).
-		 * Use 'prefix' for valid PHP (and maybe JavaScript) identifiers.
+		 * Use to 'prefix' valid PHP (and maybe JavaScript) identifiers.
 		 *
 		 * @see http://php.net/manual/en/language.variables.basics.php
 		 *
@@ -222,7 +222,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Plugin' ) ) {
 		 */
 		public function get_prefix() {
 			if ( null === $this->prefix ) {
-
 				$this->prefix = preg_replace( '/^[^_a-zA-Z\x80-\xff]/', '_', $this->get_dirname() );
 				$this->prefix = preg_replace( '/[^_a-zA-Z\x80-\xff\d]/', '_', $this->prefix );
 			}
@@ -253,18 +252,40 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Plugin' ) ) {
 
 		/** Get plugin option(s) array.
 		 *
-		 * @param mixed $key value or null for all (array) options.
+		 * @param mixed $key value or omit (null) to return all (array) options.
 		 * @param mixed $default value to return when [$key] does not exists.
 		 * @return mixed value or $default when [$key] has no value.
 		 */
 		public function get_option( $key = null, $default = null ) {
 			$options = get_option( $this->get_option_id(), array() );
+			if ( ! is_array( $options ) ) {
+				$options = array();
+			}
 			if ( null === $key ) {
 				return $options;
 			} elseif ( array_key_exists( $key, $options ) ) {
 				return $options [ $key ];
 			}
 			return $default;
+		}
+
+		/** Set option and return $options.
+		 *
+		 * @param string $key to value.
+		 * @param string $value of key.
+		 * @param array  $options to modify, if omitted use get_option().
+		 * @return array updated $options.
+		 */
+		public function set_option( $key, $value = null, $options = null ) {
+			if ( ! is_array( $options ) ) {
+				$options = $this->get_option();
+			}
+			if ( null === $value ) {
+				unset( $options[ $key ] );
+			} else {
+				$options[ $key ] = $value;
+			}
+			return $options;
 		}
 
 		/** Load Plugin Text Domain

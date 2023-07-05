@@ -24,10 +24,8 @@ use \ddur\Warp_iMagick\Base\Plugin\v1\Abstract_Settings;
 use \ddur\Warp_iMagick\Base\Plugin\v1\Abstract_Plugin;
 
 if ( ! class_exists( __NAMESPACE__ . '\Base_Settings' ) ) {
-
 	/** Settings base class. */
 	abstract class Base_Settings extends Abstract_Settings {
-
 		// phpcs:ignore
 	# region Construction and Instance
 
@@ -80,6 +78,12 @@ if ( ! class_exists( __NAMESPACE__ . '\Base_Settings' ) ) {
 		// phpcs:ignore
 	# region Helper functions.
 
+		/** New Options Initialized.
+		 *
+		 * @var bool $new_options is true when default options is created.
+		 */
+		protected $new_options = false;
+
 		/** Initialize plugin options if do not exists in database.
 		 * Upgrade/maintain plugin options if already exists in database.
 		 *
@@ -92,83 +96,46 @@ if ( ! class_exists( __NAMESPACE__ . '\Base_Settings' ) ) {
 		 * @param array $setup Custom fields to initialize.
 		 */
 		public function init_options( $setup = array() ) {
-
-			$current_option = $this->read_options();
-			if ( empty( $current_option ) ) {
-
-				$current_option = $this->get_all_fields_defaults();
+			$current_options = $this->get_option();
+			if ( empty( $current_options ) ) {
+				$current_options = $this->get_all_fields_defaults();
 
 				if ( is_array( $setup ) && ! empty( $setup ) ) {
 					foreach ( $setup as $option => $value ) {
-						$current_option [ $option ] = $value;
+						$current_options [ $option ] = $value;
 					}
 				}
-
-				$current_option = $this->validate_options( $current_option );
-				$this->save_options( $current_option );
-
-			} else {
-
-				$update_setting = false;
-				$plugin_version = $this->get_plugin()->read_plugin_version();
-				$option_version = isset( $current_option ['plugin-version'] ) ? $current_option ['plugin-version'] : '';
-
-				if ( empty( $option_version ) ) {
-
-					delete_option( $option_slug_id );
-
-					set_transient(
-						$this->pageslug . '-update-notices',
-						array(
-							array( 'notice' => 'Warp iMagick: New plugin version (1.0.1+) activated. Plugin settings are cleared to default values.' ),
-							array( 'error' => 'Warp iMagick: Please configure and update settings to disable this warning message.' ),
-						)
-					);
-					return;
+				global $wp_filter;
+				$hook_name = "pre_update_option_{$this->optionid}";
+				if ( isset( $wp_filter[ $hook_name ] ) && $wp_filter[ $hook_name ]->has_filters() ) {
+					\remove_all_filters( $hook_name );
 				}
 
-				if ( $option_version !== $plugin_version ) {
-					$current_option ['plugin-version'] = $plugin_version;
-					$update_setting                    = true;
-				}
-
-				if ( ! isset( $current_option ['jpeg-colorspace'] )
-				|| 0 !== (int) $current_option ['jpeg-colorspace'] ) {
-
-					$current_option ['jpeg-colorspace'] = Shared::jpeg_colorspace_default();
-					$update_setting                     = true;
-				}
-
-				if ( $update_setting ) {
-					$current_option = $this->validate_options( $current_option );
-					$this->save_options( $current_option );
-				}
+				\update_option( $this->optionid, $current_options, true );
+				$this->new_options = true;
 			}
-		}
 
-		/** Read all options
-		 *
-		 * @return array of options or empty array.
-		 */
-		public function read_options() {
-			$option_values = get_option( $this->optionid, null );
-			if ( ! is_array( $option_values ) ) {
-				$option_values = array();
+			$current_options = $this->get_option();
+			$update_settings = false;
+
+			$plugin_version = Shared::get_plugin_version();
+			$option_version = $this->get_option( 'plugin-version' );
+
+			if ( ! empty( $plugin_version ) && $option_version !== $plugin_version ) {
+				$current_options = $this->set_option( 'plugin-version', $plugin_version, $current_options );
+				$update_settings = true;
 			}
-			return $option_values;
-		}
 
-		/** Save but without form validation
-		 *
-		 * @param array $option_values to save.
-		 */
-		public function save_options( $option_values ) {
+			if ( true === $update_settings ) {
+				/** Save raw options data, already (form) validated.*/
+				global $wp_filter;
+				$hook_name = "pre_update_option_{$this->optionid}";
+				if ( isset( $wp_filter[ $hook_name ] ) && $wp_filter[ $hook_name ]->has_filters() ) {
+					\remove_all_filters( $hook_name );
+				}
 
-			remove_filter( "pre_update_option_{$this->optionid}", array( $this, 'on_abstract_validate_form_input' ), 10 );
-
-			update_option( $this->optionid, $option_values, true );
-
-			add_filter( "pre_update_option_{$this->optionid}", array( $this, 'on_abstract_validate_form_input' ), 10, 3 );
+				\update_option( $this->optionid, $current_options, true );
+			}
 		}
 
 		/** Initialize plugin (multisite) options.
@@ -227,7 +194,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Base_Settings' ) ) {
 		 * @param array $values - reference to options values.
 		 */
 		protected function set_dynamic_configuration( &$values ) {
-
 			if ( ! array_key_exists( 'configuration', $values ) ) {
 				$values ['configuration'] = array();
 			}
@@ -246,13 +212,11 @@ if ( ! class_exists( __NAMESPACE__ . '\Base_Settings' ) ) {
 		 * @param array $values - reference to options values.
 		 */
 		protected function set_dynamic_menu_position( &$values ) {
-
 			$this->set_dynamic_configuration( $values );
 
 			$config_menu_parent = Lib::safe_key_value( $this->settings, array( 'menu', 'parent-slug' ), '' );
 
 			if ( ! self::is_valid_menu_parent_slug( $config_menu_parent ) ) {
-
 				$config_menu_parent = abs( Lib::safe_key_value( $this->settings, array( 'menu', 'position' ), 0 ) );
 			}
 
@@ -261,12 +225,10 @@ if ( ! class_exists( __NAMESPACE__ . '\Base_Settings' ) ) {
 			if ( empty( $menu_input )
 			|| ( ! self::is_valid_menu_parent_slug( $menu_input )
 			&& ! is_numeric( $menu_input ) ) ) {
-
 				$menu_input = $config_menu_parent;
 			}
 
 			if ( is_numeric( $menu_input ) ) {
-
 				$menu_input = abs( intval( $menu_input ) );
 
 				$values ['configuration']['menu']['parent-slug'] = '';

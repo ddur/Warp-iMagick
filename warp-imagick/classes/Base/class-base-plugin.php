@@ -22,10 +22,8 @@ use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use \ddur\Warp_iMagick\Base\Plugin\v1\Abstract_Plugin;
 
 if ( ! class_exists( __NAMESPACE__ . '\Base_Plugin' ) ) {
-
 	/** Plugin base class. */
 	abstract class Base_Plugin extends Abstract_Plugin {
-
 		// phpcs:ignore
 	# region Plugin construction.
 
