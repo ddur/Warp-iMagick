@@ -109,13 +109,13 @@ __Use Copy button at top-right (visible on mouse hover) of code-snippet below an
 <ifModule mod_rewrite.c>
 	RewriteEngine On
 	RewriteBase /
-	
+
 	RewriteCond %{HTTP_ACCEPT} image/webp
 	RewriteCond %{REQUEST_URI} /wp-content/
-	RewriteCond %{REQUEST_URI} (?i)(.*)\.(jpe?g|png)$
-	RewriteCond %{DOCUMENT_ROOT}%1\.%2.webp -f
-
-	RewriteRule .+ %1\.%2\.webp [T=image/webp,E=webp:1,L]
+	RewriteCond %{REQUEST_URI} (.*)\.(?i)(jpe?g|png)$
+	RewriteCond %{REQUEST_FILENAME} -f
+	RewriteCond %{REQUEST_FILENAME}.webp -f
+	RewriteRule .* %1\.%2.webp [T=image/webp,E=webp:1,L]
 
 	<IfModule mod_headers.c>
 		Header append Vary Accept env=REDIRECT_webp
@@ -123,6 +123,7 @@ __Use Copy button at top-right (visible on mouse hover) of code-snippet below an
 </IfModule>
 
 # END Warp-iMagick
+
 
 ```
 After Apache ``/.htaccess`` file is successfully modified and your site is serving WebP images, you don't need [Htaccess File Editor plugin](https://wordpress.org/plugins/wp-htaccess-editor/) anymore and feel free to __uninstall__ it.
@@ -148,10 +149,13 @@ Below is annotated version of ``/.htaccess`` snippet with options/variations and
 	RewriteCond %{REQUEST_URI} /wp-content/
 
 	# If request is for jpg/png file?
-	RewriteCond %{REQUEST_URI} (?i)(.*)\.(jpe?g|png)$
+	RewriteCond %{REQUEST_URI} (?i)(.*)\.(?i)(jpe?g|png)$
 	
+	# If JPG/PNG file exists?
+	RewriteCond %{REQUEST_FILENAME} -f
+
 	# If WebP Clone file exists?
-	RewriteCond %{DOCUMENT_ROOT}%1\.%2.webp -f
+	RewriteCond %{REQUEST_FILENAME}.webp -f
 
 	# Transparently serve existing WebP Clone.
 	# For each requested JPEG/PNG image, returns HTTP code [200].
@@ -165,7 +169,7 @@ Below is annotated version of ``/.htaccess`` snippet with options/variations and
 	# CONS:
 		# If CDN/external cache is used, it should support Vary: header. CDN cache may choose to cache none, one or both image versions.
 	# DEFAULT REWRITE RULE - if you enable (uncomment) any OPTIONAL REWRITE RULE below, you MUST comment-out this RewriteRule.
-	RewriteRule .+ %1\.%2\.webp [T=image/webp,E=webp:1,L]
+	RewriteRule .* %1\.%2\.webp [T=image/webp,E=webp:1,L]
 
 	# Temporary redirect to existing WebP Clone.
 	# For each requested JPEG/PNG image, if WebP Clone exists, returns HTTP code [302], else [200]
@@ -177,7 +181,7 @@ Below is annotated version of ``/.htaccess`` snippet with options/variations and
 	# CONS:
 		# Redirection takes small/short time every time when JPEG/PNG image is requested.
 	# OPTIONAL REWRITE RULE - If you enable/un-comment this RewriteRule, you MUST comment-out other two RewriteRule-s.
-	# RewriteRule .+ %1\.%2\.webp [R=302,L]
+	# RewriteRule .* %1\.%2\.webp [R=302,L]
 
 	# Permanent redirect to existing WebP Clone.
 	# For each requested JPG/PNG image, if WebP Clone exists returns HTTP code [301] once and then [200], else [200].
@@ -190,7 +194,7 @@ Below is annotated version of ``/.htaccess`` snippet with options/variations and
 		# If Webp Clone image is deleted/removed, browser will receive error 404.
 		# For browser to receive JPEG/PNG again, user has to clear your site data in his browser site data cache.
 	# OPTIONAL REWRITE RULE - If you enable/un-comment this RewriteRule, you MUST comment-out other two RewriteRule-s.
-	# RewriteRule .+ %1\.%2\.webp [R=301,L]
+	# RewriteRule .* %1\.%2\.webp [R=301,L]
 
 	<IfModule mod_headers.c>
 		Header append Vary Accept env=REDIRECT_webp
