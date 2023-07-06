@@ -4,7 +4,7 @@ Author: © 2017-2023, Dragan Đurić. All rights reserved.
 License: GPLv2
 Requires PHP: 7.3
 Tested up to: 6.2.2
-Stable tag: 1.10.4
+Stable tag: 1.10.4.1
 Requires at least: 5.3
 
 Optimize Images On-Site. No Cloud-Service/Signup. Convert to WebP On Upload/Regenerate. Resize Uploads. Set Sharpness, Quality & Big-Image-Threshold.
@@ -269,10 +269,14 @@ Because your server has no PHP-Imagick extension installed or has too old versio
 
 == Changelog ==
 
-= 1.10.4 (Current Version) =
+= 1.10.4.1 (Current Version) =
+* Fix: Delay Plugin Reactivation because test images
+  are not created while plugin is in WP upgrader sandbox.
+
+= 1.10.4 =
 * Mute most of debug messages.
+* Visual WebP redirection test.
 * Prevent PHP 8.0+ warnings/errors.
-* Apache Visual WebP redirection test.
 * Display plugin version in Plugin Title.
 * Preview Thumbnails: add link to image URL.
 * Upgrade PUC 4.11 (PHP7) to PUC 5.11 (PHP8).

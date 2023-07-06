@@ -43,13 +43,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Meta_Plugin' ) ) {
 		// phpcs:ignore
 	# region Plugin install and update infrastructure.
 
-		/** On Install/Upgrade reactivated flag.
-		 * Prevent reactivating plugin twice.
-		 *
-		 * @var bool $my_is_reactivated flag.
-		 */
-		protected $my_is_reactivated = false;
-
 		/** Reactivate plugin on "live" upgrade events.
 		 * When plugin is already active and now upgraded,
 		 * either via "Upload Plugin" upgrade or downgrade
@@ -63,6 +56,11 @@ if ( ! class_exists( __NAMESPACE__ . '\Meta_Plugin' ) ) {
 
 		/** Install or Update Handler. */
 		protected function install_update_handler() {
+			if ( get_transient( $this->get_slug() . '-reactivate' ) ) {
+				$this->reactivate_when_active();
+				delete_transient( $this->get_slug() . '-reactivate' );
+			}
+
 			/** Upgrader Post Install
 			 *
 			 * On [Add New][Upload Plugin].
@@ -71,7 +69,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Meta_Plugin' ) ) {
 			add_filter(
 				'upgrader_post_install',
 				function( $success = false, $hook_extra = false, $result = false ) {
-					if ( true === $this->my_is_reactivated ) {
+					if ( get_transient( $this->get_slug() . '-reactivate' ) ) {
 						return $success;
 					}
 
@@ -110,11 +108,10 @@ if ( ! class_exists( __NAMESPACE__ . '\Meta_Plugin' ) ) {
 						}
 					}
 
-					if ( true !== $this->my_is_reactivated ) {
-						$this->reactivate_when_active();
-						$this->my_is_reactivated = true;
-					} else {
+					if ( get_transient( $this->get_slug() . '-reactivate' ) ) {
 						;
+					} else {
+						set_transient( $this->get_slug() . '-reactivate', true );
 					}
 
 					return $success;
@@ -131,7 +128,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Meta_Plugin' ) ) {
 			add_action(
 				'upgrader_process_complete',
 				function( $upgrader_instance = null, $hook_extra = null ) {
-					if ( true === $this->my_is_reactivated ) {
+					if ( get_transient( $this->get_slug() . '-reactivate' ) ) {
 						return;
 					}
 
@@ -203,11 +200,10 @@ if ( ! class_exists( __NAMESPACE__ . '\Meta_Plugin' ) ) {
 
 					}
 
-					if ( true !== $this->my_is_reactivated ) {
-						$this->reactivate_when_active();
-						$this->my_is_reactivated = true;
-					} else {
+					if ( get_transient( $this->get_slug() . '-reactivate' ) ) {
 						;
+					} else {
+						set_transient( $this->get_slug() . '-reactivate', true );
 					}
 
 					return;
