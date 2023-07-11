@@ -115,7 +115,7 @@ __Use Copy button at top-right (visible on mouse hover) of code-snippet below an
 	RewriteCond %{REQUEST_URI} (.*)\.(?i)(jpe?g|png)$
 	RewriteCond %{REQUEST_FILENAME} -f
 	RewriteCond %{REQUEST_FILENAME}.webp -f
-	RewriteRule .* %1\.%2.webp [T=image/webp,E=webp:1,L]
+	RewriteRule .* %1.%2.webp [T=image/webp,E=webp:1,L]
 
 	<IfModule mod_headers.c>
 		Header append Vary Accept env=REDIRECT_webp
@@ -169,7 +169,7 @@ Below is annotated version of ``/.htaccess`` snippet with options/variations and
 	# CONS:
 		# If CDN/external cache is used, it should support Vary: header. CDN cache may choose to cache none, one or both image versions.
 	# DEFAULT REWRITE RULE - if you enable (uncomment) any OPTIONAL REWRITE RULE below, you MUST comment-out this RewriteRule.
-	RewriteRule .* %1\.%2\.webp [T=image/webp,E=webp:1,L]
+	RewriteRule .* %1.%2.webp [T=image/webp,E=webp:1,L]
 
 	# Temporary redirect to existing WebP Clone.
 	# For each requested JPEG/PNG image, if WebP Clone exists, returns HTTP code [302], else [200]
@@ -194,7 +194,7 @@ Below is annotated version of ``/.htaccess`` snippet with options/variations and
 		# If Webp Clone image is deleted/removed, browser will receive error 404.
 		# For browser to receive JPEG/PNG again, user has to clear your site data in his browser site data cache.
 	# OPTIONAL REWRITE RULE - If you enable/un-comment this RewriteRule, you MUST comment-out other two RewriteRule-s.
-	# RewriteRule .* %1\.%2\.webp [R=301,L]
+	# RewriteRule .* %1.%2.webp [R=301,L]
 
 	<IfModule mod_headers.c>
 		Header append Vary Accept env=REDIRECT_webp
