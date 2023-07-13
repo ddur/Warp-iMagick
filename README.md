@@ -8,7 +8,7 @@
 
 * Unlike any other plugin I have seen, this plugin has real visual size preview of media image and all generated thumbnails, including WebP clones. When mouse hovers over any image in a preview, a tooltip is shown with size-name (webp clone), pixel-size, file-name and byte-size.
 
-* Because of using server redirection rules, it does't matter if the image is served via HTML <img> tag or CSS background-image style. It works always!
+* Because of using server redirection rules, it does't matter if the image is served via HTML ``<img>`` or ``<picture>`` tag, CSS ``background-image:`` style or via JavaScript. It always works!
 
 * Due to flexible configuration and compression quality, Warp iMagick Plugin is endorsed and recommended by photografic site owner [KennyLL support post](https://wordpress.org/support/topic/disable-full-size-compressed-version/#post-14381959).
 
@@ -24,7 +24,7 @@
 
 * Plugin is extended with [YahnisElsts/plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker) in order to replace WordPress.org hosting & update service.
 
-* Tested with WordPress version 5.3 - 6.2. Compatible with PHP version 7.2 up to and including 8.2.
+* Tested with WordPress version 5.3 - 6.2. Compatible with PHP version 7.3 up to and including 8.2.
 
 * Tested with Apache Server and NGinx Server on [WordOps](https://github.com/WordOps/WordOps) configuration.
 
