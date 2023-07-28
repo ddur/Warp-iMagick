@@ -66,17 +66,17 @@
 * In WordPress support forums some users in their [plugin list report having Warp iMagick plugin version 1.9.5.1](https://wordpress.org/support/topic/calculated-fields-form-not-visible/). That version is never released by author and can't be found or downloaded from [WordPress Server](https://downloads.wordpress.org/plugin/warp-imagick.1.9.5.1.zip).
 
 
-# Install or Update from Github:
-
-* Clone this Repository and zip /warp-imagick/ subdirectory into warp-imagick.zip file. __Important Note__: Zip file must contain only /warp-imagick/ subdirectory.
-* Use Your Wordpress Site Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select your warp-imagick.zip file. Follow WordPress instructions ....
-
-
 # Install or Update from Update Server:
 
 * Go to [Plugin Update Server](https://warp-imagick.pagespeed.club/)
 * Press [Download Plugin] button and download & save free Warp iMagick plugin.
 * Use Your Wordpress Site Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select just downloaded warp-imagick.zip file. Follow WordPress instructions ....
+
+
+# Install or Update from Github:
+
+* Clone this Repository and zip /warp-imagick/ subdirectory into warp-imagick.zip file. __Important Note__: Zip file must contain only /warp-imagick/ subdirectory.
+* Use Your Wordpress Site Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select your warp-imagick.zip file. Follow WordPress instructions ....
 
 
 # Register for Automated Updates:
