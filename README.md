@@ -59,10 +59,10 @@
 * [![PHP compatibility](https://plugintests.com/plugins/wporg/warp-imagick/php-badge.svg)](https://plugintests.com/plugins/wporg/warp-imagick/latest)
 * Download Warp-iMagick Version 1.9.6 from [WordPress Server](https://downloads.wordpress.org/plugin/warp-imagick.1.9.6.zip)
 * Use Your Wordpress Site Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select just downloaded warp-imagick.1.9.6.zip file. Follow WordPress instructions ....
-* __Attention: Version 1.9.6 will __NOT__ be updated from WordPress-Server and can't automatically check for updates on own Update-Server. To be able to check for future version updates, download and install (or update to) any version from this Github repository or from Warp iMagick Update-Server (as described in sections below).__
+* __Attention: Any Plugin version (including 1.9.6) released via Wordpress server can't and will __NOT__ be updated from WordPress-Server and can't automatically check for updates on own Update-Server. To be able to check for future version updates, download and install (or update to) latest version from Warp iMagick Update-Server as described in section below (or from this Github repository).__
 
 
-# Attention: Version 1.9.5.1 may be a spyware.
+# Attention: Plugin version 1.9.5.1 may be a spyware.
 
 * In WordPress support forums some users in their [plugin list report having Warp iMagick plugin version 1.9.5.1](https://wordpress.org/support/topic/calculated-fields-form-not-visible/). That version is never released by author and can't be found or downloaded from [WordPress Server](https://downloads.wordpress.org/plugin/warp-imagick.1.9.5.1.zip).
 
@@ -80,9 +80,10 @@
 * In another browser Tab/Window, open [Plugin Update Server](https://warp-imagick.pagespeed.club/), press [Automatic Updates] button, (register &) login. In your user profile go to section "Application Passwords". Paste copied "Plugin Update Hostname" into "New Application Password Name" field. Press "Add New Application Password" button and you will be presented with your new password. Copy text from "new password".
 * Go back to your Wordpress Site at Warp-iMagick Plugin Settings Page -> General Settings Tab -> Plugin Settings Section and paste your new password into "Plugin Update Password" Field.
 * Press [Save Changes] Button.
-* __Note__: __You can delete your WordPress profile at any time.__
+* __Note__: __Your email will NEVER be sold to anyone or used for spam purposes.__
+* __Note__: __You can delete your Update Server user profile and email at any time.__
 * __Note__: __You can add/register and get update passwords for more than one Warp iMagick Plugin (for each site/host where is installed).__ Each Warp iMagick Plugin has different "Plugin Update Password" for every WordPress site (hostname).
-* __Note__: Without registration and password, plugin should let you know that new update is available but may fail to download & update plugin via WordPress administration panel/interface, either on-click-update or auto-update. In that case you still have option to update from GitHub or Update Server as described in two sections above.
+* __Note__: Without registration and password, plugin should let you know that new update is available but may fail to download & update plugin via WordPress administration panel/interface, either on-click-update or auto-update. In that case you may still have option to download/update plugin from Update Server as described in section above.
 
 
 # __Post Install: Apache Server WebP Configuration:__
@@ -214,6 +215,6 @@ No Nginx configuration changes are required to automatically serve Webp images t
 
 # __Post Install: [Open Litespeed](https://openlitespeed.org/) WebP Configuration:__
 
-Using Open Litespeed was never tested nor recommended for this plugin. I especially dicourage you from buying services from a2hosting which has redistributed WP versions (below 1.9.6) of Warp iMagick plugin and used Warp iMagick name for advertizing purposes without linking to plugin web page. Although they having thousands of Warp iMagick plugin installs, they refused to cooperate with plugin author. I do not know what version or modifications you got from them. Plugin support will be provided only to latest original unmodified version. So, if you are client of a2hosting with older or modified Warp iMagick plugin, do not expect help here.
+Using Open Litespeed was never tested nor recommended for this plugin. I especially dicourage you from buying services from a2hosting which has redistributed WP versions (below 1.9.6) of Warp iMagick plugin privatelly, only to it's clients. They used Warp iMagick name for advertizing purposes without linking to plugin web page. Although they probably having thousands of Warp iMagick plugin installs, they refused to cooperate with plugin author. I do not know what version or modifications you got from them. Plugin support will be provided only to latest original unmodified version released by author. So, if you are client of a2hosting with older or modified Warp iMagick plugin, do not expect help here.
 
 :vulcan_salute:
