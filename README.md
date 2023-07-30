@@ -209,6 +209,6 @@ __Looking for more details? Then press [Help] button at the top-right of Warp iM
 
 # __Post Install: [WordOps Nginx Server](https://wordops.net/) WebP Configuration:__
 
-No Nginx configuration changes required to automatically serve Webp images to WebP enabled browsers. WebP redirection just works with default configuration.
+No Nginx configuration changes are required to automatically serve Webp images to WebP enabled browsers. WebP redirection just works with default [WordOps Nginx Server configuration](https://github.com/WordOps/WordOps).
 
 :vulcan_salute:
