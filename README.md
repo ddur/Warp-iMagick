@@ -211,4 +211,9 @@ __Looking for more details? Then press [Help] button at the top-right of Warp iM
 
 No Nginx configuration changes are required to automatically serve Webp images to WebP enabled browsers. WebP redirection just works with default [WordOps Nginx Server configuration](https://github.com/WordOps/WordOps).
 
+
+# __Post Install: [Open Litespeed](https://openlitespeed.org/) WebP Configuration:__
+
+Using Open Litespeed was never tested nor recommended for this plugin. I especially dicourage you from buying services from a2hosting which has redistributed WP versions (below 1.9.6) of Warp iMagick plugin and used Warp iMagick name for advertizing purposes without linking to plugin web page. Although they having thousands of Warp iMagick plugin installs, they refused to cooperate with plugin author. I do not know what version or modifications you got from them. Plugin support will be provided only to latest original unmodified version. So, if you are client of a2hosting with older or modified Warp iMagick plugin, do not expect help here.
+
 :vulcan_salute:
