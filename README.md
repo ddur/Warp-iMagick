@@ -84,7 +84,7 @@
 * Press [Save Changes] Button.
 * __Note__: __Your email will NEVER be sold to anyone or used for spam purposes.__
 * __Note__: __You can delete your Update Server user profile and email at any time.__
-* __Note__: __You can add/register and get update passwords for more than one Warp iMagick Plugin (for each site/host where is installed).__ Each Warp iMagick Plugin has different "Plugin Update Password" for every WordPress site (hostname).
+* __Note__: __You can add/register and get update passwords for more than one Warp iMagick Plugin (for each site/host/domain where is installed).__ Each Warp iMagick Plugin has different "Plugin Update Password" for every WordPress site (hostname).
 * __Note__: Without registration and password, plugin should let you know that new update is available but may fail to download & update plugin via WordPress administration panel/interface, either on-click-update or auto-update. In that case you may still have option to download/update plugin from Update Server as described in section above.
 
 
