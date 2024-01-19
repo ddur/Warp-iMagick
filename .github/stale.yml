@@ -10,7 +10,7 @@ exemptLabels:
   - enhancement
 exemptProjects: true
 exemptMilestones: true
-staleLabel: stale
+staleLabel: staled
 markComment: >
   This issue will be closed after another 15 days of inactivity.
 closeComment: >
