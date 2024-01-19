@@ -1,0 +1,18 @@
+---
+only: issues
+limitPerRun: 30
+daysUntilStale: 15
+daysUntilClose: 15
+exemptLabels:
+  - bug
+  - In progress
+  - planned
+  - enhancement
+exemptProjects: true
+exemptMilestones: true
+staleLabel: stale
+markComment: >
+  This issue will be closed after another 15 days of inactivity.
+closeComment: >
+  This issue has been automatically closed due to extended period of inactivity.
+  Please reopen if it is still valid. Thank you for your contributions.
