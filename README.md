@@ -53,7 +53,7 @@
 * [Awesome WP Speed Up - Image Optimization Plugins](https://github.com/lukecav/awesome-wp-speed-up#image-optimization-plugins)
 
 
-# Install last WordPress release - Version 1.9.6:
+# Do not install last WordPress release - Version 1.9.6:
 
 * [__Plugin Reviews__](https://wordpress.org/support/plugin/warp-imagick/reviews/?filter=5)
 * [__10.000+ active installs__](https://plugintests.com/plugins/wporg/warp-imagick/latest#)
