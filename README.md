@@ -1,8 +1,8 @@
-[![WP Version compatible](https://img.shields.io/badge/WP%205.3--6.4.2-compatible%20(after%20update)-darkgreen)](https://wordpress.org/download/releases/#branch-53)
+[![WP Version compatible](https://img.shields.io/badge/WP%205.3--6.7.1-compatible%20(after%20update)-darkgreen)](https://wordpress.org/download/releases/#branch-53)
 [![PHP Version compatible](https://img.shields.io/badge/PHP%207.4/8.1/8.2-compatible-darkgreen)](https://www.php.net/supported-versions.php)
 [![WordOps compatible](https://img.shields.io/badge/WordOps-compatible-darkgreen)](https://wordops.net/) 
 
-# Warp iMagick - WordPress Image Compressor Plugin. Resize, Optimize, Sharpen, Compress, Regenerate, Clone & Convert to WebP - Next Gen Image Format.
+# Warp iMagick - WebP Converter - Plugin 4 WordPress. Resize, Optimize, Sharpen, Compress, Regenerate, Convert to WebP Clones - Next Gen Image Format.
 
 * Unlike almost all of other WordPress Image Optimizer Plugins, this plugin is __NOT__ just connector to external Image Optimization Service. Image Optimization is performed by your WordPress site server, free and at the "expense" of your hosting provider CPU time. No external image optimization service/signup required. No limits in number or megabytes of optimized images. No risky/external binaries required to install on your site server. Plugin uses only safe PHP extension software available or installed on your server by your hosting provider: PHP-imagick and PHP-GD. **If you find any comparable and free plugin that is compressing images without using external service, please let me know 😎.**
 
@@ -26,7 +26,7 @@
 
 * Plugin is extended with [YahnisElsts/plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker) in order to replace WordPress.org hosting & update service.
 
-* Tested with WordPress version 5.3 - 6.2. Compatible with PHP version 7.3 up to and including 8.2.
+* Tested with WordPress version 5.3 - 6.4 (6.7.1 after update) Compatible with PHP version 7.3 up to and including 8.2.
 
 * Tested with Apache Server and NGinx Server on [WordOps](https://github.com/WordOps/WordOps) configuration.
 
