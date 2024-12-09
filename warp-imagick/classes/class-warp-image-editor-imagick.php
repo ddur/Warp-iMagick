@@ -20,7 +20,9 @@ use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use \ddur\Warp_iMagick\Shared;
 use \ddur\Warp_iMagick\Plugin;
 
-if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
+$class = '\\Warp_Image_Editor_Imagick';
+
+if ( ! class_exists( $class ) ) {
 	if ( ! class_exists( '\WP_Image_Editor_Imagick' ) ) {
 		require_once ABSPATH . WPINC . '/class-wp-image-editor.php';
 		require_once ABSPATH . WPINC . '/class-wp-image-editor-gd.php';
@@ -398,4 +400,6 @@ if ( ! class_exists( 'Warp_Image_Editor_Imagick' ) ) {
 		}
 
 	}
+} else {
+	Shared::debug( "Class already exists: $class" );
 }

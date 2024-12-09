@@ -25,7 +25,9 @@ use \ddur\Warp_iMagick\Shared;
 
 require_once ABSPATH . 'wp-admin/includes/file.php';
 
-if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
+$class = __NAMESPACE__ . '\\Settings';
+
+if ( ! class_exists( $class ) ) {
 	/** Implementation of Plugin Settings. */
 	class Settings extends Meta_Settings {
 		// phpcs:ignore
@@ -545,7 +547,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 		protected function on_prepare_settings_page() {
 			$actual_wp_version = get_bloginfo( 'version' );
 
-			$tested_wp_version = '6.2.2';
+			$tested_wp_version = '6.4';
 			if ( 0 === \strpos( $actual_wp_version, $tested_wp_version . '.' ) ) {
 				return;
 			}
@@ -874,10 +876,13 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 						\delete_transient( $settings->pageslug . '-reactivate-todo' );
 						\delete_transient( $settings->pageslug . '-conflict-errors' );
 						\delete_transient( $settings->pageslug . '-update-version' );
+						\delete_transient( $settings->pageslug . '-update-notices' );
 
 						self::clear_ui_state_user_settings( $settings->pageslug );
 
 						\delete_transient( $settings->pageslug . '-obsolete-usermeta-cleared' );
+
+						\delete_transient( Lib::get_namespace() . '-notices' );
 
 						\flush_rewrite_rules();
 
@@ -1060,4 +1065,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings' ) ) {
 	# endregion
 
 	}
+} else {
+	Shared::debug( "Class already exists: $class" );
 }

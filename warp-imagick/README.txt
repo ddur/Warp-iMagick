@@ -1,10 +1,10 @@
 === Warp Compress, Sharpen, Optimize Images. Convert WebP. Resize Uploads ===
-Plugin URI: https://github.com/ddur/Warp-iMagick
+Plugin URI: https://warp-imagick.pagespeed.club/
 Author: © 2017-2023, Dragan Đurić. All rights reserved.
 License: GPLv2
 Requires PHP: 7.3
-Tested up to: 6.2.2
-Stable tag: 1.10.4.1
+Tested up to: 6.4
+Stable tag: 1.11
 Requires at least: 5.3
 
 Optimize Images On-Site. No Cloud-Service/Signup. Convert to WebP On Upload/Regenerate. Resize Uploads. Set Sharpness, Quality & Big-Image-Threshold.
@@ -269,7 +269,12 @@ Because your server has no PHP-Imagick extension installed or has too old versio
 
 == Changelog ==
 
-= 1.10.4.1 (Current Version) =
+= 1.11 (Current Version) =
+* Tested up to WP 6.4
+* Patch: PUC 5.1 PHP 8.2 Warnings.
+* Wrap classes with uniform if class exist code.
+
+= 1.10.4.1 =
 * Fix: Delay Plugin Reactivation because test images
   are not created while plugin is in WP upgrader sandbox.
 

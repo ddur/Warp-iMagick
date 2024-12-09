@@ -22,7 +22,9 @@ use \ddur\Warp_iMagick\Base\Meta_Settings_Renderer;
 use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use \ddur\Warp_iMagick\Shared;
 
-if ( ! class_exists( __NAMESPACE__ . '\Settings_Renderer' ) ) {
+$class = __NAMESPACE__ . '\\Settings_Renderer';
+
+if ( ! class_exists( $class ) ) {
 	/** Admin-Setting page renderer (separated rendering code) */
 	class Settings_Renderer extends Meta_Settings_Renderer {
 		/** Render Sidebar (Logo). */
@@ -48,7 +50,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Settings_Renderer' ) ) {
 
 			$pluginbox = Lib::safe_key_value( $this->settings->get_settings(), array( 'plugin', 'metabox' ), array() );
 			$image_lnk = Lib::safe_key_value( $pluginbox, 'logo', $this->plugin->get_url_path() . '\/assets/warp-logo.png' );
-			$click_lnk = Lib::safe_key_value( $pluginbox, 'link', 'https://github.com/ddur/Warp-iMagick/' );
+			$click_lnk = Lib::safe_key_value( $pluginbox, 'link', 'https://warp-imagick.pagespeed.club/' );
 			$box_title = Lib::safe_key_value( $pluginbox, 'name', wp_parse_url( $click_lnk, PHP_URL_HOST ) );
 			$this->render_hard_meta_box( $image_lnk, $click_lnk, $box_title, 'logo' );
 
@@ -305,4 +307,6 @@ PHP-GD function missing: imagepalettetotruecolor.
 		}
 
 	}
+} else {
+	Shared::debug( "Class already exists: $class" );
 }

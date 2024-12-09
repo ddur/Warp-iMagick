@@ -26,7 +26,9 @@ use \ddur\Warp_iMagick\Base\Base_Plugin;
 use \ddur\Warp_iMagick\Settings;
 use \ddur\Warp_iMagick\Shared;
 
-if ( ! class_exists( __NAMESPACE__ . '\Meta_Plugin' ) ) {
+$class = __NAMESPACE__ . '\\Meta_Plugin';
+
+if ( ! class_exists( $class ) ) {
 	/** Meta Plugin Class.
 	 *
 	 * Class between Plugin and abstract Base_Plugin class.
@@ -504,4 +506,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Meta_Plugin' ) ) {
 	# endregion
 
 	}
+} else {
+	Shared::debug( "Class already exists: $class" );
 }

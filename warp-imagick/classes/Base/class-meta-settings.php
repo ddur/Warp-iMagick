@@ -18,10 +18,13 @@ namespace ddur\Warp_iMagick\Base;
 
 defined( 'ABSPATH' ) || die( -1 );
 
+use \ddur\Warp_iMagick\Shared;
 use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use \ddur\Warp_iMagick\Base\Base_Settings;
 
-if ( ! class_exists( __NAMESPACE__ . '\Meta_Settings' ) ) {
+$class = __NAMESPACE__ . '\\Meta_Settings';
+
+if ( ! class_exists( $class ) ) {
 	/** Meta Settings Class.
 	 *
 	 * Class between Settings and abstract Base_Settings class.
@@ -46,5 +49,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Meta_Settings' ) ) {
 	# endregion
 
 	}
-
+} else {
+	Shared::debug( "Class already exists: $class" );
 }

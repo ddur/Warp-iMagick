@@ -18,9 +18,12 @@ namespace ddur\Warp_iMagick\Base;
 
 defined( 'ABSPATH' ) || die( -1 );
 
+use \ddur\Warp_iMagick\Shared;
 use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 
-if ( ! class_exists( __NAMESPACE__ . '\Base_Settings_Renderer' ) ) {
+$class = __NAMESPACE__ . '\\Base_Settings_Renderer';
+
+if ( ! class_exists( $class ) ) {
 	/** Render settings base class. */
 	abstract class Base_Settings_Renderer {
 		/** Plugin instance.
@@ -162,5 +165,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Base_Settings_Renderer' ) ) {
 		}
 
 	}
-
+} else {
+	Shared::debug( "Class already exists: $class" );
 }

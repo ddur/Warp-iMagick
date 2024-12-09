@@ -21,7 +21,9 @@ defined( 'ABSPATH' ) || die( -1 );
 use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use \ddur\Warp_iMagick\Plugin;
 
-if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
+$class = __NAMESPACE__ . '\\Shared';
+
+if ( ! class_exists( $class ) ) {
 	/** Shared class */
 	class Shared {
 		// phpcs:ignore
@@ -1077,5 +1079,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Shared' ) ) {
 	# endregion
 
 	}
-
+} else {
+	Shared::debug( "Class already exists: $class" );
 }

@@ -23,7 +23,9 @@ use \ddur\Warp_iMagick\Base\Meta_Plugin;
 use \ddur\Warp_iMagick\Settings;
 use \ddur\Warp_iMagick\Shared;
 
-if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
+$class = __NAMESPACE__ . '\\Plugin';
+
+if ( ! class_exists( $class ) ) {
 	/** Plugin class */
 	class Plugin extends Meta_Plugin {
 		// phpcs:ignore
@@ -2112,4 +2114,6 @@ if ( ! class_exists( __NAMESPACE__ . '\\Plugin' ) ) {
 	# endregion
 
 	}
+} else {
+	Shared::debug( "Class already exists: $class" );
 }

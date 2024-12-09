@@ -23,7 +23,9 @@ use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use \ddur\Warp_iMagick\Base\Plugin\v1\Abstract_Settings;
 use \ddur\Warp_iMagick\Base\Plugin\v1\Abstract_Plugin;
 
-if ( ! class_exists( __NAMESPACE__ . '\Base_Settings' ) ) {
+$class = __NAMESPACE__ . '\\Base_Settings';
+
+if ( ! class_exists( $class ) ) {
 	/** Settings base class. */
 	abstract class Base_Settings extends Abstract_Settings {
 		// phpcs:ignore
@@ -261,5 +263,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Base_Settings' ) ) {
 	# endregion
 
 	}
-
+} else {
+	Shared::debug( "Class already exists: $class" );
 }

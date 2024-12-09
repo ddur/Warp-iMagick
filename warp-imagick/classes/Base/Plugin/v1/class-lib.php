@@ -27,20 +27,25 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 	# region Admin notices
 
 		/** Transient (Short Persistent) Admin notice implementation.
+		 * Used for Lib::debug/debug_var/error notices.
 		 *
 		 * @todo? multi-record for concurrent admin users?
 		 * @param string $message to display.
 		 * @param string $class to implement (CSS).
 		 */
 		private static function t_notice( $message, $class ) {
-			$transient_id = self::get_namespace() . '_notices';
+			$transient_id = self::get_namespace() . '-notices';
 			$transient    = get_transient( $transient_id );
 			$notices      = is_string( $transient ) ? $transient : '';
 			$notices     .= '<div class="' . esc_attr( $class ) . '"><p style="white-space:pre"><strong>' . esc_html( $message ) . '</strong></p></div>';
 			set_transient( $transient_id, $notices, HOUR_IN_SECONDS );
 		}
 
-		/** Show Transient admin notices.*/
+		/** Show Transient admin notices.
+		 * Every plugin has different namespace.
+		 * This will show only transient messages
+		 * for this Lib::implementation namespace.
+		 */
 		public static function do_transient_notices() {
 			$transient_id = self::get_namespace() . '_notices';
 			$transient    = get_transient( $transient_id );
@@ -50,7 +55,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 			}
 		}
 
-		/** Get root namespace. */
+		/** Get main plugin namespace. */
 		public static function get_namespace() {
 			$namespace = array();
 			foreach ( preg_split( '~\\\\~', __NAMESPACE__, 0, PREG_SPLIT_NO_EMPTY ) as $name ) {
@@ -59,7 +64,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 				}
 				$namespace[] = $name;
 			}
-			return strtolower( implode( '_', $namespace ) );
+			return strtolower( implode( '-', $namespace ) );
 		}
 
 		/** Echo html.
@@ -141,24 +146,13 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 				}
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 				\error_log( 'Lib::debug: ' . $message );
-				self::t_notice_info( $echo_message );
+
 				if ( self::is_wp_cli() ) {
 					\WP_CLI::debug( $echo_message );
+				} else {
+					self::t_notice_info( $echo_message );
 				}
 			}
-		}
-
-		/** Error log and admin feedback.
-		 *
-		 * @param string $message error to log and show as admin notice.
-		 */
-		public static function error( $message ) {
-			// phpcs:disable WordPress.PHP.DevelopmentFunctions
-			error_log( 'Lib::error: ' . $message );
-			if ( self::is_debug() ) {
-				self::t_notice_error( $message );
-			}
-			// phpcs:enable WordPress.PHP.DevelopmentFunctions
 		}
 
 		/** Debug variable value, log & show if WordPress is in debug mode.
@@ -168,14 +162,37 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		 */
 		public static function debug_var( &$var, $name = '' ) {
 			if ( self::is_debug() ) {
-				// phpcs:disable WordPress.PHP.DevelopmentFunctions
 				if ( ! is_string( $name ) || '' === trim( $name ) ) {
+					// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 					$name = debug_backtrace()[1]['function'];
 				}
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 				$message = rtrim( trim( $name ), ':' ) . ': ' . print_r( $var, true );
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 				error_log( 'Lib::debug_var: ' . $message );
-				self::t_notice_info( $message );
-				// phpcs:enable WordPress.PHP.DevelopmentFunctions
+
+				if ( self::is_wp_cli() ) {
+					\WP_CLI::debug( $echo_message );
+				} else {
+					self::t_notice_info( $echo_message );
+				}
+			}
+		}
+
+		/** Error log and admin feedback.
+		 *
+		 * @param string $message error to log and show as admin notice.
+		 */
+		public static function error( $message ) {
+			if ( self::is_debug() ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions
+				error_log( 'Lib::error: ' . $message );
+
+				if ( self::is_wp_cli() ) {
+					\WP_CLI::debug( $echo_message );
+				} else {
+					self::t_notice_error( $echo_message );
+				}
 			}
 		}
 

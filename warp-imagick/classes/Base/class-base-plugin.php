@@ -18,10 +18,13 @@ namespace ddur\Warp_iMagick\Base;
 
 defined( 'ABSPATH' ) || die( -1 );
 
+use \ddur\Warp_iMagick\Shared;
 use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use \ddur\Warp_iMagick\Base\Plugin\v1\Abstract_Plugin;
 
-if ( ! class_exists( __NAMESPACE__ . '\Base_Plugin' ) ) {
+$class = __NAMESPACE__ . '\\Base_Plugin';
+
+if ( ! class_exists( $class ) ) {
 	/** Plugin base class. */
 	abstract class Base_Plugin extends Abstract_Plugin {
 		// phpcs:ignore
@@ -105,4 +108,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Base_Plugin' ) ) {
 	# endregion
 
 	}
+} else {
+	Shared::debug( "Class already exists: $class" );
 }

@@ -2495,10 +2495,13 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				return $new_value;
 			}
 
+			/** Filter is just triggered to call here.
+			 * Required only once after POST, remove now.
+			*/
 			\remove_filter(
 				"pre_update_option_{$this->optionid}",
 				array( $this, 'on_abstract_validate_form_input' ),
-				10,
+				10
 			);
 
 			if ( ! is_array( $new_value ) ) {
