@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -18,9 +18,9 @@ namespace ddur\Warp_iMagick\Base;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use \ddur\Warp_iMagick\Shared;
-use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
-use \ddur\Warp_iMagick\Base\Base_Settings_Renderer;
+use ddur\Warp_iMagick\Shared;
+use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Base\Base_Settings_Renderer;
 
 $class = __NAMESPACE__ . '\\Meta_Settings_Renderer';
 

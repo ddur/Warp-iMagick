@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -18,15 +18,21 @@ namespace ddur\Warp_iMagick;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use \ddur\Warp_iMagick\Base\Meta_Settings_Renderer;
-use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
-use \ddur\Warp_iMagick\Shared;
+use ddur\Warp_iMagick\Base\Meta_Settings_Renderer;
+use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Shared;
 
 $class = __NAMESPACE__ . '\\Settings_Renderer';
 
 if ( ! class_exists( $class ) ) {
 	/** Admin-Setting page renderer (separated rendering code) */
 	class Settings_Renderer extends Meta_Settings_Renderer {
+		/** Relative path/name of copytight notice file
+		 *
+		 * @var string $copyright_notice contains relative path_name.
+		 */
+		private $copyright_notice = '/docs/copyright-notice.php';
+
 		/** Render Sidebar (Logo). */
 		public function render_settings_page_sidebar() {
 			if ( ! Shared::get_option( 'disable-img-test-metabox' ) ) {
@@ -54,6 +60,7 @@ if ( ! class_exists( $class ) ) {
 			$box_title = Lib::safe_key_value( $pluginbox, 'name', wp_parse_url( $click_lnk, PHP_URL_HOST ) );
 			$this->render_hard_meta_box( $image_lnk, $click_lnk, $box_title, 'logo' );
 
+			// phpcs:enable
 		}
 
 		/** Render Settings Page Subtitle.
@@ -80,9 +87,11 @@ if ( ! class_exists( $class ) ) {
 				) . '">' . esc_html( __( 'Click here to find, install and/or activate "Regenerate Thumbnails" plugin.', 'warp-imagick' ) ) . '</a></div>';
 			}
 
+			$github_issuess     = __( 'GitHub Issues', 'warp-imagick' );
+			$github_discussions = __( 'GitHub Discussions', 'warp-imagick' );
 			echo '<p></p><div>' . esc_html( __( 'If you have any problem, question or idea, please visit ', 'warp-imagick' ) );
-			echo sprintf( '<a target=_blank rel="noopener noreferrer" href="https://github.com/ddur/Warp-iMagick/issues">%s</a> or <a target=_blank rel="noopener noreferrer" href="https://github.com/ddur/Warp-iMagick/discussions">%s</a>.</div>', esc_html( __( 'GitHub Issues', 'warp-imagick' ) ), esc_html( __( 'GitHub Discussions', 'warp-imagick' ) ) );
-			echo '<p></p><div>' . esc_html( __( 'For older questions and answers, you may also browse a', 'warp-imagick' ) ) . ' ' . sprintf( '<a target=_blank rel="noopener noreferrer" href="https://wordpress.org/support/plugin/warp-imagick"/>%s</a>', esc_html( __( 'WordPress Support Forum', 'warp-imagick' ) ) ) . '.</div>';
+			printf( '<a target=_blank rel="noopener noreferrer" href="https://github.com/ddur/Warp-iMagick/issues">%s</a> or <a target=_blank rel="noopener noreferrer" href="https://github.com/ddur/Warp-iMagick/discussions?discussions_q=">%s</a>.</div>', esc_html( $github_issuess ), esc_html( $github_discussions ) );
+			echo '<p></p><div>' . esc_html( __( 'For older issues, questions and answers, you may also browse a', 'warp-imagick' ) ) . ' ' . sprintf( '<a target=_blank rel="noopener noreferrer" href="https://wordpress.org/support/plugin/warp-imagick"/>%s</a>', esc_html( __( 'WordPress Support Forum', 'warp-imagick' ) ) ) . '.</div>';
 		}
 
 		/** Section Terms renderer.
@@ -305,7 +314,6 @@ PHP-GD function missing: imagepalettetotruecolor.
 				}
 			}
 		}
-
 	}
 } else {
 	Shared::debug( "Class already exists: $class" );

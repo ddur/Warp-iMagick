@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -31,13 +31,13 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		 *
 		 * @todo? multi-record for concurrent admin users?
 		 * @param string $message to display.
-		 * @param string $class to implement (CSS).
+		 * @param string $class_name to implement (CSS).
 		 */
-		private static function t_notice( $message, $class ) {
+		private static function t_notice( $message, $class_name ) {
 			$transient_id = self::get_namespace() . '-notices';
 			$transient    = get_transient( $transient_id );
 			$notices      = is_string( $transient ) ? $transient : '';
-			$notices     .= '<div class="' . esc_attr( $class ) . '"><p style="white-space:pre"><strong>' . esc_html( $message ) . '</strong></p></div>';
+			$notices     .= '<div class="' . esc_attr( $class_name ) . '"><p style="white-space:pre"><strong>' . esc_html( $message ) . '</strong></p></div>';
 			set_transient( $transient_id, $notices, HOUR_IN_SECONDS );
 		}
 
@@ -52,6 +52,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 			if ( false !== $transient ) {
 				delete_transient( $transient_id );
 				self::echo_html( $transient );
+
 			}
 		}
 
@@ -128,24 +129,32 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		/** Debug helper, log and display debug message if WordPress is in debug mode.
 		 *
 		 * @param string $message to log & show.
-		 * @param bool   $trace flag, set to true to dump calling function list.
+		 * @param bool   $trace flag, set to true to dump calling function stack/list.
 		 */
 		public static function debug( $message, $trace = false ) {
 			if ( self::is_debug() ) {
-				$echo_message = $message;
-				if ( true === $trace ) {
-					// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-					$stack = debug_backtrace();
+				$echo_message = '';
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions
+				$stack = debug_backtrace();
+				/** To prevent phpcs warning, must call debug_backtrace before using $trace argument. */
+				if ( false === $trace ) {
+					$stack = null;
+				}
+				if ( is_array( $stack ) && count( $stack ) ) {
+					/** $stack is not empty array */
 					foreach ( $stack as $traced ) {
-					// phpcs:ignore WordPress.PHP.DevelopmentFunctions
+						// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 						$echo_message = $traced ['function'] . '(' . print_r( $traced ['args'], true ) . ') File:' . $traced ['line'] . '/' . $traced ['file'] . PHP_EOL . $echo_message;
 					}
 					$echo_message = $message . PHP_EOL . $echo_message;
 				} elseif ( is_string( $trace ) && trim( $trace ) ) {
+					/** $trace is not empty string */
 					$echo_message = rtrim( trim( $trace ), ':' ) . ': ' . $message;
+				} else {
+					$echo_message = $message;
 				}
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-				\error_log( 'Lib::debug: ' . $message );
+				\error_log( 'Lib::debug: ' . $echo_message );
 
 				if ( self::is_wp_cli() ) {
 					\WP_CLI::debug( $echo_message );
@@ -157,24 +166,24 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 
 		/** Debug variable value, log & show if WordPress is in debug mode.
 		 *
-		 * @param mixed  $var reference.
+		 * @param mixed  $vref variable reference.
 		 * @param string $name to prefix value.
 		 */
-		public static function debug_var( &$var, $name = '' ) {
+		public static function debug_var( &$vref, $name = '' ) {
 			if ( self::is_debug() ) {
 				if ( ! is_string( $name ) || '' === trim( $name ) ) {
 					// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 					$name = debug_backtrace()[1]['function'];
 				}
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-				$message = rtrim( trim( $name ), ':' ) . ': ' . print_r( $var, true );
+				$message = rtrim( trim( $name ), ':' ) . ': ' . print_r( $vref, true );
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 				error_log( 'Lib::debug_var: ' . $message );
 
 				if ( self::is_wp_cli() ) {
-					\WP_CLI::debug( $echo_message );
+					\WP_CLI::debug( $message );
 				} else {
-					self::t_notice_info( $echo_message );
+					self::t_notice_info( $message );
 				}
 			}
 		}
@@ -189,9 +198,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 				error_log( 'Lib::error: ' . $message );
 
 				if ( self::is_wp_cli() ) {
-					\WP_CLI::debug( $echo_message );
+					\WP_CLI::debug( $message );
 				} else {
-					self::t_notice_error( $echo_message );
+					self::t_notice_error( $message );
 				}
 			}
 		}
@@ -268,7 +277,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		 * @return bool
 		 */
 		public static function is_linux_os() {
-			return self::osName() === 'Linux';
+			return self::os_name() === 'Linux';
 		}
 
 		/** Operating System is Windows?
@@ -277,7 +286,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		 * @return bool
 		 */
 		public static function is_windows_os() {
-			return self::osName() === 'Windows';
+			return self::os_name() === 'Windows';
 		}
 
 		/** Operating System is Apple?
@@ -286,7 +295,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		 * @return bool
 		 */
 		public static function is_apple_os() {
-			return self::osName() === 'Apple';
+			return self::os_name() === 'Apple';
 		}
 
 		/** Php output is compressed?
@@ -319,8 +328,8 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 				$d         = ini_get( 'disable_functions' );
 				$s         = ini_get( 'suhosin.executor.func.blacklist' );
 				if ( "$d$s" ) {
-					$array = preg_split( '/,\s*/', "$d,$s" );
-					if ( in_array( 'exec', $array, true ) ) {
+					$an_array = preg_split( '/,\s*/', "$d,$s" );
+					if ( in_array( 'exec', $an_array, true ) ) {
 						$available = false;
 					}
 				}
@@ -388,11 +397,11 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		 *
 		 * @access public
 		 * @param string $hook name.
-		 * @param mixed  $callable string or array.
+		 * @param string $callback option.
 		 * @return bool
 		 */
-		public static function is_hook_hooked( $hook, $callable = false ) {
-			return \has_filter( $hook, $callable );
+		public static function is_hook_hooked( $hook, $callback = false ) {
+			return \has_filter( $hook, $callback );
 		}
 
 		/** Auto-magically Use Dedicated Method Names As Handlers For WordPress Hooks (Actions/Filters).
@@ -400,45 +409,45 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		 * Ie 'init' action: on_init_action, on_init_hook, on_init_filter,
 		 * on_init_20_action, on_init_plus100_hook, on_init_minus100_event .....
 		 *
-		 * @param object                              $object to wire to events.
-		 * @param string    required not empty method $prefix filter.
-		 * @param array  not empty array of not empty $suffix strings.
+		 * @param object $an_object to wire to events.
+		 * @param string $a_prefix filter, required not empty ctype_alnum string ('on').
+		 * @param array  $a_suffix strings not empty array of not empty strings.
 		 */
-		public static function auto_hook( $object, $prefix = 'on', $suffix = array( 'hook', 'action', 'filter', 'event' ) ) {
-			if ( ! is_object( $object ) ) {
-				$msg = __METHOD__ . ': argument $object is not an object-type.';
+		public static function auto_hook( $an_object, $a_prefix = 'on', $a_suffix = array( 'hook', 'action', 'filter', 'event' ) ) {
+			if ( ! is_object( $an_object ) ) {
+				$msg = __METHOD__ . ': argument $an_object is not object-type.';
 				self::error( $msg );
 				wp_die( esc_html( $msg ) );
 			}
 
-			if ( ! is_string( $prefix ) || ! ctype_alnum( $prefix ) ) {
-				$msg = __METHOD__ . ': argument $prefix is not valid.';
+			if ( ! is_string( $a_prefix ) || ! ctype_alnum( $a_prefix ) ) {
+				$msg = __METHOD__ . ': argument $a_prefix is not valid.';
 				self::error( $msg );
 				wp_die( esc_html( $msg ) );
 			}
 
-			if ( ! is_array( $suffix ) || empty( $suffix ) ) {
-				$msg = __METHOD__ . ': argument $suffix is not valid.';
+			if ( ! is_array( $a_suffix ) || empty( $a_suffix ) ) {
+				$msg = __METHOD__ . ': argument $a_suffix is not valid.';
 				self::error( $msg );
 				wp_die( esc_html( $msg ) );
 			} else {
-				foreach ( $suffix as $ends_with ) {
+				foreach ( $a_suffix as $ends_with ) {
 					if ( ! is_string( $ends_with ) || ! ctype_alnum( $ends_with ) ) {
-						$msg = __METHOD__ . ': argument $suffix (ends_with) is not valid.';
+						$msg = __METHOD__ . ': argument $a_suffix (ends_with) is not valid.';
 						self::error( $msg );
 						wp_die( esc_html( $msg ) );
 					}
 				}
 			}
 
-			$methods = get_class_methods( $object );
+			$methods = get_class_methods( $an_object );
 
 			foreach ( $methods as $method ) {
 				$method_items = explode( '_', $method );
 
 				if ( count( $method_items ) >= 3
-				&& ( array_shift( $method_items ) === $prefix )
-				&& in_array( strtolower( array_pop( $method_items ) ), $suffix, true ) ) {
+				&& ( array_shift( $method_items ) === $a_prefix )
+				&& in_array( strtolower( array_pop( $method_items ) ), $a_suffix, true ) ) {
 					$priority = false;
 					if ( count( $method_items ) > 1 ) {
 						$priority_item = end( $method_items );
@@ -459,7 +468,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 					if ( false === $priority ) {
 						$priority = 10;
 					}
-					self::auto_hook_connect( $object, $method, $hook, $priority );
+					self::auto_hook_connect( $an_object, $method, $hook, $priority );
 				}
 			}
 		}
@@ -467,17 +476,17 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		/**
 		 * Connect method to hook.
 		 *
-		 * @param object  $object instance.
+		 * @param object  $an_object instance.
 		 * @param string  $method name.
 		 * @param string  $hook name.
 		 * @param integer $priority level.
 		 */
-		private static function auto_hook_connect( $object, $method, $hook, $priority = 10 ) {
-			$callable = self::auto_hook_get_callable( $object, $method );
+		private static function auto_hook_connect( $an_object, $method, $hook, $priority = 10 ) {
+			$callback = self::auto_hook_get_callable( $an_object, $method );
 
-			if ( false !== $callable && self::is_hook_hooked( $hook, $callable ) === false ) {
-				$arguments = self::auto_hook_get_arg_count( $object, $method );
-				return add_filter( $hook, $callable, $priority, $arguments );
+			if ( false !== $callback && false === self::is_hook_hooked( $hook, $callback ) ) {
+				$arg_count = self::auto_hook_get_arg_count( $an_object, $method );
+				return add_filter( $hook, $callback, $priority, $arg_count );
 			}
 			return false;
 		}
@@ -485,33 +494,17 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		/**
 		 * Is method callable by WordPress action/filter?
 		 *
-		 * @param object $object instance.
+		 * @param object $an_object instance.
 		 * @param string $method name.
-		 * @return bool
+		 * @return mixed ReflectionMethod|bool
 		 */
-		private static function auto_hook_is_callable_method( $object, $method ) {
-			if ( method_exists( $object, $method ) ) {
-				$r = new \ReflectionMethod( $object, $method );
-				return $r->isPublic()
-					&& ! $r->isConstructor()
-					&& ! $r->isDestructor() ?
+		private static function auto_hook_is_callable_method( $an_object, $method ) {
+			if ( method_exists( $an_object, $method ) ) {
+				$r = new \ReflectionMethod( $an_object, $method );
+				return true === $r->isPublic()
+					&& false === $r->isConstructor()
+					&& false === $r->isDestructor() ?
 						$r : false;
-			}
-			return false;
-		}
-
-		/**
-		 * Return reflection instance if method is static and callable by WordPress action/filter.
-		 * Else return false.
-		 *
-		 * @param object $object instance.
-		 * @param string $method name.
-		 * @return bool
-		 */
-		private static function auto_hook_is_callable_static( $object, $method ) {
-			$r = self::auto_hook_is_callable_method( $object, $method );
-			if ( false !== $r ) {
-				return $r->isStatic() ? $r : false;
 			}
 			return false;
 		}
@@ -520,35 +513,35 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		 * Return valid callable (array) if method is callable by WordPress action/filter.
 		 * Return false if method in not callable by WordPress action/filter.
 		 *
-		 * @param object $object instance.
+		 * @param object $an_object instance.
 		 * @param string $method name.
-		 * @return mixed
+		 * @return array|false
 		 */
-		private static function auto_hook_get_callable( $object, $method ) {
-			$r = self::auto_hook_is_callable_method( $object, $method );
-			if ( false !== $r ) {
-				if ( $r->isStatic() ) {
-					return array( get_class( $object ), $method );
-				}
-				return array( $object, $method );
+		private static function auto_hook_get_callable( $an_object, $method ) {
+			$r = self::auto_hook_is_callable_method( $an_object, $method );
+			if ( false === $r ) {
+				return false;
+			} elseif ( true === $r->isStatic() ) {
+				return array( get_class( $an_object ), $method );
+			} else {
+				return array( $an_object, $method );
 			}
-			return false;
 		}
 
 		/**
 		 * Return number of arguments if method is callable by WordPress action/filter.
 		 * Return false if method in not callable by WordPress action/filter.
 		 *
-		 * @param object $object instance.
+		 * @param object $an_object instance.
 		 * @param string $method name.
 		 * @return mixed
 		 */
-		private static function auto_hook_get_arg_count( $object, $method ) {
-			$r = self::auto_hook_is_callable_method( $object, $method );
+		private static function auto_hook_get_arg_count( $an_object, $method ) {
+			$r = self::auto_hook_is_callable_method( $an_object, $method );
 			if ( false !== $r ) {
-				return count( $r->getParameters() );
+				return $r->getNumberOfParameters();
 			}
-			return false;
+			return 0;
 		}
 
 		// phpcs:ignore
@@ -589,39 +582,39 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		// phpcs:ignore
 	# region Array helpers
 
-		/** Safe Get Array [$key] => $value.
+		/** Safe Get Array [$a_key] => $value.
 		 *
-		 * @param array $array to use $key on.
-		 * @param mixed $key to use on array.
-		 * @param mixed $example if not null used as type-check and as default value when key not present.
-		 * @param mixed $default if not null used as default value (instead of $example) when key not present.
+		 * @param array $an_array to use $a_key on.
+		 * @param mixed $a_key to use on array.
+		 * @param mixed $an_example if not null used as type-check and as default value when key not present.
+		 * @param mixed $a_default if not null used as default value (instead of $an_example) when key not present.
 		 * @return mixed $value
 		 */
-		public static function safe_key_value( $array, $key, $example = null, $default = null ) {
-			if ( isset( $array ) && is_array( $array ) ) {
+		public static function safe_key_value( $an_array, $a_key, $an_example = null, $a_default = null ) {
+			if ( isset( $an_array ) && is_array( $an_array ) ) {
 				$safe_value = null;
 				$safe_found = false;
-				if ( ( is_string( $key ) || is_int( $key ) ) && array_key_exists( $key, $array ) ) {
-					$safe_value = $array [ $key ];
+				if ( ( is_string( $a_key ) || is_int( $a_key ) ) && array_key_exists( $a_key, $an_array ) ) {
+					$safe_value = $an_array [ $a_key ];
 					$safe_found = true;
-				} elseif ( is_array( $key ) ) {
-					$safe_value = $array;
+				} elseif ( is_array( $a_key ) ) {
+					$safe_value = $an_array;
 					$safe_found = true;
-					foreach ( $key as $key_item ) {
-						if ( is_array( $safe_value ) && array_key_exists( $key_item, $safe_value ) ) {
-							$safe_value = $safe_value [ $key_item ];
+					foreach ( $a_key as $a_key_item ) {
+						if ( is_array( $safe_value ) && array_key_exists( $a_key_item, $safe_value ) ) {
+							$safe_value = $safe_value [ $a_key_item ];
 						} else {
 							$safe_found = false;
 							break;
 						}
 					}
 				}
-				if ( true === $safe_found && ( null === $example || gettype( $safe_value ) === gettype( $example ) ) ) {
+				if ( true === $safe_found && ( null === $an_example || gettype( $safe_value ) === gettype( $an_example ) ) ) {
 					return $safe_value;
 				}
 			}
 
-			return func_num_args() <= 3 ? $example : $default;
+			return func_num_args() <= 3 ? $an_example : $a_default;
 		}
 
 		/** Array Difference.
@@ -637,18 +630,18 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 				$result = array();
 				if ( is_array( $needle ) ) {
 					$needles = array();
-					foreach ( $needle as $key ) {
-						$needles [ $key ] = null;
+					foreach ( $needle as $a_key ) {
+						$needles [ $a_key ] = null;
 					}
-					foreach ( $haystack as $key => $val ) {
+					foreach ( $haystack as $a_key => $val ) {
 						if ( ! array_key_exists( $val, $needles ) ) {
-							$result [ $key ] = $val;
+							$result [ $a_key ] = $val;
 						}
 					}
 				} else {
-					foreach ( $haystack as $key => $val ) {
+					foreach ( $haystack as $a_key => $val ) {
 						if ( $val !== $needle ) {
-							$result [ $key ] = $val;
+							$result [ $a_key ] = $val;
 						}
 					}
 				}
@@ -883,6 +876,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		 */
 		public static function register_script( $handle, $src, $deps = array(), $ver = false, $in_footer = false ) {
 			if ( self::is_debug() && is_string( $src ) && '' !== trim( $src ) && is_file( untrailingslashit( ABSPATH ) . $src ) ) {
+				/** When in debug mode, set fresh ?version for each new install/update  */
 				$ver = self::hash_time( filemtime( untrailingslashit( ABSPATH ) . $src ) );
 			}
 			wp_register_script( $handle, $src, $deps, $ver, $in_footer );
@@ -899,6 +893,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 		 */
 		public static function enqueue_script( $handle, $src = '', $deps = array(), $ver = false, $in_footer = false ) {
 			if ( self::is_debug() && is_string( $src ) && '' !== trim( $src ) && is_file( untrailingslashit( ABSPATH ) . $src ) ) {
+				/** When in debug mode, set fresh ?version for each new install/update  */
 				$ver = self::hash_time( filemtime( untrailingslashit( ABSPATH ) . $src ) );
 			}
 			wp_enqueue_script( $handle, $src, $deps, $ver, $in_footer );
@@ -917,6 +912,5 @@ if ( ! class_exists( __NAMESPACE__ . '\Lib' ) ) {
 
 		// phpcs:ignore
 	# endregion
-
 	}
 }

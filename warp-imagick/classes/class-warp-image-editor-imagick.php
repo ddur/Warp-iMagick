@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -16,9 +16,9 @@
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
-use \ddur\Warp_iMagick\Shared;
-use \ddur\Warp_iMagick\Plugin;
+use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Shared;
+use ddur\Warp_iMagick\Plugin;
 
 $class = '\\Warp_Image_Editor_Imagick';
 
@@ -34,6 +34,8 @@ if ( ! class_exists( $class ) ) {
 	 * Optimization, Optimization control & Plugin integration.
 	 */
 	class Warp_Image_Editor_Imagick extends WP_Image_Editor_Imagick {
+		// phpcs:enable
+
 		/**
 		 * Support & accept only JPEG/PNG media types.
 		 *
@@ -70,6 +72,8 @@ if ( ! class_exists( $class ) ) {
 			) {
 				return $size_data;
 			}
+
+			// phpcs:enable
 
 			$this->reset_execution_time();
 			return parent::make_subsize( $size_data );
@@ -118,6 +122,7 @@ if ( ! class_exists( $class ) ) {
 								if ( is_callable( array( $this->image, 'stripImage' ) ) ) {
 									$this->image->stripImage();
 									$strip_meta = false;
+
 									\add_filter( 'image_strip_meta', '__return_false', 99 );
 								} else {
 									$strip_meta = true;
@@ -128,6 +133,8 @@ if ( ! class_exists( $class ) ) {
 								break;
 						}
 					} elseif ( 'image/jpeg' === $this->mime_type ) {
+						// phpcs:enable
+
 						if ( is_callable( array( $this->image, 'transformImageColorspace' ) )
 						&& is_callable( array( $this->image, 'getImageColorspace' ) )
 						&& is_callable( array( $this->image, 'profileImage' ) ) ) {
@@ -141,7 +148,8 @@ if ( ! class_exists( $class ) ) {
 								if ( 0 !== $jpeg_colorspace ) {
 									if ( $this->image->getImageColorspace() !== $jpeg_colorspace ) {
 										if ( ! $this->image->transformImageColorspace( $jpeg_colorspace ) ) {
-											;
+											sleep( 0 );
+
 										} else {
 											$this->image->profileImage( 'icc', null );
 										}
@@ -169,9 +177,11 @@ if ( ! class_exists( $class ) ) {
 								if ( $can_strip_all && \is_callable( array( $this->image, 'stripImage' ) ) ) {
 									$this->image->stripImage();
 									$strip_meta = false;
+
 									\add_filter( 'image_strip_meta', '__return_false', 99 );
 								} else {
 									$strip_meta = true;
+
 									\add_filter( 'image_strip_meta', '__return_true', 99 );
 								}
 								break;
@@ -195,11 +205,15 @@ if ( ! class_exists( $class ) ) {
 				return $thumb_result;
 			}
 
+			// phpcs:enable
+
 			$this->reset_execution_time();
 
 			if ( is_object( Shared::plugin() ) ) {
 				if ( 'image/png' === $this->mime_type ) {
 					try {
+						// phpcs:enable
+
 						if ( true === Shared::get_option( 'png-reduce-colors-enable', Shared::png_reduce_colors_enabled_default() ) ) {
 							$colors_max = Shared::get_option( 'png-reduce-max-colors-count', Shared::png_max_colors_value_default() );
 
@@ -250,6 +264,7 @@ if ( ! class_exists( $class ) ) {
 											case 4:
 											case 5:
 												break;
+
 											default:
 												if ( 4 < $this->image->getImageChannelDepth( \Imagick::CHANNEL_ALPHA ) ) {
 													$this->image->setImageChannelDepth( \Imagick::CHANNEL_ALPHA, 4 );
@@ -279,6 +294,9 @@ if ( ! class_exists( $class ) ) {
 									$saved_restore_img = false;
 								}
 							}
+
+							// phpcs:enable
+
 						}
 
 						$png_sizes = array();
@@ -292,9 +310,11 @@ if ( ! class_exists( $class ) ) {
 						$png_sizes [ strlen( $this->image->getImageBlob() ) ] = array( 0, 0, 'Imagick Default' );
 
 						ksort( $png_sizes );
+
 						$this->image->setOption( 'png:compression-strategy', '' . reset( $png_sizes ) [0] );
 						$this->image->setOption( 'png:compression-filter', '' . reset( $png_sizes ) [1] );
 
+						// phpcs:enable
 					} catch ( Exception $e ) {
 						Lib::error( 'Exception: ' . $e->getMessage() );
 						return new \WP_Error( 'warp_optimize_error', $e->getMessage() );
@@ -304,6 +324,7 @@ if ( ! class_exists( $class ) ) {
 
 				if ( 'image/jpeg' === $this->mime_type ) {
 					try {
+						// phpcs:enable
 						if ( is_callable( array( $this->image, 'sharpenImage' ) ) ) {
 							if ( $this->image->getImageWidth() === $orig_size['width']
 							&& $this->image->getImageHeight() === $orig_size['height'] ) {
@@ -315,15 +336,31 @@ if ( ! class_exists( $class ) ) {
 							}
 						}
 
+						// phpcs:enable
+
 						$jpeg_compression_quality = Shared::get_option( 'jpeg-compression-quality', Shared::jpeg_quality_default() );
 						0 === $jpeg_compression_quality || $this->image->setImageCompressionQuality( $jpeg_compression_quality );
 
+						// phpcs:enable
+
+						/**
+						 * Imagick::setImageProperty requires ImageMagick 6.3.2 or newer.
+						 * Reduces color channel by sampling more than one pixel colors.
+						 * Not (by parent class) required/checked method. Check if callable.
+						 */
 						if ( is_callable( array( $this->image, 'setImageProperty' ) ) ) {
 							$jpeg_sampling_factor = Shared::get_option( 'jpeg-sampling-factor', Shared::jpeg_sampling_factor_default() );
 							'' === $jpeg_sampling_factor || $this->image->setImageProperty( 'jpeg:sampling-factor', $jpeg_sampling_factor );
 
+							// phpcs:enable
 						}
 
+						/**
+						 * Only two options really exists - NO INTERLACE === WP, all other settings are progressive.
+						 * Final file size is random, depends on bits arrangement in each specific image file.
+						 * To find smaller file size (automatic), must run both (progressive and not) scheme.
+						 * This is not (by parent class) required method. Check if callable.
+						 */
 						if ( is_callable( array( $this->image, 'setInterlaceScheme' ) ) ) {
 							$jpeg_interlace_scheme = Shared::get_option( 'jpeg-interlace-scheme', Shared::jpeg_interlace_scheme_default() );
 							switch ( $jpeg_interlace_scheme ) {
@@ -390,7 +427,6 @@ if ( ! class_exists( $class ) ) {
 			}
 
 			return $saved;
-
 		}
 
 		/** Reset execution time. Private.
@@ -398,7 +434,6 @@ if ( ! class_exists( $class ) ) {
 		private function reset_execution_time() {
 			ini_get( 'max_execution_time' ) && set_time_limit( intval( ini_get( 'max_execution_time' ) ) );
 		}
-
 	}
 } else {
 	Shared::debug( "Class already exists: $class" );

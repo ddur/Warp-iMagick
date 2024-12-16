@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -18,14 +18,14 @@ namespace ddur\Warp_iMagick\Base;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use \ddur\Warp_iMagick\Shared;
-use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
-use \ddur\Warp_iMagick\Base\Plugin\v1\Abstract_Settings;
-use \ddur\Warp_iMagick\Base\Plugin\v1\Abstract_Plugin;
+use ddur\Warp_iMagick\Shared;
+use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Base\Plugin\v1\Abstract_Settings;
+use ddur\Warp_iMagick\Base\Plugin\v1\Abstract_Plugin;
 
-$class = __NAMESPACE__ . '\\Base_Settings';
+$class_name = __NAMESPACE__ . '\\Base_Settings';
 
-if ( ! class_exists( $class ) ) {
+if ( ! class_exists( $class_name ) ) {
 	/** Settings base class. */
 	abstract class Base_Settings extends Abstract_Settings {
 		// phpcs:ignore
@@ -48,7 +48,8 @@ if ( ! class_exists( $class ) ) {
 				try {
 					self::$me = new static( $plugin );
 					self::$me->init();
-				} catch ( Exception $e ) {
+
+				} catch ( \Exception $e ) {
 					self::$me = null;
 					Lib::error( $e->getMessage() );
 				}
@@ -111,11 +112,16 @@ if ( ! class_exists( $class ) ) {
 				$hook_name = "pre_update_option_{$this->optionid}";
 				if ( isset( $wp_filter[ $hook_name ] ) && $wp_filter[ $hook_name ]->has_filters() ) {
 					\remove_all_filters( $hook_name );
+					sleep( 0 );
+
 				}
+				sleep( 0 );
 
 				\update_option( $this->optionid, $current_options, true );
 				$this->new_options = true;
 			}
+
+			// phpcs:enable
 
 			$current_options = $this->get_option();
 			$update_settings = false;
@@ -128,13 +134,18 @@ if ( ! class_exists( $class ) ) {
 				$update_settings = true;
 			}
 
+			// phpcs:enable
+
 			if ( true === $update_settings ) {
 				/** Save raw options data, already (form) validated.*/
 				global $wp_filter;
 				$hook_name = "pre_update_option_{$this->optionid}";
 				if ( isset( $wp_filter[ $hook_name ] ) && $wp_filter[ $hook_name ]->has_filters() ) {
 					\remove_all_filters( $hook_name );
+					sleep( 0 );
+
 				}
+				sleep( 0 );
 
 				\update_option( $this->optionid, $current_options, true );
 			}
@@ -174,14 +185,17 @@ if ( ! class_exists( $class ) ) {
 		protected static function remove_all_options( $option_id ) {
 			if ( is_multisite() ) {
 				delete_site_option( $option_id );
+
 				$sites = get_sites();
 				foreach ( $sites as $site ) {
 					switch_to_blog( $site->blog_id );
 					delete_option( $option_id );
+
 				}
 				restore_current_blog();
 			} else {
 				delete_option( $option_id );
+
 			}
 		}
 
@@ -204,9 +218,10 @@ if ( ! class_exists( $class ) ) {
 			}
 			if ( ! array_key_exists( 'parent-slug', $values ['configuration']['menu'] ) ) {
 				$values ['configuration']['menu']['parent-slug'] = null;
-				$values ['configuration']['menu']['position']    = null;
-			}
 
+				$values ['configuration']['menu']['position'] = null;
+
+			}
 		}
 
 		/** Plugin dynamic menu position
@@ -225,6 +240,7 @@ if ( ! class_exists( $class ) ) {
 			$menu_input = $values ['menu-parent-slug'];
 
 			if ( empty( $menu_input )
+
 			|| ( ! self::is_valid_menu_parent_slug( $menu_input )
 			&& ! is_numeric( $menu_input ) ) ) {
 				$menu_input = $config_menu_parent;
@@ -234,7 +250,8 @@ if ( ! class_exists( $class ) ) {
 				$menu_input = abs( intval( $menu_input ) );
 
 				$values ['configuration']['menu']['parent-slug'] = '';
-				$values ['configuration']['menu']['position']    = $menu_input;
+
+				$values ['configuration']['menu']['position'] = $menu_input;
 
 				$admin_page = '';
 
@@ -256,13 +273,11 @@ if ( ! class_exists( $class ) ) {
 			}
 
 			$values ['menu-parent-slug'] = $menu_input;
-
 		}
 
 		// phpcs:ignore
 	# endregion
-
 	}
 } else {
-	Shared::debug( "Class already exists: $class" );
+	Shared::debug( "Class already exists: $class_name " );
 }

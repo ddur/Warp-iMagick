@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -18,7 +18,7 @@ namespace ddur\Warp_iMagick\Base\Plugin\v1;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 
 if ( ! class_exists( __NAMESPACE__ . '\Abstract_Plugin' ) ) {
 	/** Derive your plugin class from this abstract class.
@@ -127,7 +127,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Plugin' ) ) {
 					wp_die();
 				}
 			}
-
 		}
 
 		/** Get plugin entry-file name.
@@ -253,10 +252,10 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Plugin' ) ) {
 		/** Get plugin option(s) array.
 		 *
 		 * @param mixed $key value or omit (null) to return all (array) options.
-		 * @param mixed $default value to return when [$key] does not exists.
-		 * @return mixed value or $default when [$key] has no value.
+		 * @param mixed $value value to return when [$key] does not exists.
+		 * @return mixed value or $value when [$key] has no value.
 		 */
-		public function get_option( $key = null, $default = null ) {
+		public function get_option( $key = null, $value = null ) {
 			$options = get_option( $this->get_option_id(), array() );
 			if ( ! is_array( $options ) ) {
 				$options = array();
@@ -266,7 +265,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Plugin' ) ) {
 			} elseif ( array_key_exists( $key, $options ) ) {
 				return $options [ $key ];
 			}
-			return $default;
+			return $value;
 		}
 
 		/** Set option and return $options.
@@ -298,6 +297,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Plugin' ) ) {
 				$this->textdomain = load_plugin_textdomain( $this->get_slug(), false, $this->get_language_dir() );
 			}
 		}
-
 	}
+
 }

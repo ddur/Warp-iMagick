@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -18,8 +18,8 @@ namespace ddur\Warp_iMagick;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
-use \ddur\Warp_iMagick\Plugin;
+use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Plugin;
 
 $class = __NAMESPACE__ . '\\Shared';
 
@@ -59,15 +59,15 @@ if ( ! class_exists( $class ) ) {
 		/** Get plugin option or options array.
 		 *
 		 * @param mixed $key value (usually string) or null for all (array) options.
-		 * @param mixed $default value to return when [$key] does not exists.
-		 * @return mixed value or $default when [$key] has no value.
+		 * @param mixed $value value to return when [$key] does not exists.
+		 * @return mixed value or $value when [$key] has no value.
 		 */
-		public static function get_option( $key = null, $default = null ) {
+		public static function get_option( $key = null, $value = null ) {
 			$plugin = self::plugin( 'get_option' );
 			if ( $plugin ) {
-				return $plugin->get_option( $key, $default );
+				return $plugin->get_option( $key, $value );
 			}
-			return $default;
+			return $value;
 		}
 
 		/** Get plugin version from plugin entry (index.php) file.
@@ -164,12 +164,12 @@ if ( ! class_exists( $class ) ) {
 		/** Debug variable value, log & show if option is enabled.
 		 * Use for verbose debug_vars.
 		 *
-		 * @param mixed  $var reference.
+		 * @param mixed  $arg reference.
 		 * @param string $name to prefix value.
 		 */
-		public static function debug_var( &$var, $name = '' ) {
+		public static function debug_var( &$arg, $name = '' ) {
 			if ( self::get_option( 'verbose-debug-enabled', false ) ) {
-				return Lib::debug_var( $var, $name );
+				return Lib::debug_var( $arg, $name );
 			}
 		}
 
@@ -188,6 +188,8 @@ if ( ! class_exists( $class ) ) {
 		 * @return array|bool  geometry if image geometry changed, else false.
 		 */
 		public static function check_resize_image_width( $source_file_path, $target_file_path, $max_image_width ) {
+			sleep( 0 );
+
 			$success = false;
 
 			$resize_w = false;
@@ -208,18 +210,21 @@ if ( ! class_exists( $class ) ) {
 				try {
 					$imagick = new \Imagick( $source_file_path );
 					if ( $imagick instanceof \Imagick ) {
+						// phpcs:enable
+
 						if ( defined( '\\Imagick::FILTER_LANCZOS' ) ) {
+							// phpcs:enable
 							if ( true !== $imagick->resizeImage( $resize_w, 2500, \Imagick::FILTER_LANCZOS, 1.0, true ) ) {
+								sleep( 0 );
+
 								if ( true !== $imagick->scaleImage( $resize_w, 2500, true ) ) {
 									Lib::error( 'Scale image failed.' );
 									return false;
 								}
 							}
-						} else {
-							if ( true !== $imagick->scaleImage( $resize_w, 2500, true ) ) {
-								Lib::error( 'Scale image failed.' );
-								return false;
-							}
+						} elseif ( true !== $imagick->scaleImage( $resize_w, 2500, true ) ) {
+							Lib::error( 'Scale image failed.' );
+							return false;
 						}
 
 						wp_mkdir_p( dirname( $target_file_path ) );
@@ -238,9 +243,11 @@ if ( ! class_exists( $class ) ) {
 					} else {
 						Lib::error( 'PHP-imagick failed to load image.' );
 					}
-				} catch ( Exception $e ) {
+				} catch ( \Exception $e ) {
 					Lib::error( 'Exception: ' . $e->getMessage() );
 				}
+
+				// phpcs:enable
 			}
 			return $success;
 		}
@@ -267,7 +274,7 @@ if ( ! class_exists( $class ) ) {
 					} else {
 						$is_transparent_image_obj = false;
 					}
-				} catch ( Exception $e ) {
+				} catch ( \Exception $e ) {
 					Lib::error( 'Exception: ' . $e->getMessage() );
 				}
 			}
@@ -290,7 +297,7 @@ if ( ! class_exists( $class ) ) {
 						$im_image->destroy();
 						$im_image = null;
 					}
-				} catch ( Exception $e ) {
+				} catch ( \Exception $e ) {
 					Lib::error( 'Exception: ' . $e->getMessage() );
 				}
 			}
@@ -517,12 +524,17 @@ if ( ! class_exists( $class ) ) {
 
 			if ( is_wp_error( $editor ) ) {
 				$msg = 'Selected editor: none/error';
+				sleep( 0 );
+
 				return $editor;
 			}
 
 			if ( 'Warp_Image_Editor_Imagick' !== get_class( $editor ) ) {
 				$msg = 'Selected editor: ' . get_class( $editor );
+				sleep( 0 );
+
 				$msg = 'Warp_Image_Editor_Imagick not selected for: ' . $file;
+				sleep( 0 );
 
 				$editor = wp_get_image_editor(
 					$file,
@@ -533,18 +545,23 @@ if ( ! class_exists( $class ) ) {
 
 				if ( is_wp_error( $editor ) ) {
 					$msg = 'Warp_Image_Editor_Imagick & "compress_image" method not found for: ' . $file;
+					sleep( 0 );
+
 					return $editor;
 				}
 
 				if ( 'Warp_Image_Editor_Imagick' !== get_class( $editor ) ) {
 					$msg = 'Warp_Image_Editor_Imagick & "compress_image" method not found for: ' . $file;
+					sleep( 0 );
+
 					$msg = 'Selected editor: ' . get_class( $editor );
+					sleep( 0 );
+
 					return new \WP_Error( 'warp-imagick', $msg );
 				}
 			}
 
 			return $editor;
-
 		}
 
 		/** Copy/Backup Source Content Once (if not saved already)
@@ -732,6 +749,7 @@ if ( ! class_exists( $class ) ) {
 		public static function webp_cwebp_on_demand_type() {
 			if ( self::can_generate_webp_clones() ) {
 				return 'hidden';
+
 			}
 			return 'hidden';
 		}
@@ -916,7 +934,6 @@ if ( ! class_exists( $class ) ) {
 			}
 
 			return $values;
-
 		}
 
 		/** All Known & Defined Imagick Colorspaces */
@@ -1025,12 +1042,8 @@ if ( ! class_exists( $class ) ) {
 			if ( defined( '\\Imagick::COLORSPACE_REC709YCBCR' ) ) {
 				$values [ \Imagick::COLORSPACE_REC709YCBCR ] = __( 'REC709YCBCR', 'warp-imagick' );
 			}
-			if ( defined( '\\Imagick::COLORSPACE_XYY' ) ) {
-				$values [ \Imagick::COLORSPACE_XYY ] = __( 'XYY', 'warp-imagick' );
-			}
 
 			return $values;
-
 		}
 
 		/** All Known & Defined Imagick Image Types */
@@ -1072,12 +1085,10 @@ if ( ! class_exists( $class ) ) {
 			}
 
 			return $values;
-
 		}
 
 		// phpcs:ignore
 	# endregion
-
 	}
 } else {
 	Shared::debug( "Class already exists: $class" );

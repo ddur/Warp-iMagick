@@ -1,9 +1,9 @@
 /**!
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -24,7 +24,7 @@
 				var $png_reduce_max_colors_count = $( 'tr.' + page_slug + '-png-reduce-max-colors-count' );
 				$png_reduce_colors_enable.on(
 					'change',
-					function() {
+					function () {
 						if ($png_reduce_colors_enable.is( ':checked' )) {
 							$png_reduce_colors_dither.show( 'slow' );
 							$png_reduce_max_colors_count.show( 'slow' );
@@ -41,7 +41,7 @@
 				var $webp_jpeg_image_compression_quality = $( 'tr.' + page_slug + '-webp-jpeg-compression-quality' );
 				$webp_image_clones_enabled.on(
 					'change',
-					function() {
+					function () {
 						if ($webp_image_clones_enabled.is( ':checked' )) {
 							$webp_image_compression_quality.show( 'slow' );
 							$webp_jpeg_image_compression_quality.show( 'slow' );
@@ -57,7 +57,7 @@
 				var $image_max_width_pixels  = $( 'tr.' + page_slug + '-image-max-width-pixels' );
 				$image_max_width_enabled.on(
 					'change',
-					function() {
+					function () {
 						if ($image_max_width_enabled.is( ':checked' )) {
 							$image_max_width_pixels.show( 'slow' );
 						} else {
@@ -71,7 +71,7 @@
 				var $big_image_size_threshold_value    = $( 'tr.' + page_slug + '-wp-big-image-size-threshold-value' );
 				$big_image_size_threshold_disabled.on(
 					'change',
-					function() {
+					function () {
 						if ($big_image_size_threshold_disabled.is( ':checked' )) {
 							$big_image_size_threshold_value.hide( 'slow' );
 						} else {

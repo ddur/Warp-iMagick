@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -18,7 +18,7 @@ namespace ddur\Warp_iMagick\Base\Plugin\v1;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 
 if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 	/** Abstract Settings Class
@@ -80,7 +80,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 */
 		protected $settings;
 
-		/** Plugin settings page slug == $plugin->get_slug().
+		/** Plugin settings page slug === $plugin->get_slug().
 		 *
 		 * @var string $pageslug
 		 */
@@ -94,7 +94,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 */
 		protected $optionid;
 
-		/** Plugin Basename == $plugin->get_basename().
+		/** Plugin Basename === $plugin->get_basename().
 		 *
 		 * @var string $basename
 		 */
@@ -398,17 +398,15 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 						if ( array_key_exists( 'wp', $requires ) ) {
 							if ( ! is_string( $requires ['wp'] ) ) {
 								$fail [] = __( 'Invalid settings [plugin][requires][wp] value.', 'warp-imagick' );
-							} else {
-								if ( 'latest' === $requires ['wp'] ) {
-									$version = ( json_decode( wp_safe_remote_get( 'https://api.wordpress.org/core/version-check/1.7/' )['body'] )->offers[0]->version );
-									if ( is_string( $version ) && ! version_compare( get_bloginfo( 'version' ), $version, '>=' ) ) {
-										// Translators: %s is WordPress version.
-										$fail [] = sprintf( __( 'Please upgrade WordPress to latest release version (%s).', 'warp-imagick' ), $version );
-									}
-								} elseif ( ! version_compare( get_bloginfo( 'version' ), $requires ['wp'], '>=' ) ) {
-										// Translators: %s is WordPress version.
-										$fail [] = sprintf( __( 'Please upgrade WordPress to version %s or higher.', 'warp-imagick' ), $requires ['wp'] );
+							} elseif ( 'latest' === $requires ['wp'] ) {
+								$version = ( json_decode( wp_safe_remote_get( 'https://api.wordpress.org/core/version-check/1.7/' )['body'] )->offers[0]->version );
+								if ( is_string( $version ) && ! version_compare( get_bloginfo( 'version' ), $version, '>=' ) ) {
+									// Translators: %s is WordPress version.
+									$fail [] = sprintf( __( 'Please upgrade WordPress to latest release version (%s).', 'warp-imagick' ), $version );
 								}
+							} elseif ( ! version_compare( get_bloginfo( 'version' ), $requires ['wp'], '>=' ) ) {
+								// Translators: %s is WordPress version.
+								$fail [] = sprintf( __( 'Please upgrade WordPress to version %s or higher.', 'warp-imagick' ), $requires ['wp'] );
 							}
 						}
 						if ( array_key_exists( 'timeout', $requires ) ) {
@@ -418,6 +416,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 								$timeout = (int) ini_get( 'max_execution_time' );
 								if ( set_time_limit( $requires ['timeout'] ) === true ) {
 									set_time_limit( $timeout );
+
 								} else {
 										// Translators: %d is number of seconds.
 										$fail [] = sprintf( __( 'Timeout is limited to %d seconds and cannot be changed.', 'warp-imagick' ), $timeout );
@@ -641,59 +640,49 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 								if ( array_key_exists( 'version', $requires_plugin ) ) {
 									if ( ! is_string( $requires_plugin ['version'] ) ) {
 										$fail [] = __( 'Invalid [plugin][requires][plugin][version] settings value.', 'warp-imagick' );
+									} elseif ( empty( $plugin_data ) ) {
+										$fail [] = __( 'Invalid [plugin][requires][plugin] settings. No plugin version found for "name" or "basename".', 'warp-imagick' );
 									} else {
-										if ( empty( $plugin_data ) ) {
-											$fail [] = __( 'Invalid [plugin][requires][plugin] settings. No plugin version found for "name" or "basename".', 'warp-imagick' );
-										} else {
-											$version = '0';
-											if ( array_key_exists( 'Version', $plugin_data ) ) {
-												$version = $data ['Version'];
-											}
-											if ( ! version_compare( $version, $requires_plugin ['version'], '>=' ) ) {
-												// Translators: %1$s is plugin name/slug, %2$s is current version, %3$s is required version.
-												$fail [] = sprintf( __( 'Please update "%1$s" plugin from version "%2$s" to version "%3$s" or higher', 'warp-imagick' ), $plugin_name, $version, $requires_plugin ['version'] );
-											}
+										$version = '0';
+										if ( array_key_exists( 'Version', $plugin_data ) ) {
+											$version = $data ['Version'];
+										}
+										if ( ! version_compare( $version, $requires_plugin ['version'], '>=' ) ) {
+											// Translators: %1$s is plugin name/slug, %2$s is current version, %3$s is required version.
+											$fail [] = sprintf( __( 'Please update "%1$s" plugin from version "%2$s" to version "%3$s" or higher', 'warp-imagick' ), $plugin_name, $version, $requires_plugin ['version'] );
 										}
 									}
 								}
 								if ( array_key_exists( 'class', $requires_plugin ) ) {
 									if ( ! is_string( $requires_plugin ['class'] ) ) {
 										$fail [] = __( 'Invalid [plugin][requires][plugin][class] settings.', 'warp-imagick' );
-									} else {
-										if ( ! class_exists( $requires_plugin ['class'], true ) ) {
-											// Translators: %1$s is plugin name/slug, %2$s is class name.
-											$fail [] = sprintf( __( 'Please install and/or activate "%1$s" plugin providing required class: "%2$s"', 'warp-imagick' ), $plugin_name, $requires_plugin ['class'] );
-										}
+									} elseif ( ! class_exists( $requires_plugin ['class'], true ) ) {
+										// Translators: %1$s is plugin name/slug, %2$s is class name.
+										$fail [] = sprintf( __( 'Please install and/or activate "%1$s" plugin providing required class: "%2$s"', 'warp-imagick' ), $plugin_name, $requires_plugin ['class'] );
 									}
 								}
 								if ( array_key_exists( 'constant', $requires_plugin ) ) {
 									if ( ! is_string( $requires_plugin ['constant'] ) ) {
 										$fail [] = __( 'Invalid [plugin][requires][plugin][constant] settings value.', 'warp-imagick' );
-									} else {
-										if ( ! defined( $requires_plugin ['constant'] ) ) {
-											// Translators: %1$s is plugin name/slug, %2$s is constant name.
-											$fail [] = sprintf( __( 'Please install and/or activate "%1$s" plugin providing required constant: "%2$s"', 'warp-imagick' ), $plugin_name, $requires_plugin ['constant'] );
-										}
+									} elseif ( ! defined( $requires_plugin ['constant'] ) ) {
+										// Translators: %1$s is plugin name/slug, %2$s is constant name.
+										$fail [] = sprintf( __( 'Please install and/or activate "%1$s" plugin providing required constant: "%2$s"', 'warp-imagick' ), $plugin_name, $requires_plugin ['constant'] );
 									}
 								}
 								if ( array_key_exists( 'function', $requires_plugin ) ) {
 									if ( ! is_string( $requires_plugin ['function'] ) ) {
 										$fail [] = __( 'Invalid [plugin][requires][plugin][function] settings value.', 'warp-imagick' );
-									} else {
-										if ( ! function_exists( $requires_plugin ['function'] ) ) {
-											// Translators: %1$s is plugin name/slug, %2$s is function name.
-											$fail [] = sprintf( __( 'Please install and/or activate "%1$s" plugin providing required function: "%2$s"', 'warp-imagick' ), $plugin_name, $requires_plugin ['function'] );
-										}
+									} elseif ( ! function_exists( $requires_plugin ['function'] ) ) {
+										// Translators: %1$s is plugin name/slug, %2$s is function name.
+										$fail [] = sprintf( __( 'Please install and/or activate "%1$s" plugin providing required function: "%2$s"', 'warp-imagick' ), $plugin_name, $requires_plugin ['function'] );
 									}
 								}
 								if ( array_key_exists( 'file', $requires_plugin ) ) {
 									if ( ! is_string( $requires_plugin ['file'] ) ) {
 										$fail [] = __( 'Invalid [plugin][requires][plugin][file] settings.', 'warp-imagick' );
-									} else {
-										if ( ! file_exists( WP_CONTENT_DIR . $requires_plugin ['file'] ) ) {
-											// Translators: %1$s is plugin (name) that requires %2$s file (name) in wp-content directory.
-											$fail [] = sprintf( __( 'Please install and/or activate "%1$s" plugin providing required file: "%2$s"', 'warp-imagick' ), $plugin_name, $requires_plugin ['file'] );
-										}
+									} elseif ( ! file_exists( WP_CONTENT_DIR . $requires_plugin ['file'] ) ) {
+										// Translators: %1$s is plugin (name) that requires %2$s file (name) in wp-content directory.
+										$fail [] = sprintf( __( 'Please install and/or activate "%1$s" plugin providing required file: "%2$s"', 'warp-imagick' ), $plugin_name, $requires_plugin ['file'] );
 									}
 								}
 							}
@@ -772,9 +761,11 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @access protected
 		 * @param bool  $networkwide flag.
 		 * @param array $settings - Plugin Settings (configured activate requirements).
-		 * @return void or exit([$message]) to abort activation
+		 * @return array or exit([$message]) to immediately abort activation.
 		 */
-		protected function on_check_activate_requirements( $networkwide, $settings ) {}
+		protected function on_check_activate_requirements( $networkwide, $settings ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
+			return array();
+		}
 
 		/** Override to implement custom activation failure
 		 *
@@ -861,6 +852,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					$icon = array_key_exists( 'settings-icon', $this->settings ['menu'] ) ?
 						trim( $this->settings ['menu']['settings-icon'] ) :
 						'⚙';
+
 					$icon = trim( $icon ) ? $icon . ' ' : '';
 					$name = array_key_exists( 'settings-name', $this->settings ['menu'] ) ?
 						trim( $this->settings ['menu']['settings-name'] ) : 'Settings';
@@ -884,20 +876,22 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				return;
 			}
 
-			$relative_path = Lib::relative_path( __DIR__ );
+			$abstract_path = Lib::relative_path( __DIR__ );
 
-			Lib::enqueue_style( 'abstract-settings-admin', $relative_path . '/assets/admin.css', array(), $this->plugin->get_abstract_version(), 'screen' );
+			Lib::enqueue_style( 'abstract-settings-admin', $abstract_path . '/assets/admin.css', array(), $this->plugin->get_abstract_version(), 'screen' );
 
-			Lib::register_style( 'abstract-settings-jquery-chosen', $relative_path . '/assets/chosen/chosen.min.css', array(), '1.8.2', 'screen' );
+			Lib::register_style( 'abstract-settings-jquery-chosen', $abstract_path . '/assets/chosen/chosen.min.css', array(), '1.8.2', 'screen' );
 
-			Lib::register_style( 'abstract-settings-admin-styled', $relative_path . '/assets/admin-styled.css', array( 'abstract-settings-jquery-chosen' ), $this->plugin->get_abstract_version(), 'screen' );
+			Lib::register_style( 'abstract-settings-admin-styled', $abstract_path . '/assets/admin-styled.css', array( 'abstract-settings-jquery-chosen' ), $this->plugin->get_abstract_version(), 'screen' );
+
+			Lib::enqueue_script( 'abstract-settings-accordion', $abstract_path . '/assets/accordion.js', array(), $this->plugin->get_abstract_version(), $in_footer = true );
 
 			$wp_script_dependencies = array(
 				'jquery',
 				'utils',
 				'common',
 				'postbox',
-				'accordion',
+
 				'jquery-ui-draggable',
 				'jquery-ui-droppable',
 				'jquery-ui-sortable',
@@ -908,21 +902,26 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				Lib::enqueue_script( $script_identifier );
 			}
 
-			Lib::enqueue_script( 'abstract-settings-admin', $relative_path . '/assets/admin.js', $wp_script_dependencies, $this->plugin->get_abstract_version(), $in_footer = true );
+			Lib::enqueue_script( 'abstract-settings-admin', $abstract_path . '/assets/admin.js', $wp_script_dependencies, $this->plugin->get_abstract_version(), $in_footer = true );
 
 			$wp_script_dependencies = array( 'jquery' );
 
-			Lib::register_script( 'abstract-settings-jquery-are-you-sure', $relative_path . '/assets/ays/jquery.are-you-sure.js', array( 'jquery' ), '1.9.0' );
+			Lib::register_script( 'abstract-settings-jquery-are-you-sure', $abstract_path . '/assets/ays/jquery.are-you-sure.js', array( 'jquery' ), '1.9.0' );
 
 			$wp_script_dependencies [] = 'abstract-settings-jquery-are-you-sure';
 
-			Lib::register_script( 'abstract-settings-jquery-chosen', $relative_path . '/assets/chosen/chosen.jquery.min.js', array( 'jquery' ), '1.8.2' );
+			Lib::register_script( 'abstract-settings-jquery-chosen', $abstract_path . '/assets/chosen/chosen.jquery.min.js', array( 'jquery' ), '1.8.2' );
 
 			$wp_script_dependencies [] = 'abstract-settings-jquery-chosen';
 			$wp_script_dependencies [] = 'abstract-settings-admin';
 
-			Lib::register_script( 'abstract-settings-admin-styled', $relative_path . '/assets/admin-styled.js', $wp_script_dependencies, $this->plugin->get_abstract_version(), $in_footer = true );
+			Lib::register_script( 'abstract-settings-admin-styled', $abstract_path . '/assets/admin-styled.js', $wp_script_dependencies, $this->plugin->get_abstract_version(), $in_footer = true );
 
+			// phpcs:enable
+
+			/** Enqueue registered scripts by $id.
+			 * Method is derived in class-settings
+			 */
 			$this->enqueue_page_scripts();
 		}
 
@@ -950,15 +949,25 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				$menu_parent_slug,
 				array(
 					'index.php',
+
 					'tools.php',
+
 					'options-general.php',
+
 					'plugins.php',
+
 					'users.php',
+
 					'profile.php',
+
 					'edit.php',
+
 					'edit-comments.php',
+
 					'upload.php',
+
 					'themes.php',
+
 				),
 				true
 			);
@@ -1009,6 +1018,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 						$menu_position = abs( intval( $this->settings ['menu']['position'] ) );
 					} else {
 						$menu_position = 0;
+
 					}
 				}
 				$menu_icon = Lib::safe_key_value( $this->settings ['menu'], 'menu-icon', 'none' );
@@ -1147,7 +1157,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 *
 		 * @access protected
 		 * @uses \add_settings_field
-		 * @param string $field_name (field $key from Config-Settings).
+		 * @param string $field_name (field $a_key from Config-Settings).
 		 * @param array  $field_settings (field $val from Config-Settings).
 		 * @param string $section_id (parent section from Config-Settings).
 		 * @return bool $success
@@ -1233,6 +1243,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$args               = array( 'settings' => $args_settings );
 			$args ['label_for'] = $args_settings ['id'];
 			$args ['class']     = $args_settings ['id'];
+
 			add_settings_field(
 				$this->optionid . '_' . $field_name,
 				'hidden' === $args_settings ['type'] ? '' : $args_settings ['label'],
@@ -1322,12 +1333,12 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 *
 		 * @ignore
 		 * @access private
-		 * @param string $fn - field name.
+		 * @param string $a_fn - field name.
 		 * @param array  $args - arguments.
 		 * @return mixed $value - value.
 		 */
-		private function get_form_field_option_value( $fn, $args ) {
-			$value = $this->get_form_field_value( $fn, $this->get_option( $fn ) );
+		private function get_form_field_option_value( $a_fn, $args ) {
+			$value = $this->get_form_field_value( $a_fn, $this->get_option( $a_fn ) );
 			return ( null === $value && array_key_exists( 'default', $args ) ? $args ['default'] : $value );
 		}
 
@@ -1340,7 +1351,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		public function render_checkbox_input_field( $field_args ) {
 			$args = $this->get_field_settings_args( $field_args );
 
-			$fn   = $args ['fn'];
+			$a_fn = $args ['fn'];
 			$id   = esc_attr( $args ['id'] );
 			$name = esc_attr( $args ['name'] ) . '[]';
 
@@ -1348,9 +1359,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$disabled      = array_key_exists( 'disabled', $field_options ) ? true === $field_options ['disabled'] : false;
 			$readonly      = array_key_exists( 'readonly', $field_options ) ? true === $field_options ['readonly'] : false;
 
-			$args ['value'] = $this->get_form_field_option_value( $fn, $args );
+			$args ['value'] = $this->get_form_field_option_value( $a_fn, $args );
 
-			$args = $this->apply_field_args_filters( $args, $fn );
+			$args = $this->apply_field_args_filters( $args, $a_fn );
 
 			$value = isset( $args ['value'] ) && in_array( $args ['value'], array( 'on', true ), true ) ? ' value="' . esc_attr( $args ['value'] ) . '" checked' : '';
 
@@ -1372,7 +1383,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$html = "<input id=\"$id\" type=\"checkbox\" name=\"$name\"$value$attrs/>";
 
-			$html = $this->apply_field_html_filters( $html, $args, $fn );
+			$html = $this->apply_field_html_filters( $html, $args, $a_fn );
 
 			$html .= "<input id=\"$id-hidden\" type=\"hidden\" name=\"$name\" value=\"\"/>";
 
@@ -1389,7 +1400,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		public function render_range_slider_input_field( $field_args ) {
 			$args = $this->get_field_settings_args( $field_args );
 
-			$fn   = $args ['fn'];
+			$a_fn = $args ['fn'];
 			$id   = esc_attr( $args ['id'] );
 			$name = esc_attr( $args ['name'] );
 
@@ -1400,9 +1411,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$range_max     = array_key_exists( 'max', $field_options ) ? $field_options['max'] : 100;
 			$range_step    = array_key_exists( 'step', $field_options ) ? $field_options['step'] : 1;
 
-			$args ['value'] = $this->get_form_field_option_value( $fn, $args );
+			$args ['value'] = $this->get_form_field_option_value( $a_fn, $args );
 
-			$args = $this->apply_field_args_filters( $args, $fn );
+			$args = $this->apply_field_args_filters( $args, $a_fn );
 
 			$value = esc_attr( $args ['value'] );
 
@@ -1428,7 +1439,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$html = "<input type=\"range\" id=\"$id\" name=\"$name\" value=\"$value\" oninput=\"document.getElementById('{$id}_out').value=this.value;\"$attrs>";
 
-			$html = $this->apply_field_html_filters( $html, $args, $fn );
+			$html = $this->apply_field_html_filters( $html, $args, $a_fn );
 
 			Lib::echo_html( $html );
 		}
@@ -1443,19 +1454,19 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		public function render_hidden_input_field( $field_args ) {
 			$args = $this->get_field_settings_args( $field_args );
 
-			$fn   = $args ['fn'];
+			$a_fn = $args ['fn'];
 			$id   = esc_attr( $args ['id'] );
 			$name = esc_attr( $args ['name'] );
 
-			$args ['value'] = $this->get_form_field_option_value( $fn, $args );
+			$args ['value'] = $this->get_form_field_option_value( $a_fn, $args );
 
-			$args = $this->apply_field_args_filters( $args, $fn );
+			$args = $this->apply_field_args_filters( $args, $a_fn );
 
 			$value = esc_attr( $args ['value'] );
 
 			$html = "<input type=\"hidden\" id=\"$id\" name=\"$name\" value=\"$value\">";
 
-			$html = $this->apply_field_html_filters( $html, $args, $fn );
+			$html = $this->apply_field_html_filters( $html, $args, $a_fn );
 
 			Lib::echo_html( $html );
 		}
@@ -1470,7 +1481,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		public function render_text_input_field( $field_args ) {
 			$args = $this->get_field_settings_args( $field_args );
 
-			$fn   = $args ['fn'];
+			$a_fn = $args ['fn'];
 			$id   = esc_attr( $args ['id'] );
 			$name = esc_attr( $args ['name'] );
 
@@ -1496,7 +1507,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				$range_step = array_key_exists( 'step', $field_options ) ? $field_options ['step'] : 1;
 			}
 
-			$args ['value'] = $this->get_form_field_option_value( $fn, $args );
+			$args ['value'] = $this->get_form_field_option_value( $a_fn, $args );
 
 			if ( $multiple ) {
 				$name         .= '[]';
@@ -1505,13 +1516,11 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				if ( ! is_array( $args ['value'] ) ) {
 					$args ['value'] = array( $args ['value'] );
 				}
-			} else {
-				if ( is_array( $args ['value'] ) ) {
-					$args ['value'] = array_shift( $args ['value'] );
-				}
+			} elseif ( is_array( $args ['value'] ) ) {
+				$args ['value'] = array_shift( $args ['value'] );
 			}
 
-			$args = $this->apply_field_args_filters( $args, $fn );
+			$args = $this->apply_field_args_filters( $args, $a_fn );
 
 			$value = $args ['value'];
 
@@ -1542,7 +1551,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$html = '';
 			if ( $multiple ) {
 				$html_value = esc_attr( array_shift( $value ) );
-				$item_html  = $this->apply_field_html_filters( "<input type=\"$type\" id=\"$id\" name=\"$name\" value=\"$html_value\"$attrs>", $args, $fn );
+				$item_html  = $this->apply_field_html_filters( "<input type=\"$type\" id=\"$id\" name=\"$name\" value=\"$html_value\"$attrs>", $args, $a_fn );
 
 				if ( $sortable ) {
 					$item_head  = '<li style="margin:initial;padding:initial;cursor:pointer">';
@@ -1566,7 +1575,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				}
 				foreach ( $value as $item_value ) {
 					$html_value = esc_attr( $item_value );
-					$item_html  = $this->apply_field_html_filters( "<input type=\"$type\" name=\"$name\" value=\"$html_value\"$attrs>", $args, $fn );
+					$item_html  = $this->apply_field_html_filters( "<input type=\"$type\" name=\"$name\" value=\"$html_value\"$attrs>", $args, $a_fn );
 					$html      .= $item_head . $item_html . $item_tail;
 				}
 				if ( $sortable ) {
@@ -1574,7 +1583,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				}
 			} else {
 				$value = esc_attr( $args ['value'] );
-				$html .= $this->apply_field_html_filters( "<input type=\"$type\" id=\"$id\" name=\"$name\" value=\"$value\"$attrs>", $args, $fn );
+				$html .= $this->apply_field_html_filters( "<input type=\"$type\" id=\"$id\" name=\"$name\" value=\"$value\"$attrs>", $args, $a_fn );
 			}
 
 			Lib::echo_html( $html );
@@ -1590,7 +1599,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		public function render_textarea_input_field( $field_args ) {
 			$args = $this->get_field_settings_args( $field_args );
 
-			$fn   = $args ['fn'];
+			$a_fn = $args ['fn'];
 			$id   = esc_attr( $args ['id'] );
 			$name = esc_attr( $args ['name'] );
 
@@ -1600,9 +1609,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$readonly      = array_key_exists( 'readonly', $field_options ) ? true === $field_options ['readonly'] : false;
 			$required      = array_key_exists( 'required', $field_options ) ? true === $field_options ['required'] : false;
 
-			$args ['value'] = $this->get_form_field_option_value( $fn, $args );
+			$args ['value'] = $this->get_form_field_option_value( $a_fn, $args );
 
-			$args = $this->apply_field_args_filters( $args, $fn );
+			$args = $this->apply_field_args_filters( $args, $a_fn );
 
 			$value = esc_textarea( $args ['value'] );
 
@@ -1628,7 +1637,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$html = "<textarea id=\"$id\" name=\"$name\"$attrs>$value</textarea>";
 
-			$html = $this->apply_field_html_filters( $html, $args, $fn );
+			$html = $this->apply_field_html_filters( $html, $args, $a_fn );
 
 			Lib::echo_html( $html );
 		}
@@ -1643,7 +1652,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		public function render_upload_file_input_field( $field_args ) {
 			$args = $this->get_field_settings_args( $field_args );
 
-			$fn   = $args ['fn'];
+			$a_fn = $args ['fn'];
 			$id   = esc_attr( $args ['id'] );
 			$name = esc_attr( $args ['name'] );
 
@@ -1662,7 +1671,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			unset( $args ['value'] );
 
-			$args = $this->apply_field_args_filters( $args, $fn );
+			$args = $this->apply_field_args_filters( $args, $a_fn );
 
 			$value = null;
 
@@ -1690,7 +1699,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$html = "<input type=\"file\" id=\"$id\" name=\"$name\"$attrs>";
 
-			$html = $this->apply_field_html_filters( $html, $args, $fn );
+			$html = $this->apply_field_html_filters( $html, $args, $a_fn );
 
 			Lib::echo_html( $html );
 		}
@@ -1705,7 +1714,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		public function render_select_option_input_field( $field_args ) {
 			$args = $this->get_field_settings_args( $field_args );
 
-			$fn   = $args ['fn'];
+			$a_fn = $args ['fn'];
 			$id   = esc_attr( $args ['id'] );
 			$name = esc_attr( $args ['name'] );
 
@@ -1716,7 +1725,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$required      = array_key_exists( 'required', $field_options ) ? true === $field_options ['required'] : false;
 			$multiple      = array_key_exists( 'multiple', $field_options ) ? true === $field_options ['multiple'] : false;
 
-			$args ['value'] = $this->get_form_field_option_value( $fn, $args );
+			$args ['value'] = $this->get_form_field_option_value( $a_fn, $args );
 
 			if ( $multiple ) {
 				$name         .= '[]';
@@ -1725,19 +1734,20 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				if ( ! is_array( $args ['value'] ) ) {
 					$args ['value'] = array( $args ['value'] );
 				}
-			} else {
-				if ( is_array( $args ['value'] ) ) {
-					$args ['value'] = array_shift( $args ['value'] );
-				}
+			} elseif ( is_array( $args ['value'] ) ) {
+				$args ['value'] = array_shift( $args ['value'] );
 			}
 
-			$args = $this->apply_field_args_filters( $args, $fn );
+			$args = $this->apply_field_args_filters( $args, $a_fn );
 
-			$value         = $args ['value'];
-			$options       = array();
+			$value = $args ['value'];
+
+			$options = array();
+
 			$field_options = is_array( $field_options ) ? $field_options : array();
-			$source_key    = array_key_exists( 'source', $field_options ) ? $field_options ['source'] : 'not found';
-			$source_data   = array_key_exists( $source_key, $field_options ) ? $field_options [ $source_key ] : null;
+
+			$source_key  = array_key_exists( 'source', $field_options ) ? $field_options ['source'] : 'not found';
+			$source_data = array_key_exists( $source_key, $field_options ) ? $field_options [ $source_key ] : null;
 			switch ( $source_key ) {
 				case 'plugins':
 					$plugins = get_plugins();
@@ -1852,7 +1862,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			}
 			$html .= '</select>';
 
-			$html = $this->apply_field_html_filters( $html, $args, $fn );
+			$html = $this->apply_field_html_filters( $html, $args, $a_fn );
 
 			if ( $multiple ) {
 				$html .= "<input id=\"$id-hidden\" type=\"hidden\" name=\"$name\" value=\"\"/>";
@@ -1876,10 +1886,11 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			'title' => 'Save All Changes in All Tabs And Sections.',
 			'value' => 'Save Changes',
 		) ) {
-			$fn          = $args ['fn'];
+			$a_fn        = $args ['fn'];
 			$args ['id'] = esc_attr( $args ['id'] . uniqid( '-' ) );
-			$id          = $args ['id'];
-			$name        = esc_attr( $this->optionid . '[' . $args ['name'] . '][' . $tab_index . '][' . $section_id . ']' );
+
+			$id   = $args ['id'];
+			$name = esc_attr( $this->optionid . '[' . $args ['name'] . '][' . $tab_index . '][' . $section_id . ']' );
 
 			$field_options = array_key_exists( 'options', $args ) ? $args ['options'] : array();
 			$disabled      = array_key_exists( 'disabled', $field_options ) ? true === $field_options ['disabled'] : false;
@@ -1888,7 +1899,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$args ['value'] = isset( $args ['value'] ) && is_string( $args ['value'] ) ? $args ['value'] : 'Save Changes';
 
 			$args ['class'] = 'button button-primary ' . $this->pageslug;
-			$args           = $this->apply_field_args_filters( $args, $fn );
+			$args           = $this->apply_field_args_filters( $args, $a_fn );
 
 			$value = esc_attr( $args ['value'] );
 
@@ -1908,7 +1919,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$html = "<input id=\"$id\" name=\"$name\" type=\"submit\" value=\"$value\"$attrs/>";
 
-			Lib::echo_html( '<div class=submit-button>' . $this->apply_field_html_filters( $html, $args, $fn ) . '</div>' );
+			Lib::echo_html( '<div class=submit-button>' . $this->apply_field_html_filters( $html, $args, $a_fn ) . '</div>' );
 		}
 
 		// phpcs:ignore
@@ -1918,6 +1929,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 	# region Render Sections
 
 		/** Renders section (accordion) and content (section-fields)
+		 * TODO: Replace WP Accordion with jQuery accordion or simpler (see W3Schools links above).
 		 *
 		 * @ignore
 		 * @access private
@@ -1926,29 +1938,32 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @param int   $sections_todo - flag to skip Submit button for last section.
 		 * @param int   $tab_index - current tab index.
 		 * @param int   $push_tabs - (debug only) formatting.
-		 * @uses $wp_settings_fields
+		 * @global $wp_settings_fields
 		 * @return void
 		 */
 		private function render_section_elements( $wp_section, $section_is_open, $sections_todo, $tab_index, $push_tabs = 0 ) {
 			global $wp_settings_fields;
-			$section_id = $wp_section ['id'];
 
+			$section_id      = $wp_section ['id'];
 			$section_id_attr = esc_attr( $section_id );
-
-			Lib::echo_html( Lib::debug_eol_tabs( 0 + $push_tabs ) . "<div id=\"section-$section_id_attr\" class=\"accordion-container\">" );
-
-			$section_attrs = 'class="accordion-section' . ( false !== $section_is_open ? ' open" aria-expanded=true' : '" aria-expanded=false' );
-
-			Lib::echo_html( Lib::debug_eol_tabs( 1 + $push_tabs ) . "<div $section_attrs>" );
 
 			$section_title = 'Section';
 			if ( isset( $wp_section ['title'] ) && is_string( $wp_section ['title'] ) ) {
 				$section_title = esc_html( $wp_section['title'] );
 			}
 
-			Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . "<h3 class=\"accordion-section-title\">$section_title</h3>" );
+			Lib::echo_html( Lib::debug_eol_tabs( 0 + $push_tabs ) . "<div id=\"section-$section_id_attr\" class=\"accordion-container\">" );
 
-			Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . '<div class="accordion-section-content">' );
+			// phpcs:enable
+
+				$section_attrs = 'class="accordion-section' . ( false !== $section_is_open ? ' open" aria-expanded=true' : '" aria-expanded=false' );
+				Lib::echo_html( Lib::debug_eol_tabs( 1 + $push_tabs ) . "<div $section_attrs>" );
+
+				Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . "<h3 class=\"accordion-section-title\">$section_title</h3>" );
+
+				Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . '<div class="accordion-section-content">' );
+
+			// phpcs:enable
 
 			if ( isset( $wp_section ['callback'] ) && is_callable( $wp_section ['callback'] ) ) {
 				call_user_func( $wp_section ['callback'], $wp_section );
@@ -1996,7 +2011,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			}
 
 			Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . '</div>' );
+
 			Lib::echo_html( Lib::debug_eol_tabs( 1 + $push_tabs ) . '</div>' );
+
 			Lib::echo_html( Lib::debug_eol_tabs( 0 + $push_tabs ) . '</div>' );
 		}
 
@@ -2018,7 +2035,8 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 */
 		private function render_tab_open_elements( $tab_index, $tab_settings, $tab_sections = false, $push_tabs = 0 ) {
 			$current_index = (int) $tab_index;
-			$tab_class_id  = rtrim( ' ' . Lib::safe_key_value( $tab_settings, 'key_index', '' ) );
+
+			$tab_class_id = rtrim( ' ' . Lib::safe_key_value( $tab_settings, 'key_index', '' ) );
 			Lib::echo_html( Lib::debug_eol_tabs( 0 + $push_tabs ) . "<div id=\"nav-tab-page-$current_index\" class=\"nav-tab-page$tab_class_id\" role=\"tabpanel\" aria-labelledby=\"nav-tab-$tab_index\">" );
 
 			$render_method_name = array_key_exists( 'render', $tab_settings ) && is_string( $tab_settings ['render'] ) ? $tab_settings ['render'] : false;
@@ -2056,6 +2074,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 */
 		private function render_tab_close_elements( $tab_index, $tab_settings, $tab_sections, $push_tabs = 0 ) {
 			Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . '</div><!--nav-tab-page-content-->' );
+
 			Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . '<div class="nav-tab-page-footer">' );
 
 			if ( array_key_exists( 'submit', $tab_settings ) ) {
@@ -2077,6 +2096,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			}
 
 			Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . '</div><!--nav-tab-page-footer-->' );
+
 			Lib::echo_html( Lib::debug_eol_tabs( 0 + $push_tabs ) . '</div><!--nav-tab-page-->' );
 		}
 
@@ -2156,13 +2176,12 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			add_filter(
 				'screen_options_show_screen',
-				function ( $show_screen, $screen ) {
+				function ( $show_screen, $screen ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
 					return $show_screen;
 				},
 				10,
 				2
 			);
-
 		}
 
 		/** Method hook for the derived class */
@@ -2292,7 +2311,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				$tab_index = 0;
 				foreach ( $tabs_settings as $ignore ) {
 					Lib::echo_html( Lib::debug_eol_tabs( 5 ) . "<input type=\"radio\" class=\"nav-tab-state\" name=\"nav-tab-state\" style=\"display:none\" id=\"nav-tab-state-$tab_index\" data-ays-ignore=\"true\"" . ( $open_tab_index === $tab_index ? ' checked' : '' ) . '/>' );
-					++ $tab_index;
+					++$tab_index;
 				}
 
 				Lib::echo_html( Lib::debug_eol_tabs( 5 ) . '<div class="nav-tab-wrapper" role="tablist">' );
@@ -2300,7 +2319,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				foreach ( $tabs_settings as $tab_settings ) {
 					$tab_title = ( is_string( $tab_settings ['title'] ) ? trim( $tab_settings ['title'] ) : 'Tab ' . $tab_index );
 					Lib::echo_html( Lib::debug_eol_tabs( 6 ) . "<label for=\"nav-tab-state-$tab_index\" id=\"nav-tab-$tab_index\" class=\"nav-tab\" role=\"tab\" area-controls=\"nav-tab-page-$tab_index\">$tab_title</label>" );
-					++ $tab_index;
+					++$tab_index;
 				}
 				Lib::echo_html( Lib::debug_eol_tabs( 5 ) . '</div>' );
 
@@ -2325,9 +2344,11 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			}
 
 			if ( count( $tabs_settings ) !== 0 ) {
-				$tab_index     = 0;
+				$tab_index = 0;
+
 				$section_index = 0;
-				$tab_settings  = $tabs_settings [ $tabs_keyindex[ $tab_index ] ];
+
+				$tab_settings = $tabs_settings [ $tabs_keyindex[ $tab_index ] ];
 
 				$tab_settings ['key_index'] = $tabs_keyindex[ $tab_index ];
 
@@ -2338,6 +2359,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 				if ( $tab_index === $last_tab_index && 0 === $sections_todo ) {
 					$sections_todo = count( $wp_sections );
+
 				}
 
 				$tab_sections = 0 !== $sections_todo;
@@ -2349,13 +2371,15 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					while ( $sections_todo <= 0 && $tab_index < $last_tab_index ) {
 						$this->render_tab_close_elements( $tab_index, $tab_settings, $tab_sections, 8 );
 
-						++ $tab_index;
+						++$tab_index;
+
 						$tab_settings = $tabs_settings [ $tabs_keyindex[ $tab_index ] ];
 
 						$tab_settings ['key_index'] = $tabs_keyindex[ $tab_index ];
 
 						$sections_todo = array_key_exists( 'sections', $tab_settings )
 						&& is_int( $tab_settings ['sections'] )
+
 						? $tab_settings ['sections'] : 0;
 
 						if ( $tab_index === $last_tab_index ) {
@@ -2375,15 +2399,16 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					if ( $sections_todo > 0 ) {
 						$section_is_open = ( isset( $open_sections [ $section_index ] ) ? $open_sections [ $section_index ] : true );
 						$this->render_section_elements( $wp_section, $section_is_open, $sections_todo, $tab_index, 9 );
-						++ $section_index;
-						-- $sections_todo;
-						++ $sections_done;
+						++$section_index;
+						--$sections_todo;
+						++$sections_done;
 					}
 				}
 
 				while ( $tab_index < ( $last_tab_index ) ) {
 					$this->render_tab_close_elements( $tab_index, $tab_settings, $tab_sections, 8 );
-					++ $tab_index;
+					++$tab_index;
+
 					$tab_sections = false;
 					$tab_settings = $tabs_settings [ $tabs_keyindex[ $tab_index ] ];
 
@@ -2399,6 +2424,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				$tab_index     = 0;
 				$section_index = 0;
 				$sections_todo = 0;
+
 				foreach ( $wp_sections as $wp_section ) {
 					$section_is_open = ( isset( $open_sections [ $section_index ] ) ? $open_sections [ $section_index ] : true );
 					$this->render_section_elements( $wp_section, $section_is_open, $sections_todo, $tab_index, 7 );
@@ -2407,14 +2433,17 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			}
 
 			Lib::echo_html( Lib::debug_eol_tabs( 6 ) . '</form>' );
+
 			Lib::echo_html( Lib::debug_eol_tabs( 5 ) . '</div>' );
 
 			Lib::echo_html( Lib::debug_eol_tabs( 4 ) . '<div id="postbox-container-1" class="postbox-container">' );
 			Lib::echo_html( Lib::debug_eol_tabs( 5 ) );
 			if ( $this !== $this->renderer && is_callable( array( $this->renderer, 'render_settings_page_sidebar' ) ) ) {
 				$this->renderer->render_settings_page_sidebar();
+
 			} else {
 				$this->render_settings_page_sidebar();
+
 			}
 			Lib::echo_html( Lib::debug_eol_tabs( 5 ) );
 			do_meta_boxes( $this->menuslug, 'side', $this );
@@ -2424,15 +2453,19 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			Lib::echo_html( Lib::debug_eol_tabs( 5 ) );
 			if ( $this !== $this->renderer && is_callable( array( $this->renderer, 'render_settings_page_footbar' ) ) ) {
 				$this->renderer->render_settings_page_footbar();
+
 			} else {
 				$this->render_settings_page_footbar();
+
 			}
 			Lib::echo_html( Lib::debug_eol_tabs( 5 ) );
 			do_meta_boxes( $this->menuslug, 'normal', $this );
 			Lib::echo_html( Lib::debug_eol_tabs( 5 ) );
 			do_meta_boxes( $this->menuslug, 'advanced', $this );
 			Lib::echo_html( Lib::debug_eol_tabs( 4 ) . '</div>' );
+
 			Lib::echo_html( Lib::debug_eol_tabs( 3 ) . '</div>' );
+
 			Lib::echo_html( Lib::debug_eol_tabs( 2 ) . '</div>' );
 
 			Lib::echo_html( Lib::debug_eol_tabs( 1 ) . '</div>' );
@@ -2531,6 +2564,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				$input_accept = false;
 
 				if ( array_key_exists( $field_name, $new_value )
+
 				&& array_key_exists( $field_name, $fields ) ) {
 					$field_type = array_key_exists( 'type', $fields [ $field_name ] )
 						? $fields [ $field_name ]['type'] : false;
@@ -2567,13 +2601,11 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 											$input_accept = false;
 										}
 									}
+								} elseif ( \is_array( $input_value ) ) {
+									$input_value  = \count( $input_value ) === 2 ? true : false;
+									$input_accept = true;
 								} else {
-									if ( \is_array( $input_value ) ) {
-										$input_value  = \count( $input_value ) === 2 ? true : false;
-										$input_accept = true;
-									} else {
-										Lib::debug( "Checkbox '$field_name' value is not an array but '$input_type'?" );
-									}
+									Lib::debug( "Checkbox '$field_name' value is not an array but '$input_type'?" );
 								}
 								break;
 
@@ -2599,18 +2631,16 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 									} else {
 										Lib::debug( "Select multiple '$field_name' value is not an array but '$input_type'?" );
 									}
-								} else {
-									if ( \is_string( $input_value ) ) {
-										if ( true === $is_integer ) {
-											$input_value = \intval( $input_value );
-										} else {
-											$input_value = \sanitize_text_field( $input_value );
-										}
-										$input_accept = true;
-
+								} elseif ( \is_string( $input_value ) ) {
+									if ( true === $is_integer ) {
+										$input_value = \intval( $input_value );
 									} else {
-										Lib::debug( "Select single '$field_name' value is not a string but '$input_type'?" );
+										$input_value = \sanitize_text_field( $input_value );
 									}
+									$input_accept = true;
+
+								} else {
+									Lib::debug( "Select single '$field_name' value is not a string but '$input_type'?" );
 								}
 								break;
 
@@ -2624,13 +2654,11 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 									} else {
 										Lib::debug( "Multiplied Textarea '$field_name' is not an array but '$input_type'?" );
 									}
+								} elseif ( \is_string( $input_value ) ) {
+									$input_value  = \sanitize_textarea_field( $input_value );
+									$input_accept = true;
 								} else {
-									if ( \is_string( $input_value ) ) {
-										$input_value  = \sanitize_textarea_field( $input_value );
-										$input_accept = true;
-									} else {
-										Lib::debug( "Textarea '$field_name' is not a string but '$input_type'?" );
-									}
+									Lib::debug( "Textarea '$field_name' is not a string but '$input_type'?" );
 								}
 								break;
 
@@ -2680,17 +2708,15 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 									} else {
 										Lib::debug( "Multiplied Input Field '$field_name' is not an array but '$input_type'?" );
 									}
-								} else {
-									if ( \is_string( $input_value ) ) {
-										if ( true === $is_integer ) {
-											$input_value = \intval( $input_value );
-										} else {
-											$input_value = \sanitize_text_field( $input_value );
-										}
-										$input_accept = true;
+								} elseif ( \is_string( $input_value ) ) {
+									if ( true === $is_integer ) {
+										$input_value = \intval( $input_value );
 									} else {
-										Lib::debug( "Input Field '$field_name' is not a string but '$input_type'?" );
+										$input_value = \sanitize_text_field( $input_value );
 									}
+									$input_accept = true;
+								} else {
+									Lib::debug( "Input Field '$field_name' is not a string but '$input_type'?" );
 								}
 								break;
 						}
@@ -2704,8 +2730,8 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				}
 			}
 
-			if ( isset( $_FILES ) ) {
-				$unslash_files = \wp_unslash( $_FILES );
+			$unslash_files = wp_unslash( $_FILES ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			if ( isset( $unslash_files ) && is_array( $unslash_files ) ) {
 				if ( array_key_exists( $this->optionid, $unslash_files ) ) {
 					$uploads = $unslash_files [ $this->optionid ];
 					if ( array_key_exists( 'name', $uploads ) && is_array( $uploads ['name'] ) ) {
@@ -2739,6 +2765,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 								$results[]                = $this->handle_single_file_upload( $upload_info, $field_name, $output );
 							}
 							$output [ $field_name ] = $results;
+
 						}
 					} else {
 						Lib::debug( 'Value not found: $uploads[name]' );
@@ -2784,32 +2811,30 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					if ( 0 === $upload_info ['size'] ) {
 						$err_num = 999;
 						$err_msg = 'Empty upload file: "' . $upload_info ['tmp_name'] . '".';
-					} else {
-						if ( is_uploaded_file( $upload_info ['tmp_name'] ) ) {
-							if ( filesize( $upload_info ['tmp_name'] ) === $upload_info ['size'] ) {
-								$allowed_mime_types = get_allowed_mime_types();
-								if ( in_array( $upload_info ['type'], \array_values( $allowed_mime_types ), true ) ) {
-									$file_extension = pathinfo( $upload_info ['name'], PATHINFO_EXTENSION );
-									if ( ! empty( $file_extension )
-									&& false !== strpos( $allowed_mime_types[ $upload_info ['type'] ], $file_extension ) ) {
-										unset( $upload_info ['error'] );
-										return $upload_info;
-									} else {
-										$err_num = 999;
-										$err_msg = 'File extension does not match mime-type: "' . $file_extension . '".';
-									}
+					} elseif ( is_uploaded_file( $upload_info ['tmp_name'] ) ) {
+						if ( filesize( $upload_info ['tmp_name'] ) === $upload_info ['size'] ) {
+							$allowed_mime_types = get_allowed_mime_types();
+							if ( in_array( $upload_info ['type'], \array_values( $allowed_mime_types ), true ) ) {
+								$file_extension = pathinfo( $upload_info ['name'], PATHINFO_EXTENSION );
+								if ( ! empty( $file_extension )
+								&& false !== strpos( $allowed_mime_types[ $upload_info ['type'] ], $file_extension ) ) {
+									unset( $upload_info ['error'] );
+									return $upload_info;
 								} else {
 									$err_num = 999;
-									$err_msg = 'Uploaded mime-type is not allowed: ' . $upload_info ['type'] . '.';
+									$err_msg = 'File extension does not match mime-type: "' . $file_extension . '".';
 								}
 							} else {
 								$err_num = 999;
-								$err_msg = 'Real file size does not match to reported file size: ' . $upload_info ['size'] . '.';
+								$err_msg = 'Uploaded mime-type is not allowed: ' . $upload_info ['type'] . '.';
 							}
 						} else {
 							$err_num = 999;
-							$err_msg = 'Invalid upload file: "' . $upload_info ['tmp_name'] . '".';
+							$err_msg = 'Real file size does not match to reported file size: ' . $upload_info ['size'] . '.';
 						}
+					} else {
+						$err_num = 999;
+						$err_msg = 'Invalid upload file: "' . $upload_info ['tmp_name'] . '".';
 					}
 				}
 			}
@@ -2941,24 +2966,24 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		/** Shortcut to $this->plugin->get_option().
 		 *
 		 * @access protected
-		 * @param mixed $key - string or null for all (array) options.
-		 * @param mixed $default - optional.
-		 * @return mixed or $default when [$key] has no value.
+		 * @param mixed $a_key - string or null for all (array) options.
+		 * @param mixed $a_default - optional.
+		 * @return mixed or $a_default when [$a_key] has no value.
 		 */
-		protected function get_option( $key = null, $default = null ) {
-			return $this->plugin->get_option( $key, $default );
+		protected function get_option( $a_key = null, $a_default = null ) {
+			return $this->plugin->get_option( $a_key, $a_default );
 		}
 
 		/** Shortcut to $this->plugin->set_option().
 		 *
 		 * @access protected
-		 * @param string $key to value.
+		 * @param string $a_key to value.
 		 * @param string $value of key.
 		 * @param array  $options to modify, if omitted use get_option().
 		 * @return array updated $options.
 		 */
-		protected function set_option( $key, $value = null, $options = null ) {
-			return $this->plugin->set_option( $key, $value, $options );
+		protected function set_option( $a_key, $value = null, $options = null ) {
+			return $this->plugin->set_option( $a_key, $value, $options );
 		}
 
 		/** Get private plugin $path variable.
@@ -3021,7 +3046,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @access public
 		 * @return array Plugin Configuration Settings compatible array.
 		 */
-		abstract public function read_configuration ();
+		abstract public function read_configuration();
 
 		/** Get Plugin Configuration Settings.
 		 * Returns Plugin Configuration Settings.
@@ -3036,13 +3061,13 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		/** Get single field configuration-settings.
 		 *
 		 * @access public
-		 * @param string $fn - field name.
+		 * @param string $a_fn - field name.
 		 * @return array of single field settings or empty array.
 		 */
-		public function get_field_settings( $fn ) {
+		public function get_field_settings( $a_fn ) {
 			$all_fields_settings = $this->get_all_fields_settings();
-			if ( array_key_exists( $fn, $all_fields_settings ) ) {
-				return $all_fields_settings [ $fn ];
+			if ( array_key_exists( $a_fn, $all_fields_settings ) ) {
+				return $all_fields_settings [ $a_fn ];
 			}
 			return array();
 		}
@@ -3114,11 +3139,11 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * Override to check/replace/transform current $value (from wp-options).
 		 *
 		 * @access protected
-		 * @param string $fn - file name of the field.
+		 * @param string $a_fn - file name of the field.
 		 * @param mixed  $value of the field.
 		 * @return mixed $value
 		 */
-		protected function get_form_field_value( $fn, $value ) {
+		protected function get_form_field_value( $a_fn, $value ) {
 			return $value;
 		}
 
@@ -3176,7 +3201,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @param array  $options - plugin options.
 		 * @return array|mixed: returned $result will be stored into $option[$field_name].
 		 */
-		protected function handle_single_file_upload( $upload_info, $field_name, $options ) {
+		protected function handle_single_file_upload( $upload_info, $field_name, $options ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
 			return $upload_info;
 		}
 
@@ -3191,11 +3216,11 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @ignore
 		 * @access private
 		 * @param array  $args - field args.
-		 * @param string $fn - field name.
+		 * @param string $a_fn - field name.
 		 * @return array $args
 		 */
-		private function apply_field_args_filters( $args, $fn ) {
-			return apply_filters( $this->prefix . '_field_args', $args, $fn );
+		private function apply_field_args_filters( $args, $a_fn ) {
+			return apply_filters( $this->prefix . '_field_args', $args, $a_fn );
 		}
 
 		/** Apply render filters for field-html, just before html echo.
@@ -3204,11 +3229,11 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @access private
 		 * @param string $html - field html.
 		 * @param string $args - field args.
-		 * @param string $fn - field name.
+		 * @param string $a_fn - field name.
 		 * @return string $html
 		 */
-		private function apply_field_html_filters( $html, $args, $fn ) {
-			return apply_filters( $this->prefix . '_field_html', $html, $args, $fn );
+		private function apply_field_html_filters( $html, $args, $a_fn ) {
+			return apply_filters( $this->prefix . '_field_html', $html, $args, $a_fn );
 		}
 
 		// phpcs:ignore
@@ -3268,6 +3293,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$pageids = array();
 			$default = array(
 				'numberposts' => 100,
+
 				'post_type'   => 'page',
 				'post_status' => 'publish',
 			);
@@ -3275,7 +3301,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				$args = $default;
 			} else {
 				$args ['post_type'] = 'page';
-				$args               = array_merge( $default, $args );
+
+				$args = array_merge( $default, $args );
+
 			}
 			$pages = get_posts( $args );
 			foreach ( $pages as $page ) {
@@ -3293,6 +3321,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$pageids = array();
 			$default = array(
 				'numberposts' => 100,
+
 				'post_type'   => 'post',
 				'post_status' => 'publish',
 			);
@@ -3300,7 +3329,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				$args = $default;
 			} else {
 				$args ['post_type'] = 'post';
-				$args               = array_merge( $default, $args );
+
+				$args = array_merge( $default, $args );
+
 			}
 			$posts = get_posts( $args );
 			foreach ( $posts as $post ) {
@@ -3324,15 +3355,19 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			}
 			$default = array(
 				'numberposts'    => 100,
+
 				'post_type'      => 'attachment',
 				'post_mime_type' => $mime_types,
 			);
 			if ( ! is_array( $args ) ) {
 				$args = $default;
 			} else {
-				$args ['post_type']      = 'attachment';
+				$args ['post_type'] = 'attachment';
+
 				$args ['post_mime_type'] = $mime_types;
-				$args                    = array_merge( $default, $args );
+
+				$args = array_merge( $default, $args );
+
 			}
 			$posts = get_posts( $args );
 			foreach ( $posts as $post ) {
@@ -3362,12 +3397,15 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$custom_post_types = $this->get_select_custom_post_types();
 			$default           = array(
 				'numberposts' => 100,
+
 				'post_status' => 'publish',
 			);
 			if ( ! is_array( $args ) ) {
 				$args = $default;
+
 			} else {
 				$args = array_merge( $default, $args );
+
 			}
 			if ( array_key_exists( 'post_type', $args ) ) {
 				if ( is_string( $args ['post_type'] ) && in_array( $args ['post_type'], $custom_post_types, true ) ) {
@@ -3407,6 +3445,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$uploads_subdirs                = self::scandirs_top( $uploads_path );
 			foreach ( $uploads_subdirs as $subdir_path ) {
 				$uploads_dirs [ $subdir_path ] = '/' . basename( $subdir_path );
+
 			}
 			return $uploads_dirs;
 		}
@@ -3416,6 +3455,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$plugins_dirs = array();
 			foreach ( self::scandirs_top( WP_PLUGIN_DIR ) as $subdir_path ) {
 				$plugins_dirs [ $subdir_path ] = '/' . basename( $subdir_path );
+
 			}
 			return $plugins_dirs;
 		}
@@ -3488,6 +3528,5 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 		// phpcs:ignore
 	# endregion
-
 	}
 }

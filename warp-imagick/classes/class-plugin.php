@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -18,10 +18,10 @@ namespace ddur\Warp_iMagick;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
-use \ddur\Warp_iMagick\Base\Meta_Plugin;
-use \ddur\Warp_iMagick\Settings;
-use \ddur\Warp_iMagick\Shared;
+use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Base\Meta_Plugin;
+use ddur\Warp_iMagick\Settings;
+use ddur\Warp_iMagick\Shared;
 
 $class = __NAMESPACE__ . '\\Plugin';
 
@@ -107,16 +107,14 @@ if ( ! class_exists( $class ) ) {
 			);
 
 			if ( is_admin() ) {
-				$this->load_textdomain();
-
 				$that = Settings::once( $this );
 				if ( is_callable( array( $that, 'check_conflicting_plugins' ) ) ) {
 					$that->check_conflicting_plugins();
 				} else {
-					;
+					sleep( 0 );
+
 				}
 			}
-
 		}
 
 		// phpcs:ignore
@@ -228,7 +226,8 @@ if ( ! class_exists( $class ) ) {
 						$source_file_path = isset( $args ['file'] ) && \file_exists( $args ['file'] ) ? $args ['file'] : false;
 						if ( $max_image_width && $source_file_path ) {
 							if ( false !== Shared::check_resize_image_width( $source_file_path, $source_file_path, $max_image_width ) ) {
-								;
+								sleep( 0 );
+
 							}
 						}
 						break;
@@ -295,6 +294,8 @@ if ( ! class_exists( $class ) ) {
 				return $metadata;
 			}
 
+			// phpcs:enable
+
 			// phpcs:ignore
 			$trace_stack = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 10 );
 			$calls_stack = array();
@@ -310,16 +311,24 @@ if ( ! class_exists( $class ) ) {
 			$scope = in_array( 'wp_create_image_subsizes', $calls_stack, true );
 
 			if ( true === $scope ) {
-				;
+				sleep( 0 );
+
 			} else {
-				;
+				sleep( 0 );
+
 			}
+
+			sleep( 0 );
+
+			// phpcs:enable
 
 			if ( true !== $scope ) {
 				return $metadata;
 			}
 
 			if ( $this->my_gen_attach_id !== $attachment_id ) {
+				sleep( 0 );
+
 				$this->my_gen_attach_id = $attachment_id;
 				$this->my_gen_file_path = $this->get_absolute_upload_file_path( $metadata['file'] );
 
@@ -328,12 +337,16 @@ if ( ! class_exists( $class ) ) {
 				$old_metadata = get_post_meta( $attachment_id, '_wp_attachment_metadata', $single = true );
 
 				if ( isset( $old_metadata['sizes'] ) && count( $old_metadata['sizes'] ) ) {
+					sleep( 0 );
+
 					$this->store_attachment_metadata( $attachment_id );
 				} else {
-					;
+					sleep( 0 );
+
 				}
 			} else {
-				;
+				sleep( 0 );
+
 			}
 
 			return $metadata;
@@ -407,10 +420,8 @@ if ( ! class_exists( $class ) ) {
 
 		/** WordPress Init */
 		public function handle_wordpress_init() {
-			$this->install_update_handler();
-			$this->plugin_upgrade_checker();
-			$this->next_version_available();
-			$this->convert_webp_on_demand();
+			parent::handle_wordpress_init();
+			$this->cwebp_endpoint_enabled();
 			$this->disable_perflab_upload();
 
 			/** Check if plugin activation requirements failed?
@@ -433,12 +444,14 @@ if ( ! class_exists( $class ) ) {
 				$accepted_args = 2
 			);
 
+			// phpcs:enable
+
 			if ( class_exists( '\\RegenerateThumbnails' ) ) {
 				\add_action( 'regenerate_thumbnails_options_onlymissingthumbnails', '__return_false' );
 
 				\add_action(
 					'admin_head',
-					function() {
+					function () {
 						?>
 <style type="text/css">#regenthumbs-regenopt-onlymissing{display:none!important}</style>
 <style type="text/css">#regenerate-thumbnails-app div:first-child p:nth-of-type(3) label{display:none!important}</style>
@@ -465,7 +478,7 @@ if ( ! class_exists( $class ) ) {
 				foreach ( $reasons as $message ) {
 					if ( is_string( $message ) && trim( $message ) ) {
 						self::echo_error_notice( $message );
-						$counter++;
+						++$counter;
 					}
 				}
 				$plugin_name = $this->get_slug();
@@ -552,6 +565,8 @@ if ( ! class_exists( $class ) ) {
 		 * @param array $editors - image editors.
 		 */
 		public function on_wp_image_editors_99_filter( $editors ) {
+			// phpcs:enable
+
 			require_once __DIR__ . '/class-warp-image-editor-imagick.php';
 
 			/** If default/original WordPress editors (classes) are missing,
@@ -653,11 +668,13 @@ if ( ! class_exists( $class ) ) {
 			 */
 			if ( $this->my_gen_attach_id !== $attachment_id ) {
 				if ( Lib::is_wp_cli() ) {
-					;
+					sleep( 0 );
+
 				} else {
 					Lib::error( 'Calling "intermediate_image_sizes_advanced" outside of function scope: wp_create_image_subsizes( _, $attachment_id ) is ' . $attachment_id . ', expected: ' . $this->my_gen_attach_id . ' !' );
 				}
 				return $sizes;
+
 			}
 
 			if ( ! array_key_exists( 'file', $metadata ) ) {
@@ -698,6 +715,8 @@ if ( ! class_exists( $class ) ) {
 			switch ( $this->my_gen_file_path ) {
 				case $new_file_path:
 				case $new_orig_path:
+					sleep( 0 );
+
 					break;
 				default:
 					Lib::error( 'Regenerate wp_create_image_subsizes( $file, _ ) doesn\'t match [file] or [original_image]' );
@@ -742,6 +761,8 @@ if ( ! class_exists( $class ) ) {
 			$this->my_metadata_done = false;
 			$this->my_generate_meta = false;
 
+			sleep( 0 );
+
 			$this->my_image_state = '';
 
 			$old_metadata = Lib::safe_key_value( $this->my_save_metadata, '_wp_attachment_metadata', array(), false );
@@ -750,7 +771,8 @@ if ( ! class_exists( $class ) ) {
 
 			$is_regenerate = false !== $old_metadata;
 			if ( Lib::is_debug() && $is_regenerate === $this->my_is_upload ) {
-				;
+				sleep( 0 );
+
 			}
 
 			$old_file_name = false;
@@ -778,6 +800,8 @@ if ( ! class_exists( $class ) ) {
 
 			if ( $is_regenerate ) {
 				if ( empty( $old_metadata ) ) {
+					sleep( 0 );
+
 					Lib::error( 'Old metadata is not available (not saved before regenerate)!' );
 					return $sizes;
 				}
@@ -829,6 +853,7 @@ if ( ! class_exists( $class ) ) {
 			if ( empty( $warp_original ) ) {
 				if ( ! $is_regenerate ) {
 					$warp_original = wp_basename( $this->my_gen_file_path );
+					sleep( 0 );
 
 				} elseif ( 'edited' === $this->my_image_state ) {
 					if ( ! empty( $backup_sizes['full-orig']['file'] ) ) {
@@ -841,7 +866,8 @@ if ( ! class_exists( $class ) ) {
 								if ( \file_exists( \path_join( dirname( $new_file_path ), $test_original ) ) ) {
 									$warp_original = wp_basename( $test_original );
 								} else {
-									;
+									sleep( 0 );
+
 								}
 							}
 						}
@@ -853,7 +879,8 @@ if ( ! class_exists( $class ) ) {
 								if ( \file_exists( \path_join( dirname( $new_file_path ), $test_original ) ) ) {
 									$warp_original = wp_basename( $test_original );
 								} else {
-									;
+									sleep( 0 );
+
 								}
 							}
 						}
@@ -865,15 +892,19 @@ if ( ! class_exists( $class ) ) {
 								if ( \file_exists( \path_join( dirname( $new_file_path ), $test_original ) ) ) {
 									$warp_original = wp_basename( $test_original );
 								} else {
-									;
+									sleep( 0 );
+
 								}
 							}
 						}
 
+						// phpcs:enable
+
 						if ( empty( $warp_original ) ) {
 							$warp_original = wp_basename( $full_original );
 							if ( ! \file_exists( \path_join( dirname( $new_file_path ), $full_original ) ) ) {
-								;
+								sleep( 0 );
+
 							}
 						}
 					} else {
@@ -893,22 +924,30 @@ if ( ! class_exists( $class ) ) {
 					}
 
 					if ( $shortest_basename !== $warp_original ) {
+						sleep( 0 );
+
 						$warp_original = $shortest_basename;
 					}
 
 					foreach ( $tracked_files as $basename => $flag ) {
 						if ( 0 !== strpos( pathinfo( $basename, PATHINFO_FILENAME ), pathinfo( $warp_original, PATHINFO_FILENAME ) ) ) {
-							;
+							sleep( 0 );
+
 						}
 					}
 
 					if ( Shared::is_edited( $warp_original ) && 'edited' !== $this->my_image_state ) {
-						;
+						sleep( 0 );
+
 					}
 
 					update_post_meta( $attachment_id, '_warp_imagick_source', $warp_original );
+
+					sleep( 0 );
+
 				} else {
-					;
+					sleep( 0 );
+
 				}
 			}
 
@@ -922,7 +961,8 @@ if ( ! class_exists( $class ) ) {
 				}
 			} elseif ( ! $is_regenerate ) {
 				// phpcs:ignore
-				;
+				sleep( 0 );
+
 			}
 
 			if ( '' === $this->my_image_state ) {
@@ -943,10 +983,14 @@ if ( ! class_exists( $class ) ) {
 							 *
 							 * Other suffixes may be created later in code.
 							 */
+							sleep( 0 );
+
 							Lib::error( 'Unexpected: [file]-suffix is not recognized: ' . $file_name . '.' );
 							return $sizes;
 						}
 					} else {
+						sleep( 0 );
+
 						Lib::error( 'Unexpected: $file_name (' . $file_name . ' does not start with $orig_name (' . $orig_name . ').' );
 						return $sizes;
 
@@ -983,12 +1027,16 @@ if ( ! class_exists( $class ) ) {
 					 */
 
 					if ( $metadata['file'] !== $old_metadata['file'] ) {
+						// phpcs:enable
+
 						$metadata['file']   = $old_metadata['file'];
 						$metadata['width']  = $old_metadata['width'];
 						$metadata['height'] = $old_metadata['height'];
 					}
 
 					$edited_source = $old_file_path;
+
+					sleep( 0 );
 
 					$this->webp_clone_image( $edited_source, $this->my_mime_type );
 
@@ -1008,6 +1056,8 @@ if ( ! class_exists( $class ) ) {
 					 */
 
 					$source = $this->get_absolute_upload_file_path( $metadata['file'] );
+					sleep( 0 );
+
 					$this->webp_clone_image( $source, $this->my_mime_type );
 
 					break;
@@ -1032,11 +1082,15 @@ if ( ! class_exists( $class ) ) {
 					 * resources and hang response until timeout.
 					 */
 					if ( 2500 < $metadata['width'] || 2500 < $metadata['height'] ) {
+						sleep( 0 );
+
 						$this->webp_clone_image( $source, $this->my_mime_type );
 						break;
 					}
 
 					try {
+						sleep( 0 );
+
 						$editor = Shared::get_warp_editor( $source );
 						if ( \is_wp_error( $editor ) ) {
 							Lib::error( 'Function get_warp_editor() returned an error: ' . $editor->get_error_message() );
@@ -1048,6 +1102,7 @@ if ( ! class_exists( $class ) ) {
 								return $sizes;
 							} else {
 								$saved = $editor->save( $source );
+
 								if ( \is_wp_error( $saved ) ) {
 									Lib::error( '$editor::save() failed with error: ' . $saved->get_error_message() );
 									return $sizes;
@@ -1055,10 +1110,12 @@ if ( ! class_exists( $class ) ) {
 								$target = $saved['path'];
 							}
 						}
-					} catch ( Exception $e ) {
+					} catch ( \Exception $e ) {
 						Lib::error( 'Exception caught: ' . $e->getMessage() );
 						return $sizes;
 					}
+
+					sleep( 0 );
 
 					if ( isset( $editor ) ) {
 						is_callable( array( $editor, '__destruct' ) ) && $editor->__destruct();
@@ -1079,6 +1136,8 @@ if ( ! class_exists( $class ) ) {
 					 */
 
 					$source = $this->get_absolute_upload_file_path( $metadata['file'] );
+					sleep( 0 );
+
 					$this->webp_clone_image( $source, $this->my_mime_type );
 					break;
 
@@ -1094,8 +1153,11 @@ if ( ! class_exists( $class ) ) {
 					$source = $this->get_absolute_upload_file_path( $metadata['file'] );
 
 					if ( $this->get_option( 'compress-jpeg-original-disabled', Shared::compress_jpeg_original_disabled_default() ) ) {
+						sleep( 0 );
+
 						$this->webp_clone_image( $source, $this->my_mime_type );
 						break;
+
 					}
 
 					/**
@@ -1104,8 +1166,11 @@ if ( ! class_exists( $class ) ) {
 					 * resources and hang response until timeout.
 					 */
 					if ( 2500 < $metadata['width'] || 2500 < $metadata['height'] ) {
+						sleep( 0 );
+
 						$this->webp_clone_image( $source, $this->my_mime_type );
 						break;
+
 					}
 
 					try {
@@ -1113,6 +1178,8 @@ if ( ! class_exists( $class ) ) {
 						 * Copy metadata[file] to metadata[original].
 						 * Change metadata[file] to compressed file name.
 						 */
+						sleep( 0 );
+
 						$editor = Shared::get_warp_editor( $source );
 						if ( \is_wp_error( $editor ) ) {
 							Lib::error( 'Function get_warp_editor() returned an error: ' . $editor->get_error_message() );
@@ -1136,11 +1203,17 @@ if ( ! class_exists( $class ) ) {
 						$metadata = _wp_image_meta_replace_original( $saved, $source, $metadata, $attachment_id );
 
 						if ( filesize( $target ) > filesize( $source ) ) {
+							sleep( 0 );
+
 							Shared::copy_file( $source, $target, $overwrite = true );
+							sleep( 0 );
+
 						}
+						sleep( 0 );
+
 						$this->webp_clone_image( $target, $this->my_mime_type );
 
-					} catch ( Exception $e ) {
+					} catch ( \Exception $e ) {
 						Lib::error( 'Exception caught: ' . $e->getMessage() );
 						return $sizes;
 					}
@@ -1208,8 +1281,11 @@ if ( ! class_exists( $class ) ) {
 			}
 
 			if ( $new_orig_path ) {
+				sleep( 0 );
+
 				$this->webp_clone_image( $new_orig_path, $this->my_mime_type );
 
+				// phpcs:enable
 			}
 
 			if ( $is_regenerate && ! empty( $warp_exifmeta ) ) {
@@ -1219,6 +1295,8 @@ if ( ! class_exists( $class ) ) {
 			if ( wp_basename( $metadata['file'] ) !== $warp_original ) {
 				if ( empty( $metadata['original_image'] )
 				|| $metadata['original_image'] !== $warp_original ) {
+					sleep( 0 );
+
 					$metadata['original_image'] = $warp_original;
 				}
 			}
@@ -1228,7 +1306,8 @@ if ( ! class_exists( $class ) ) {
 
 			if ( $curr_attached_path !== $todo_attached_path ) {
 				if ( ! \update_attached_file( $attachment_id, $todo_attached_path ) ) {
-					;
+					sleep( 0 );
+
 				}
 			}
 
@@ -1250,15 +1329,20 @@ if ( ! class_exists( $class ) ) {
 						$rotated = $editor->maybe_exif_rotate();
 
 						if ( \is_wp_error( $rotated ) ) {
-							;
+							sleep( 0 );
+
 						}
 					}
 
 					if ( \method_exists( $editor, 'make_subsize' ) ) {
+						sleep( 0 );
+
 						foreach ( $sizes as $new_size_name => $new_size_data ) {
 							$new_size_meta = $editor->make_subsize( $new_size_data );
 
 							if ( is_wp_error( $new_size_meta ) ) {
+								sleep( 0 );
+
 								continue;
 							} else {
 								$metadata['sizes'][ $new_size_name ] = $new_size_meta;
@@ -1268,17 +1352,23 @@ if ( ! class_exists( $class ) ) {
 								$this->my_updating_meta = false;
 
 								$this->my_metadata_done = $metadata;
+
 							}
 						}
 						$sizes_generated = $metadata['sizes'];
+						sleep( 0 );
+
 					} elseif ( \method_exists( $editor, 'multi_resize' ) ) {
 						/** Clean, one-time update of metadata. Anyways, in case of fatal error or timeout,
 						 * function wp_update_image_subsizes() won't be able to use right source ("edited").
 						 * For each size, execution time is extended to prevent timeout. See class.
 						 */
 
+						sleep( 0 );
+
 						$metadata['sizes'] = $editor->multi_resize( $sizes );
 						$sizes_generated   = $metadata['sizes'];
+						sleep( 0 );
 
 						$this->my_updating_meta = true;
 						\wp_update_attachment_metadata( $attachment_id, $metadata );
@@ -1302,10 +1392,13 @@ if ( ! class_exists( $class ) ) {
 
 			}
 
+			// phpcs:enable
+
 			$clone_action = $this->do_generate_webp_clones();
 			switch ( $clone_action ) {
 				case 1:
 					$clone_action = 2;
+
 					break;
 			}
 			foreach ( $tracked_files as $collected_name => $ignore ) {
@@ -1320,7 +1413,6 @@ if ( ! class_exists( $class ) ) {
 			$this->my_generate_meta = true;
 
 			return array();
-
 		}
 
 		/** On wp_generate_attachment_metadata filter.
@@ -1334,6 +1426,8 @@ if ( ! class_exists( $class ) ) {
 		 * @param string $context - caller context.
 		 */
 		public function on_wp_generate_attachment_metadata_99_filter( $metadata, $attachment_id = false, $context = false ) {
+			sleep( 0 );
+
 			// phpcs:ignore
 			$trace_stack = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 10 );
 			$calls_stack = array();
@@ -1346,7 +1440,11 @@ if ( ! class_exists( $class ) ) {
 
 			$trace_stack = array();
 
+			sleep( 0 );
+
 			if ( 'create' !== $context ) {
+				sleep( 0 );
+
 				return $metadata;
 			}
 
@@ -1376,7 +1474,6 @@ if ( ! class_exists( $class ) ) {
 			$this->my_metadata_done = false;
 
 			return $metadata;
-
 		}
 
 		// phpcs:ignore
@@ -1401,13 +1498,13 @@ if ( ! class_exists( $class ) ) {
 					$delete_webp = Shared::append_suffix_to_file_name( $path, '-jpg' );
 					$delete_webp = Shared::replace_file_name_extension( $delete_webp, 'webp' );
 					if ( \file_exists( $delete_webp ) ) {
-						\unlink( $delete_webp );
+						\wp_delete_file( $delete_webp );
 					}
 					/** Fall through */
 				case 'image/png':
 					$delete_webp = Shared::get_webp_file_name( $path );
 					if ( \file_exists( $delete_webp ) ) {
-						\unlink( $delete_webp );
+						\wp_delete_file( $delete_webp );
 					}
 					break;
 			}
@@ -1424,6 +1521,7 @@ if ( ! class_exists( $class ) ) {
 		public function on_delete_attachment_action( $post_id, $wp_post ) {
 			if ( 'attachment' !== get_post_type( $wp_post ) ) {
 				return;
+
 			}
 
 			switch ( $wp_post->post_mime_type ) {
@@ -1432,6 +1530,7 @@ if ( ! class_exists( $class ) ) {
 					break;
 				default:
 					return;
+
 			}
 
 			$metadata = \wp_get_attachment_metadata( $post_id );
@@ -1442,6 +1541,7 @@ if ( ! class_exists( $class ) ) {
 
 			\add_action(
 				'deleted_post',
+				// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
 				function ( $deleted_post_id, $wp_post ) use ( $post_id, $metadata, $tracked ) {
 					if ( $deleted_post_id !== $post_id ) {
 						return;
@@ -1459,8 +1559,9 @@ if ( ! class_exists( $class ) ) {
 							continue;
 						}
 						$tracked[ $basename ] = false;
-					}
+						sleep( 0 );
 
+					}
 				},
 				10,
 				2
@@ -1492,13 +1593,11 @@ if ( ! class_exists( $class ) ) {
 		/** Plugin is disabled due activation failures (missing requirements). */
 		public function is_disabled() {
 			return false !== $this->my_is_disabled;
-
 		}
 
 		/** Returns array of strings (messages): activation failures (missing requirements). */
 		public function why_is_disabled() {
 			return false !== $this->my_is_disabled && is_array( $this->my_is_disabled ) ? $this->my_is_disabled : array();
-
 		}
 
 		/** Return max image width (if enabled by option) */
@@ -1531,6 +1630,8 @@ if ( ! class_exists( $class ) ) {
 					case 3:
 						break;
 					default:
+						sleep( 0 );
+
 						$return = 3;
 
 				}
@@ -1544,24 +1645,37 @@ if ( ! class_exists( $class ) ) {
 			if ( null === $this->my_can_do_webp ) {
 				$functions = array(
 					'\\imagewebp',
+
 					'\\imagecreatefromjpeg',
+
 					'\\imagecreatefrompng',
+
 					'\\imageistruecolor',
 
 					'\\imagealphablending',
+
 					'\\imagecolorallocatealpha',
+
 					'\\imagecreatetruecolor',
+
 					'\\imagefilledrectangle',
+
 					'\\imagedestroy',
+
 					'\\imagecopy',
+
 					'\\imagesx',
+
 					'\\imagesy',
+
 				);
 
 				$this->my_can_do_webp = true;
 				foreach ( $functions as $function ) {
 					if ( true !== function_exists( $function ) || true !== is_callable( $function ) ) {
 						$this->my_can_do_webp = false;
+						sleep( 0 );
+
 						break;
 					}
 				}
@@ -1606,6 +1720,7 @@ if ( ! class_exists( $class ) ) {
 				case 2:
 					if ( \file_exists( $webp_path ) ) {
 						return $webp_path;
+
 					}
 					break;
 
@@ -1613,7 +1728,10 @@ if ( ! class_exists( $class ) ) {
 					return false;
 
 				default:
+					sleep( 0 );
+
 					return false;
+
 			}
 
 			if ( false === $this->can_generate_webp_clones() ) {
@@ -1621,6 +1739,8 @@ if ( ! class_exists( $class ) ) {
 			}
 
 			if ( ! is_readable( $orig_path ) ) {
+				sleep( 0 );
+
 				return false;
 			}
 			$orig_size = \filesize( $orig_path );
@@ -1635,6 +1755,8 @@ if ( ! class_exists( $class ) ) {
 					break;
 
 				default:
+					sleep( 0 );
+
 					return false;
 			}
 
@@ -1646,7 +1768,8 @@ if ( ! class_exists( $class ) ) {
 				$webp_quality = Shared::webp_quality_value_min();
 			}
 
-			$gd_convert   = false;
+			$gd_convert = false;
+
 			$gd_jpeg      = false;
 			$gd_png       = false;
 			$gd_truecolor = false;
@@ -1655,7 +1778,10 @@ if ( ! class_exists( $class ) ) {
 				case 'image/jpeg':
 					$gd_jpeg = \imagecreatefromjpeg( $orig_path );
 					if ( false === $gd_jpeg ) {
+						sleep( 0 );
+
 						break;
+
 					}
 
 					$use_quality = $this->get_option( 'webp-jpeg-compression-quality', Shared::webp_jpeg_quality_default() );
@@ -1675,6 +1801,8 @@ if ( ! class_exists( $class ) ) {
 							break;
 						default:
 					}
+					sleep( 0 );
+
 					if ( 0 === $this->get_option( 'webp-jpeg-compression-quality', Shared::webp_jpeg_quality_default() ) ) {
 						$webp_quality = $this->get_option( 'jpeg-compression-quality', Shared::jpeg_quality_default() );
 					}
@@ -1686,46 +1814,66 @@ if ( ! class_exists( $class ) ) {
 					}
 					if ( $gd_jpeg ) {
 						$gd_convert = $gd_jpeg;
-						$gd_jpeg    = false;
+
+						$gd_jpeg = false;
+
 					}
 					break;
 
 				case 'image/png':
 					$gd_png = \imagecreatefrompng( $orig_path );
 					if ( false === $gd_png ) {
+						sleep( 0 );
+
 						break;
+
 					}
 					if ( \imageistruecolor( $gd_png ) ) {
 						$gd_convert = $gd_png;
-						$gd_png     = false;
+
+						$gd_png = false;
+
 						break;
+
 					}
 					if ( function_exists( 'imagepalettetotruecolor' )
 					&& \imagepalettetotruecolor( $gd_png ) ) {
 						$gd_convert = $gd_png;
-						$gd_png     = false;
+
+						$gd_png = false;
+
 						break;
+
 					}
 
 					$gd_truecolor = \imagecreatetruecolor( \imagesx( $gd_png ), \imagesy( $gd_png ) );
 					if ( false === $gd_truecolor ) {
+						sleep( 0 );
+
 						if ( false !== $gd_png ) {
 							\imagedestroy( $gd_png );
 							$gd_png = false;
+
 						}
 						break;
+
 					}
 
 					if ( false === \imagealphablending( $gd_truecolor, false ) ) {
+						sleep( 0 );
+
 						if ( false !== $gd_png ) {
 							\imagedestroy( $gd_png );
 							$gd_png = false;
+
 						}
 						if ( false !== $gd_truecolor ) {
 							\imagedestroy( $gd_truecolor );
 							$gd_truecolor = false;
+
 						}
 						break;
+
 					}
 
 					$is_allocated = \imagecolorallocatealpha( $gd_truecolor, 255, 255, 255, 127 );
@@ -1733,67 +1881,94 @@ if ( ! class_exists( $class ) ) {
 						if ( false !== $gd_png ) {
 							\imagedestroy( $gd_png );
 							$gd_png = false;
+
 						}
 						if ( false !== $gd_truecolor ) {
 							\imagedestroy( $gd_truecolor );
 							$gd_truecolor = false;
+
 						}
 						break;
+
 					}
 
 					if ( false === \imagefilledrectangle( $gd_truecolor, 0, 0, imagesx( $gd_png ), imagesy( $gd_png ), $is_allocated ) ) {
+						sleep( 0 );
+
 						if ( false !== $gd_png ) {
 							\imagedestroy( $gd_png );
 							$gd_png = false;
+
 						}
 						if ( false !== $gd_truecolor ) {
 							\imagedestroy( $gd_truecolor );
 							$gd_truecolor = false;
+
 						}
 						break;
+
 					}
 
 					if ( false === \imagealphablending( $gd_truecolor, true ) ) {
+						sleep( 0 );
+
 						if ( false !== $gd_png ) {
 							\imagedestroy( $gd_png );
 							$gd_png = false;
+
 						}
 						if ( false !== $gd_truecolor ) {
 							\imagedestroy( $gd_truecolor );
 							$gd_truecolor = false;
+
 						}
 						break;
-					};
+
+					}
 					if ( false === \imagecopy( $gd_truecolor, $gd_png, 0, 0, 0, 0, \imagesx( $gd_png ), \imagesy( $gd_png ) ) ) {
+						sleep( 0 );
+
 						if ( false !== $gd_png ) {
 							\imagedestroy( $gd_png );
 							$gd_png = false;
+
 						}
 						if ( false !== $gd_truecolor ) {
 							\imagedestroy( $gd_truecolor );
 							$gd_truecolor = false;
 						}
 						break;
+
 					}
 					if ( false !== $gd_png ) {
+						sleep( 0 );
+
 						$gd_png = false;
 					}
 					if ( false !== $gd_truecolor ) {
-						$gd_convert   = $gd_truecolor;
+						$gd_convert = $gd_truecolor;
+
 						$gd_truecolor = false;
+
 					}
 					break;
 			}
 
 			if ( $gd_jpeg ) {
+				sleep( 0 );
+
 				$gd_jpeg = false;
 			}
 
 			if ( $gd_png ) {
+				sleep( 0 );
+
 				$gd_png = false;
 			}
 
 			if ( $gd_truecolor ) {
+				sleep( 0 );
+
 				$gd_truecolor = false;
 			}
 
@@ -1809,20 +1984,25 @@ if ( ! class_exists( $class ) ) {
 
 							$stat  = stat( dirname( $webp_path ) );
 							$perms = $stat['mode'] & 0000666;
+							// phpcs:ignore
 							chmod( $webp_path, $perms );
+
 							\imagedestroy( $gd_convert );
 							$webp_size = \filesize( $webp_path );
 							if ( $orig_size && $orig_size < $webp_size ) {
-								;
+								sleep( 0 );
+
 							}
 							return $webp_path;
 						} else {
-							;
+							sleep( 0 );
+
 						}
 					} else {
-						;
+						sleep( 0 );
+
 					}
-				} catch ( Exception $e ) {
+				} catch ( \Exception $e ) {
 					Lib::error( 'Exception caught: ' . $e->getMessage() );
 					return false;
 				}
@@ -1894,7 +2074,6 @@ if ( ! class_exists( $class ) ) {
 			if ( ! Lib::is_debug() ) {
 				return;
 			}
-
 		}
 
 		// phpcs:ignore
@@ -1910,7 +2089,7 @@ if ( ! class_exists( $class ) ) {
 		private function add_preview_thumbnails_template() {
 			\add_filter(
 				'media_row_actions',
-				function( $actions, $post = 0 ) {
+				function ( $actions, $post = null ) {
 					$actions[ $this->get_slug() . '-thumbnails' ] = sprintf(
 						'<a target=_blank href="%s" rel="bookmark">%s</a>',
 						\add_query_arg( $this->get_slug(), 'all', \get_permalink( $post->ID ) ),
@@ -1924,7 +2103,7 @@ if ( ! class_exists( $class ) ) {
 
 			\add_action(
 				'attachment_submitbox_misc_actions',
-				function() {
+				function () {
 					global $post;
 					?>
 <div class="misc-pub-section misc-pub-<?php echo \esc_attr( $this->get_slug() ); ?>-thumbnails">
@@ -1956,16 +2135,16 @@ if ( ! class_exists( $class ) ) {
 
 			\add_action(
 				'wp',
-				function() {
+				function () {
 					if ( $this->is_raw_image_template_request() ) {
 						\remove_all_actions( 'template_redirect' );
 						\add_action(
 							'template_redirect',
-							function() {
+							function () {
 								\remove_all_filters( 'template_include' );
 								\add_filter(
 									'template_include',
-									function( $template ) {
+									function ( $template ) {
 										$raw_image_template = $this->get_path() . '/templates/raw-image-template.php';
 										if ( is_file( $raw_image_template ) ) {
 											header( $this->get_slug() . ': template' );
@@ -2022,8 +2201,8 @@ if ( ! class_exists( $class ) ) {
 		// phpcs:ignore
 	# region Convert WebP on demand
 
-		/** Convert to WebP on demand */
-		private function convert_webp_on_demand() {
+		/** Add endpoint Convert to WebP on demand if enabled */
+		private function cwebp_endpoint_enabled() {
 			if ( false === $this->get_option( 'webp-cwebp-on-demand' ) ) {
 				return;
 			}
@@ -2031,16 +2210,16 @@ if ( ! class_exists( $class ) ) {
 			\add_rewrite_endpoint( 'cwebp-on-demand', EP_ROOT );
 			\add_action(
 				'wp',
-				function() {
+				function () {
 					if ( isset( $GLOBALS['wp_the_query']->query_vars['cwebp-on-demand'] ) ) {
 						\remove_all_actions( 'template_redirect' );
 						\add_action(
 							'template_redirect',
-							function() {
+							function () {
 								\remove_all_filters( 'template_include' );
 								\add_filter(
 									'template_include',
-									function( $template ) {
+									function ( $template ) {
 										$cwebp_on_demand_template = $this->get_path() . '/templates/cwebp-on-demand-template.php';
 										if ( is_file( $cwebp_on_demand_template ) ) {
 											$template = $cwebp_on_demand_template;
@@ -2107,12 +2286,10 @@ if ( ! class_exists( $class ) ) {
 			if ( $perflab ) {
 				\update_option( 'perflab_generate_webp_and_jpeg', 0 );
 			}
-
 		}
 
 		// phpcs:ignore
 	# endregion
-
 	}
 } else {
 	Shared::debug( "Class already exists: $class" );

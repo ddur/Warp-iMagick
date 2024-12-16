@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -18,12 +18,12 @@ namespace ddur\Warp_iMagick\Base;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use \ddur\Warp_iMagick\Shared;
-use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Shared;
+use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 
-$class = __NAMESPACE__ . '\\Base_Settings_Renderer';
+$call_name = __NAMESPACE__ . '\\Base_Settings_Renderer';
 
-if ( ! class_exists( $class ) ) {
+if ( ! class_exists( $call_name ) ) {
 	/** Render settings base class. */
 	abstract class Base_Settings_Renderer {
 		/** Plugin instance.
@@ -133,17 +133,17 @@ if ( ! class_exists( $class ) ) {
 		 * @param string $click_lnk pointing to url of plugin site.
 		 * @param string $box_title of "meta box".
 		 * @param string $id of "meta box" container.
-		 * @param string $class of "meta box" image element.
+		 * @param string $css_class of "meta box" image element.
 		 * @param string $delay of "meta box" jQuery slide down.
 		 */
-		protected function render_hard_meta_box( $image_lnk, $click_lnk, $box_title, $id = '', $class = 'rotate', $delay = 10000 ) {
+		protected function render_hard_meta_box( $image_lnk, $click_lnk, $box_title, $id = '', $css_class = 'rotate', $delay = 10000 ) {
 			$id = trim( $id ) ? $id : $this->pageslug;
 			echo '<div id=' . esc_attr( $id ) . '-fixed-meta-box class=postbox style=display:none;overflow:hidden>';
 			echo '<h2 style="border-bottom: 1px solid #eee;text-align:center"><span>' . esc_html( $box_title ) . '</span></h2>';
 			echo '<a target="_blank" rel="noopener noreferrer" href="' . esc_url_raw( $click_lnk ) . '">';
-			echo '<img src="' . esc_url_raw( $image_lnk ) . '" class="' . esc_attr( $class ) . '" style="max-width:100%;max-height:100%;min-width:100%;min-height:100%">';
+			echo '<img src="' . esc_url_raw( $image_lnk ) . '" class="' . esc_attr( $css_class ) . '" style="max-width:100%;max-height:100%;min-width:100%;min-height:100%">';
 			echo '</a></div>';
-			echo '<script>(function($){$("#' . esc_attr( $id ) . '-fixed-meta-box").delay(' . intval( $delay ) . ').slideDown(1000);}(jQuery));</script>';
+			echo '<script>(function ($){$("#' . esc_attr( $id ) . '-fixed-meta-box").delay(' . intval( $delay ) . ').slideDown(1000);}(jQuery));</script>';
 		}
 
 		/** Render hard (fixed not-re/movable) Meta-Box.
@@ -163,8 +163,7 @@ if ( ! class_exists( $class ) ) {
 			echo '<img src="' . esc_attr( $img_jpg_src ) . '" style="box-sizing:border-box;border-width:2px 2px 2px 1px;border-style:solid;border-color:black;max-width:50%;max-height:100%;min-width:50%;min-height:100%">';
 			echo '</a></div>';
 		}
-
 	}
 } else {
-	Shared::debug( "Class already exists: $class" );
+	Shared::debug( "Class already exists: $call_name" );
 }

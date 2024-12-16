@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -18,17 +18,17 @@ namespace ddur\Warp_iMagick\Base;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-require_once __DIR__ . '/plugin-update-checker-5.1/load-v5p1.php';
+require_once __DIR__ . '/plugin-update-checker-5.3/load-v5p3.php';
 
-use \YahnisElsts\PluginUpdateChecker\v5\PucFactory;
-use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
-use \ddur\Warp_iMagick\Base\Base_Plugin;
-use \ddur\Warp_iMagick\Settings;
-use \ddur\Warp_iMagick\Shared;
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Base\Base_Plugin;
+use ddur\Warp_iMagick\Settings;
+use ddur\Warp_iMagick\Shared;
 
-$class = __NAMESPACE__ . '\\Meta_Plugin';
+$class_name = __NAMESPACE__ . '\\Meta_Plugin';
 
-if ( ! class_exists( $class ) ) {
+if ( ! class_exists( $class_name ) ) {
 	/** Meta Plugin Class.
 	 *
 	 * Class between Plugin and abstract Base_Plugin class.
@@ -52,12 +52,19 @@ if ( ! class_exists( $class ) ) {
 		 * or via (enabled) auto-update for this plugin.
 		 */
 		private function reactivate_when_active() {
+			sleep( 0 );
+
 			$that = Settings::once( $this );
 			$that->on_abstract_activate_plugin( \is_multisite() );
+
+			sleep( 0 );
 		}
 
-		/** Install or Update Handler. */
-		protected function install_update_handler() {
+		/** When active plugin is upgraded or downgraded:
+		 * 1) Activate plugin again (reactivate) to check if
+		 * updated version requirements are still satisfied.
+		 */
+		protected function active_updated_handler() {
 			if ( get_transient( $this->get_slug() . '-reactivate' ) ) {
 				$this->reactivate_when_active();
 				delete_transient( $this->get_slug() . '-reactivate' );
@@ -70,29 +77,47 @@ if ( ! class_exists( $class ) ) {
 			 */
 			add_filter(
 				'upgrader_post_install',
-				function( $success = false, $hook_extra = false, $result = false ) {
+				function ( $success = false, $hook_extra = false, $result = false ) {
+					// phpcs:enable
+
+					sleep( 0 );
+
 					if ( get_transient( $this->get_slug() . '-reactivate' ) ) {
+						sleep( 0 );
+
 						return $success;
 					}
 
 					if ( true !== $success ) {
+						sleep( 0 );
+
 						return $success;
 					}
 
 					if ( is_wp_error( $result ) ) {
+						sleep( 0 );
+
 						return $success;
 					}
 
 					if ( ! is_array( $result ) ) {
+						sleep( 0 );
+
 						return $success;
 					}
 
 					if ( ! is_array( $hook_extra ) ) {
+						sleep( 0 );
+
 						return $success;
 					}
 
 					if ( 'plugin' !== Lib::safe_key_value( $hook_extra, 'type', '', false ) ) {
+						// phpcs:enable
+
 						if ( $this->get_basename() !== Lib::safe_key_value( $hook_extra, 'plugin', '', false ) ) {
+							sleep( 0 );
+
 							return $success;
 
 						}
@@ -103,18 +128,25 @@ if ( ! class_exists( $class ) ) {
 						if ( empty( $destination_name ) ) {
 							$destination = Lib::safe_key_value( $result, 'destination', '', false );
 							if ( $this->get_path() !== $destination ) {
+								sleep( 0 );
+
 								return $success;
 							}
 						} else {
+							sleep( 0 );
+
 							return $success;
 						}
 					}
 
 					if ( get_transient( $this->get_slug() . '-reactivate' ) ) {
-						;
+						sleep( 0 );
+
 					} else {
 						set_transient( $this->get_slug() . '-reactivate', true );
 					}
+
+					sleep( 0 );
 
 					return $success;
 				},
@@ -129,57 +161,87 @@ if ( ! class_exists( $class ) ) {
 			 */
 			add_action(
 				'upgrader_process_complete',
-				function( $upgrader_instance = null, $hook_extra = null ) {
+				function ( $upgrader_instance = null, $hook_extra = null ) {
+					sleep( 0 );
+
 					if ( get_transient( $this->get_slug() . '-reactivate' ) ) {
+						sleep( 0 );
+
 						return;
 					}
 
 					if ( ! is_object( $upgrader_instance ) ) {
+						sleep( 0 );
+
 						return;
 					}
 
 					if ( ! $upgrader_instance instanceof \Plugin_Upgrader ) {
+						sleep( 0 );
+
 						return;
 					}
 
 					if ( ! is_array( $hook_extra ) ) {
+						sleep( 0 );
+
 						if ( null !== $hook_extra ) {
-							;
+							sleep( 0 );
+
 						}
+
+						sleep( 0 );
 
 						return;
 					}
 
 					if ( 'plugin' !== Lib::safe_key_value( $hook_extra, 'type', '', false ) ) {
+						sleep( 0 );
+
 						return;
 					}
+
+					// phpcs:enable
 
 					$process_action = Lib::safe_key_value( $hook_extra, 'action', '', 'unset' );
 
 					switch ( $process_action ) {
 						case 'update':
+							sleep( 0 );
+
 							$process_plugins = Lib::safe_key_value( $hook_extra, 'plugins', array(), false );
 
 							if ( ! is_array( $process_plugins ) ) {
+								sleep( 0 );
+
 								return;
 							}
 
 							$plugin_basename = $this->get_basename();
 
 							if ( ! in_array( $plugin_basename, $process_plugins, true ) ) {
+								sleep( 0 );
+
 								return;
 							}
 
 							break;
 
 						case 'install':
+							sleep( 0 );
+
 							$result = Lib::safe_key_value( (array) $upgrader_instance, 'result', array(), false );
+							sleep( 0 );
 
 							if ( is_wp_error( $result ) ) {
+								sleep( 0 );
+
 								return;
 							}
 
 							if ( ! is_array( $result ) ) {
+								sleep( 0 );
+
 								return;
 							}
 
@@ -188,9 +250,13 @@ if ( ! class_exists( $class ) ) {
 								if ( empty( $destination_name ) ) {
 									$destination = Lib::safe_key_value( $result, 'destination', '', false );
 									if ( $this->get_path() !== $destination ) {
+										sleep( 0 );
+
 										return;
 									}
 								} else {
+									sleep( 0 );
+
 									return;
 								}
 							}
@@ -198,17 +264,20 @@ if ( ! class_exists( $class ) ) {
 							break;
 
 						default:
+							sleep( 0 );
+
 							return;
 
 					}
 
 					if ( get_transient( $this->get_slug() . '-reactivate' ) ) {
-						;
+						sleep( 0 );
+
 					} else {
 						set_transient( $this->get_slug() . '-reactivate', true );
 					}
 
-					return;
+					sleep( 0 );
 				},
 				10,
 				2
@@ -218,8 +287,11 @@ if ( ! class_exists( $class ) ) {
 		/** Upgrade checker client.
 		 *
 		 * Since 1.10.4:
-		 * 1) Using PUC 5.11 (via PUC autoload Namespace.
+		 * 1) Using PUC 5.1(5.11 via PUC autoload Namespace).
 		 * 2) Using Test Update Server when Test Environment is available.
+		 *
+		 * Since 1.12:
+		 * 1) Using PUC 5.3.
 		 *
 		 * @param string $uplink is link to updates server (https://[host.]domain.tld/[updates/]).
 		 */
@@ -227,6 +299,7 @@ if ( ! class_exists( $class ) ) {
 			if ( ! is_string( $uplink ) ) {
 				Lib::error( 'Argument $uplink is not a string ( ' . gettype( $uplink ) . ' ).' );
 				return;
+
 			}
 
 			$plugin_host = wp_parse_url( home_url(), PHP_URL_HOST );
@@ -241,6 +314,7 @@ if ( ! class_exists( $class ) ) {
 
 				if ( Lib::ends_with( gethostname(), '.host.lan' ) ) {
 					/** This site is running on private LAN hostname */
+					sleep( 0 );
 
 					if ( Lib::ends_with( $plugin_host, '.site.lan' )
 					|| Lib::ends_with( $plugin_host, '.host.lan' ) ) {
@@ -254,25 +328,25 @@ if ( ! class_exists( $class ) ) {
 			}
 
 			$uplink = \trailingslashit( $uplink );
-			$server = \add_query_arg(
-				\urlencode_deep(
-					array(
-						'action' => 'get_metadata',
-						'slug'   => $this->get_slug(),
-					)
-				),
-				$uplink
-			);
 
 			$my_update_checker = PucFactory::buildUpdateChecker(
-				$server,
+				\add_query_arg(
+					\urlencode_deep(
+						array(
+							'action' => 'get_metadata',
+							'slug'   => $this->get_slug(),
+						)
+					),
+					$uplink
+				),
 				$this->get_file(),
 				$this->get_slug()
 			);
 
 			\add_filter(
 				$my_update_checker->getUniqueName( 'request_metadata_http_result' ),
-				function( $result, $url = '', $options = '' ) use ( $uplink ) {
+				// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
+				function ( $result, $url = '', $options = '' ) use ( $uplink ) {
 					if ( ! \is_wp_error( $result ) ) {
 						switch ( $result['response']['code'] ) {
 							case 404:
@@ -290,12 +364,13 @@ if ( ! class_exists( $class ) ) {
 
 			\add_filter(
 				$my_update_checker->getUniqueName( 'manual_check_message' ),
-				function( $message, $status = '' ) use ( $uplink ) {
+				function ( $message, $status = '' ) use ( $uplink ) {
 					switch ( $status ) {
 						case 'no_update':
 							break;
 
 						case 'update_available':
+							// phpcs:enable
 							break;
 
 						case 'error':
@@ -309,15 +384,23 @@ if ( ! class_exists( $class ) ) {
 
 			\add_filter(
 				$my_update_checker->getUniqueName( 'request_update_result' ),
-				function( $update, $http_result = null ) {
+				function ( $update ) {
+					// phpcs:enable
+
+					sleep( 0 );
+
 					$plugin_version = Shared::get_plugin_version();
 
 					if ( ! is_string( $plugin_version ) ) {
+						sleep( 0 );
+
 						delete_transient( $this->get_slug() . '-update-version' );
 						return $update;
 					}
 
 					if ( empty( $plugin_version ) ) {
+						sleep( 0 );
+
 						delete_transient( $this->get_slug() . '-update-version' );
 						return $update;
 					}
@@ -331,17 +414,24 @@ if ( ! class_exists( $class ) ) {
 						$hook_name = "pre_update_option_{$this->get_option_id()}";
 						if ( isset( $wp_filter[ $hook_name ] ) && $wp_filter[ $hook_name ]->has_filters() ) {
 							\remove_all_filters( $hook_name );
+							sleep( 0 );
+
 						}
+						sleep( 0 );
 
 						\update_option( $this->get_option_id(), $updated_options, true );
 					}
 
 					if ( ! is_string( $update->version ) ) {
+						sleep( 0 );
+
 						delete_transient( $this->get_slug() . '-update-version' );
 						return $update;
 					}
 
 					if ( empty( $update->version ) ) {
+						sleep( 0 );
+
 						delete_transient( $this->get_slug() . '-update-version' );
 						return $update;
 					}
@@ -358,6 +448,8 @@ if ( ! class_exists( $class ) ) {
 				2
 			);
 
+			// phpcs:enable
+
 			$uplink_host = wp_parse_url( $uplink, PHP_URL_HOST );
 			$plugin_pass = preg_replace( '/[^a-z\d]/i', '', $this->get_option( 'plugin-app-update-password', 'xxxx xxxx xxxx xxxx xxxx xxxx' ) );
 			$header_auth = 'Basic ' . base64_encode( $plugin_host . ':' . $plugin_pass ); // phpcs:ignore
@@ -367,18 +459,30 @@ if ( ! class_exists( $class ) ) {
 				function ( $parsed_args, $url ) use ( $plugin_host, $uplink_host, $header_auth ) {
 					$remote_host = wp_parse_url( $url, PHP_URL_HOST );
 
+					sleep( 0 );
+
 					if ( $remote_host !== $uplink_host ) {
+						sleep( 0 );
+
 						return $parsed_args;
 					}
+					sleep( 0 );
 
 					if ( $remote_host === $plugin_host ) {
-						;
+						sleep( 0 );
+
 					} else {
+						sleep( 0 );
+
 						if ( false === strpos( $url, '?action=' ) ) {
+							sleep( 0 );
+
 							return $parsed_args;
 						}
 
 						if ( false === strpos( $url, '&slug=' ) ) {
+							sleep( 0 );
+
 							return $parsed_args;
 						}
 					}
@@ -387,6 +491,10 @@ if ( ! class_exists( $class ) ) {
 						is_array( $parsed_args ['headers'] ) ? $parsed_args ['headers'] : array(),
 						array( 'Authorization' => $header_auth )
 					);
+
+					sleep( 0 );
+
+					// phpcs:enable
 
 					return $parsed_args;
 				},
@@ -399,14 +507,17 @@ if ( ! class_exists( $class ) ) {
 		protected function next_version_available() {
 			if ( ! is_admin() ) {
 				return;
+
 			}
 
 			$update_version = get_transient( $this->get_slug() . '-update-version' );
 			if ( ! is_string( $update_version ) ) {
 				return;
+
 			}
 			if ( empty( $update_version ) ) {
 				return;
+
 			}
 
 			if ( is_array( $_SERVER ) && array_key_exists( 'REQUEST_URI', $_SERVER ) ) {
@@ -414,30 +525,37 @@ if ( ! class_exists( $class ) ) {
 				$request = home_url( strtok( $_server['REQUEST_URI'], '?' ) );
 				if ( admin_url( 'plugins.php' ) === $request ) {
 					return;
+
 				}
 				if ( admin_url( 'index.php' ) === $request ) {
 					return;
+
 				}
 				if ( admin_url( 'admin-ajax.php' ) === $request ) {
 					return;
+
 				}
 			}
 
 			$option_version = $this->get_option( 'plugin-version', false );
 			if ( ! is_string( $option_version ) ) {
 				return;
+
 			}
 			if ( empty( $option_version ) ) {
 				return;
+
 			}
 
 			if ( ! version_compare( $update_version, $option_version, '>' ) ) {
 				delete_transient( $this->get_slug() . '-update-version' );
 				return;
+
 			}
 
 			if ( $this->is_auto_update_enabled() ) {
 				return;
+
 			}
 
 			// Translators: %s is next plugin update version.
@@ -445,7 +563,7 @@ if ( ! class_exists( $class ) ) {
 
 			\add_action(
 				'admin_notices',
-				function() use ( $message ) {
+				function () use ( $message ) {
 					$this->echo_admin_notice(
 						$message,
 						'notice notice-info is-dismissible',
@@ -460,12 +578,16 @@ if ( ! class_exists( $class ) ) {
 			$basename = $this->get_basename();
 
 			if ( \defined( 'EASY_UPDATES_MANAGER_SLUG' ) ) {
+				sleep( 0 );
+
 				$e_u_m_options = get_site_option( 'MPSUM' );
 
 				if ( is_array( $e_u_m_options ) ) {
 					$e_u_m_options_updates = Lib::safe_key_value( $e_u_m_options, array( 'core', 'plugin_updates' ), '' );
 					switch ( $e_u_m_options_updates ) {
 						case 'automatic':
+							sleep( 0 );
+
 							return true;
 
 						case 'individual':
@@ -473,10 +595,14 @@ if ( ! class_exists( $class ) ) {
 							if ( is_array( $e_u_m_options_automatic )
 								&& count( $e_u_m_options_automatic ) ) {
 								if ( in_array( $basename, $e_u_m_options_automatic, true ) ) {
+									sleep( 0 );
+
 									return true;
 								}
 							}
-					};
+					}
+					sleep( 0 );
+
 				}
 				return false;
 			} else {
@@ -488,23 +614,39 @@ if ( ! class_exists( $class ) ) {
 
 						if ( 0 !== count( $auto_updates ) ) {
 							if ( in_array( $basename, $auto_updates, true ) ) {
+								sleep( 0 );
+
 								return true;
 							}
-						};
+						}
+
+						sleep( 0 );
+
 					} else {
-						;
+						sleep( 0 );
+
 					}
 				} else {
-					;
+					sleep( 0 );
+
 				}
 				return false;
 			}
 			return false;
 		}
 
+		/** Meta handle WordPress init. */
+		protected function handle_wordpress_init() {
+			$this->active_updated_handler();
+			$this->plugin_upgrade_checker();
+			$this->next_version_available();
+			if ( is_admin() ) {
+				$this->load_textdomain();
+			}
+		}
+
 		// phpcs:ignore
 	# endregion
-
 	}
 } else {
 	Shared::debug( "Class already exists: $class" );

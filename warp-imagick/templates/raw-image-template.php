@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -22,8 +22,8 @@
  */
 namespace ddur\Warp_iMagick;
 
-use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
-use \ddur\Warp_iMagick\Shared;
+use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Shared;
 
 defined( 'ABSPATH' ) || die( -1 );
 
@@ -76,7 +76,7 @@ function get_attachment_image_files( $id ) {
 
 	uksort(
 		$sizes,
-		function(
+		function (
 			$a,
 			$b
 		) use ( $sizes ) {
@@ -194,9 +194,11 @@ function get_attachment_image_files( $id ) {
 	}
 
 	$files = array();
+
 	foreach ( $distinct_files as $file_path => $size_data ) {
 		$new_array_key = $size_data[0];
-		$size_data[0]  = $file_path;
+
+		$size_data[0] = $file_path;
 
 		$files [ $new_array_key ] = $size_data;
 	}
@@ -220,7 +222,8 @@ function get_img_html_elements() {
 
 	$img_files = array_reverse( $img_files );
 
-	$html  = '';
+	$html = '';
+
 	$break = 0;
 
 	$root_path = wp_normalize_path( untrailingslashit( ABSPATH ) );

@@ -1,9 +1,9 @@
 /*!
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -15,6 +15,96 @@
 
 /* Highlight opened section (wp-accordion) with italic font */
 .js .accordion-section.open .accordion-section-title{font-style:italic}
+
+/** @since warp-imagick 1.12.
+	Accordion styles in common.css, backward compatibility broken (wp-6.7-branch).
+	Begin - Accordion relevant styles extracted from common.css (wp-6.6-branch).
+*/
+.accordion-section-title:after {
+	content: "\f140";
+	font: normal 20px/1 dashicons;
+	display: block;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-decoration: none;
+	color: #787c82;
+	float: right;
+	right: 20px;
+	top: -2px;
+}
+
+.accordion-section-title:hover:after {
+	color: #1d2327;
+	/* Only visible in Windows High Contrast mode */
+	outline: 1px solid transparent;
+}
+
+.accordion-section {
+	border-bottom: 1px solid #dcdcde;
+	margin: 0;
+}
+
+.accordion-section.open .accordion-section-content,
+.no-js .accordion-section .accordion-section-content {
+	display: block;
+}
+
+.accordion-section.open:hover {
+	border-bottom-color: #dcdcde;
+}
+
+.accordion-section-content {
+	display: none;
+	padding: 10px 20px 15px;
+	overflow: hidden;
+	background: #fff;
+}
+
+.accordion-section-title {
+	margin: 0;
+	padding: 12px 15px 15px;
+	position: relative;
+	border-left: 1px solid #dcdcde;
+	border-right: 1px solid #dcdcde;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+.js .accordion-section-title {
+	cursor: pointer;
+}
+
+.js .accordion-section-title:after {
+	position: absolute;
+	top: 12px;
+	right: 10px;
+	z-index: 1;
+}
+
+.accordion-section-title:focus {
+	/* Only visible in Windows High Contrast mode */
+	outline: 1px solid transparent;
+}
+
+.accordion-section-title:hover:after,
+.accordion-section-title:focus:after {
+	border-color: #a7aaad transparent;
+	/* Only visible in Windows High Contrast mode */
+	outline: 1px solid transparent;
+}
+
+.cannot-expand .accordion-section-title {
+	cursor: auto;
+}
+
+.cannot-expand .accordion-section-title:after {
+	display: none;
+}
+/** @since warp-imagick 1.12.
+	Accordion styles in common.css, backward compatibility broken (wp-6.7-branch).
+	Final - Accordion relevant styles extracted from (wp-6.6-branch) common.css.
+*/
+
 
 /* Section submit button */
 .accordion-section .submit-button {

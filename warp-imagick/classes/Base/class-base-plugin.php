@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -18,13 +18,13 @@ namespace ddur\Warp_iMagick\Base;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use \ddur\Warp_iMagick\Shared;
-use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
-use \ddur\Warp_iMagick\Base\Plugin\v1\Abstract_Plugin;
+use ddur\Warp_iMagick\Shared;
+use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Base\Plugin\v1\Abstract_Plugin;
 
-$class = __NAMESPACE__ . '\\Base_Plugin';
+$class_name = __NAMESPACE__ . '\\Base_Plugin';
 
-if ( ! class_exists( $class ) ) {
+if ( ! class_exists( $class_name ) ) {
 	/** Plugin base class. */
 	abstract class Base_Plugin extends Abstract_Plugin {
 		// phpcs:ignore
@@ -54,6 +54,7 @@ if ( ! class_exists( $class ) ) {
 				}
 			} else {
 				self::$me->init();
+
 			}
 			return self::$me;
 		}
@@ -91,23 +92,22 @@ if ( ! class_exists( $class ) ) {
 		/** Run-time admin-notice handler.
 		 *
 		 * @param string $message to report.
-		 * @param string $class css class.
+		 * @param string $css_class css class.
 		 * @param bool   $esc_html escape.
 		 */
-		public static function echo_admin_notice( $message = '', $class = 'notice notice-info is-dismissible', $esc_html = true ) {
-			if ( $message && $class ) {
+		public static function echo_admin_notice( $message = '', $css_class = 'notice notice-info is-dismissible', $esc_html = true ) {
+			if ( $message && $css_class ) {
 				if ( true === $esc_html ) {
 					$message = esc_html( $message );
 				}
-				$output = '<div class="' . esc_attr( $class ) . '"><p style="white-space:pre"><strong>' . $message . '</strong></p></div>';
+				$output = '<div class="' . esc_attr( $css_class ) . '"><p style="white-space:pre"><strong>' . $message . '</strong></p></div>';
 				Lib::echo_html( $output );
 			}
 		}
 
 		// phpcs:ignore
 	# endregion
-
 	}
 } else {
-	Shared::debug( "Class already exists: $class" );
+	Shared::debug( "Class already exists: $css_name" );
 }

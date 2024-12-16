@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -16,8 +16,8 @@
 
 namespace ddur\Warp_iMagick;
 
-use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
-use \ddur\Warp_iMagick\Shared;
+use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Shared;
 
 defined( 'ABSPATH' ) || die( -1 );
 
@@ -28,7 +28,8 @@ return array(
 		'requires' => array(
 
 			'wp'         => '5.3',
-			'php'        => '7.3',
+
+			'php'        => '7.4',
 
 			'extensions' => array(
 				'imagick' => 'PHP Imagick',
@@ -48,20 +49,26 @@ return array(
 			'files'      => array(),
 		),
 
+		// phpcs:enable
+
 		'metabox'  => array(
 			'name' => __( 'Plugin Home Page', 'warp-imagick' ),
 
 		),
+
+		// phpcs:enable
 
 	),
 	'menu'            => array(
 		'title'         => 'Warp iMagick',
 		'menu-icon'     => 'dashicons-hammer',
 		'parent-slug'   => 'upload.php',
+
 		'position'      => 99,
 
 		'settings-name' => __( 'Settings', 'warp-imagick' ),
 		'settings-icon' => '⚙',
+
 	),
 	'page'            => array(
 		'title'     => trim( 'Warp iMagick - Image Compressor ' . Shared::get_plugin_version() ),
@@ -121,7 +128,7 @@ Copy code snippet (below) and paste it into your editor, at the top of /.htacces
 </p>
 <script>
 document.getElementById("copy-to-clipboard")
-  .onclick = function() {
+  .onclick = function () {
 	let text = document.getElementById("htaccess-snippet").textContent;
 	navigator.clipboard.writeText(text)
 	  .then(() => {
@@ -247,6 +254,8 @@ document.getElementById("copy-to-clipboard")
 					),
 				),
 
+				// phpcs:enable
+
 				'jpeg-colorspace'          => array(
 					'label'   => __( 'Convert Colors to "sRGB" Colorspace', 'warp-imagick' ),
 					'type'    => 'select',
@@ -300,6 +309,7 @@ document.getElementById("copy-to-clipboard")
 					'type'    => 'select',
 					'style'   => 'width:200px',
 					'default' => Shared::jpeg_interlace_scheme_default(),
+
 					'title'   => __( 'Interlace scheme WP/ON/OFF or AUTO to try both and select smaller file size. Default value is "AUTO".', 'warp-imagick' ),
 					'options' => array(
 						'source'   => 'callback',
@@ -313,6 +323,8 @@ document.getElementById("copy-to-clipboard")
 			'title'  => __( 'PNG Sizes/Thumbs', 'warp-imagick' ),
 			'render' => 'render_png_thumb_options',
 			'fields' => array(
+
+				// phpcs:enable
 
 				'png-reduce-colors-enable'    => array(
 					'label'   => __( 'Reduce Colors', 'warp-imagick' ),
@@ -479,6 +491,8 @@ document.getElementById("copy-to-clipboard")
 				),
 			),
 		),
+
+		// phpcs:enable
 
 		'plugin-options'              => array(
 			'title'  => __( 'Plugin Settings', 'warp-imagick' ),

@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2017-2023 Dragan Đurić. All rights reserved.
+ * Copyright © 2017-2025 Dragan Đurić. All rights reserved.
  *
  * @package warp-imagick
  * @license GNU General Public License Version 2.
- * @copyright © 2017-2023. All rights reserved.
+ * @copyright © 2017-2025. All rights reserved.
  * @author Dragan Đurić
  * @link https://warp-imagick.pagespeed.club/
  *
@@ -18,10 +18,10 @@ namespace ddur\Warp_iMagick;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use \ddur\Warp_iMagick\Base\Plugin\v1\Lib;
-use \ddur\Warp_iMagick\Base\Meta_Settings;
-use \ddur\Warp_iMagick\Settings_Renderer;
-use \ddur\Warp_iMagick\Shared;
+use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Base\Meta_Settings;
+use ddur\Warp_iMagick\Settings_Renderer;
+use ddur\Warp_iMagick\Shared;
 
 require_once ABSPATH . 'wp-admin/includes/file.php';
 
@@ -47,10 +47,9 @@ if ( ! class_exists( $class ) ) {
 
 			/** Instantiate custom Settings_Renderer. */
 			$this->renderer = new Settings_Renderer( $this );
-
 		}
 
-		/** Enqueue admin page scripts. Overridden. */
+		/** Enqueue admin page scripts. Derived & Overridden. */
 		public function enqueue_page_scripts() {
 			Lib::enqueue_style( 'abstract-settings-admin-styled' );
 			Lib::enqueue_script( 'abstract-settings-admin-styled' );
@@ -62,6 +61,8 @@ if ( ! class_exists( $class ) ) {
 			Lib::enqueue_style( $this->pageslug, $relative_path . '/assets/style.css', array(), $style_version = $plugin_version, 'screen' );
 
 			Lib::enqueue_script( $this->pageslug, $relative_path . '/assets/script.js', $dependencies, $script_version = $plugin_version, $in_footer = true );
+
+			// phpcs:enable
 		}
 
 		// phpcs:ignore
@@ -124,8 +125,9 @@ if ( ! class_exists( $class ) ) {
 		 */
 		public function validate_options( $options ) {
 			if ( ! is_array( $options ) ) {
+				$gettype = gettype( $options );
 				$options = array();
-				$this->add_settings_update_error( 'Invalid input type: ' . get_type( $options ) );
+				$this->add_settings_update_error( 'Invalid options type: ' . $gettype );
 			}
 
 			self::validate_checkbox_key( 'jpeg-colorspace-force', $options );
@@ -192,6 +194,8 @@ if ( ! class_exists( $class ) ) {
 					$options ['jpeg-compression-quality'] = Shared::jpeg_quality_default();
 				}
 			}
+
+			// phpcs:enable
 
 			if ( ! array_key_exists( 'jpeg-colorspace', $options ) ) {
 				$options ['jpeg-colorspace'] = Shared::jpeg_colorspace_default();
@@ -409,8 +413,9 @@ if ( ! class_exists( $class ) ) {
 				$values [ \Imagick::COLORSPACE_SRGB ] = __( 'sRGB *', 'warp-imagick' );
 			}
 
-			return $values;
+			// phpcs:enable
 
+			return $values;
 		}
 
 		/** Get sampling factor choices for the form */
@@ -508,7 +513,6 @@ if ( ! class_exists( $class ) ) {
 			}
 
 			return $values;
-
 		}
 
 		/** Get sampling factor choices for the form */
@@ -519,6 +523,7 @@ if ( ! class_exists( $class ) ) {
 			$values [-1] = __( 'Use JPEG quality -5%', 'warp-imagick' );
 			$values [0]  = __( 'Use JPEG quality *', 'warp-imagick' );
 			$values [1]  = __( 'Use WebP quality', 'warp-imagick' );
+
 			return $values;
 		}
 
@@ -539,6 +544,7 @@ if ( ! class_exists( $class ) ) {
 		protected function get_all_fields_extended() {
 			return array(
 				'configuration'  => array(),
+
 				'plugin-version' => Shared::get_plugin_version(),
 			);
 		}
@@ -547,19 +553,17 @@ if ( ! class_exists( $class ) ) {
 		protected function on_prepare_settings_page() {
 			$actual_wp_version = get_bloginfo( 'version' );
 
-			$tested_wp_version = '6.4';
-			if ( 0 === \strpos( $actual_wp_version, $tested_wp_version . '.' ) ) {
-				return;
-			}
+			$tested_wp_version = '6.7.1';
 			if ( version_compare( $actual_wp_version, $tested_wp_version, '<=' ) ) {
 				return;
+
 			}
 			\add_action(
 				'admin_notices',
-				function() use ( $tested_wp_version, $actual_wp_version ) {
+				function () use ( $tested_wp_version, $actual_wp_version ) {
 					$this->plugin->echo_admin_notice(
 						// Translators: %s is tested and current WordPress version.
-						sprintf( __( 'This version of plugin is tested up to WP %1$s (Now %2$s). Please update.', 'warp-imagick' ), $tested_wp_version, $actual_wp_version ),
+						sprintf( __( 'This version of plugin is tested up to WP %1$s (Now %2$s).', 'warp-imagick' ), $tested_wp_version, $actual_wp_version ),
 						'notice notice-warning is-dismissible',
 						true
 					);
@@ -627,13 +631,13 @@ if ( ! class_exists( $class ) ) {
 				}
 
 				$conflict_errors [] = array( 'error' => $conflict_message );
-
 			}
+
+			// phpcs:enable
 
 			if ( ! empty( $conflict_errors ) ) {
 				\set_transient( $this->pageslug . '-conflict-errors', $conflict_errors );
 			}
-
 		}
 
 		/** Before render settings page. Overridden. */
@@ -666,7 +670,7 @@ if ( ! class_exists( $class ) ) {
 			if ( class_exists( '\Imagick' ) ) {
 				try {
 					$imagick_required = new \Imagick();
-				} catch ( Exception $e ) {
+				} catch ( \Exception $e ) {
 					$fail[] = 'Exception thrown on creating PHP \\Imagick class: ' . $e->getMessage();
 				}
 			}
@@ -683,12 +687,18 @@ if ( ! class_exists( $class ) ) {
 					$module_version  = $current_version ['versionNumber'];
 					$library_version = $current_version ['versionString'];
 
+					/**
+					 * --------------------------------------------------------------
+					 * Imagick::setImageProperty requires ImageMagick 6.3.2 or newer.
+					 * --------------------------------------------------------------
+					 */
 					$compare_version = '0.0.0';
 					$partial_version = preg_split( '~[\s]+~', $library_version, 0, PREG_SPLIT_NO_EMPTY );
 					foreach ( $partial_version as $part_version ) {
 						if ( preg_match( '~^\d+\.\d+\.\d+~', $part_version ) ) {
 							$compare_version = $part_version;
 							break;
+
 						}
 					}
 					if ( version_compare( $compare_version, '6.3.2', '<' ) ) {
@@ -714,6 +724,7 @@ if ( ! class_exists( $class ) ) {
 				}
 
 				$constants = array(
+
 					'\\Imagick::COMPRESSION_JPEG',
 					'\\Imagick::COLORSPACE_SRGB',
 					'\\Imagick::INTERLACE_PLANE',
@@ -733,7 +744,7 @@ if ( ! class_exists( $class ) ) {
 			if ( empty( $fail ) ) {
 				add_filter(
 					'wp_image_editors',
-					function( $editors ) {
+					function ( $editors ) {
 						$wp_editors = array( 'WP_Image_Editor_Imagick', 'WP_Image_Editor_GD' );
 
 						if ( class_exists( 'Warp_Image_Editor_Imagick' ) ) {
@@ -764,6 +775,8 @@ if ( ! class_exists( $class ) ) {
 					$imagick_required = null;
 
 				} catch ( \Exception $e ) {
+					sleep( 0 );
+
 					$fail [] = $e->getMessage();
 				}
 			} elseif ( is_object( $imagick_required ) ) {
@@ -772,6 +785,8 @@ if ( ! class_exists( $class ) ) {
 					unset( $imagick_required );
 
 				} catch ( \Exception $e ) {
+					sleep( 0 );
+
 					$fail [] = $e->getMessage();
 				}
 			}
@@ -789,6 +804,8 @@ if ( ! class_exists( $class ) ) {
 		 */
 		protected function on_activate_plugin_failure( $fail ) {
 			if ( ! is_array( $fail ) ) {
+				sleep( 0 );
+
 				$fail = array( 'Unknown reason.' );
 			}
 			\update_option( $this->optionid . '-disabled', $fail, $autoload = true );
@@ -824,6 +841,7 @@ if ( ! class_exists( $class ) ) {
 				/** On manual activate: whatever required */
 				$option_values = $this->get_option();
 
+				// phpcs:enable
 			}
 
 			self::copy_test_images_to_test_dir( $that->get_path() . '/assets/clone-test', 'warp-imagick' );
@@ -913,7 +931,6 @@ if ( ! class_exists( $class ) ) {
 			self::set_cwebp_on_demand();
 
 			self::on_manage_plugin( 'uninstall' );
-
 		}
 
 		/** Clear plugin settings-page ui-state user-settings.
@@ -931,6 +948,7 @@ if ( ! class_exists( $class ) ) {
 			/** Since 1.10.4: check headers_sent() as PHP >= 8.0 may report fatal error. */
 			if ( ! headers_sent() ) {
 				setcookie( $pageslug, ' ', time() - YEAR_IN_SECONDS );
+
 			}
 
 			/** Clear obsolete wp_usermeta, set by user using settings-page of older versions of this plugin.
@@ -996,7 +1014,6 @@ if ( ! class_exists( $class ) ) {
 			}
 
 			\set_transient( $pageslug . '-obsolete-usermeta-cleared', true );
-
 		}
 
 		/** Copy "clone redirect test" images to site test directory.
@@ -1022,13 +1039,16 @@ if ( ! class_exists( $class ) ) {
 			WP_Filesystem();
 
 			ob_start();
+
 			$error = copy_dir( $source_dir, $target_dir );
 			ob_end_clean();
 
 			if ( is_wp_error( $error ) ) {
-				;
+				sleep( 0 );
+
 			}
 
+			// phpcs:enable
 		}
 
 		/** Remove "clone redirect test" images from site test directory
@@ -1043,12 +1063,12 @@ if ( ! class_exists( $class ) ) {
 			}
 
 			WP_Filesystem();
+
 			global $wp_filesystem;
 			$wp_filesystem->rmdir(
 				$target_dir,
 				$recursive = true
 			);
-
 		}
 
 		/** Enable or Disable WebP On Demand via server flag.
@@ -1059,12 +1079,13 @@ if ( ! class_exists( $class ) ) {
 		private static function set_cwebp_on_demand( $set = false ) {
 			/** CWEBP: Code is missing here. */
 
+			// phpcs:enable
 		}
 
 		// phpcs:ignore
 	# endregion
-
 	}
+
 } else {
 	Shared::debug( "Class already exists: $class" );
 }
