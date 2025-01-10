@@ -18,14 +18,15 @@ namespace ddur\Warp_iMagick\Base;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use ddur\Warp_iMagick\Shared;
-use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Dbg;
 use ddur\Warp_iMagick\Base\Plugin\v1\Abstract_Plugin;
 
 $class_name = __NAMESPACE__ . '\\Base_Plugin';
 
 if ( ! class_exists( $class_name ) ) {
-	/** Plugin base class. */
+	/** Plugin base class.
+	 * Instantiates Plugin-Singleton object.
+	 */
 	abstract class Base_Plugin extends Abstract_Plugin {
 		// phpcs:ignore
 	# region Plugin construction.
@@ -36,7 +37,7 @@ if ( ! class_exists( $class_name ) ) {
 		 */
 		private static $me = null;
 
-		/** Once constructor.
+		/** Construct Once.
 		 * Static Singleton Class Constructor.
 		 *
 		 * @param string $file - Magic __FILE__ constant from plugin-entry file.
@@ -48,9 +49,9 @@ if ( ! class_exists( $class_name ) ) {
 			}
 			if ( null === self::$me ) {
 				if ( null === $file ) {
-					Lib::error( 'Missing $file argument' );
+					Dbg::error( 'Missing $file argument' );
 				} else {
-					Lib::error( 'Invalid $file argument' );
+					Dbg::error( 'Invalid $file argument' );
 				}
 			} else {
 				self::$me->init();
@@ -66,7 +67,7 @@ if ( ! class_exists( $class_name ) ) {
 	# endregion
 
 		// phpcs:ignore
-	# region Public Shared Static Access.
+	# region Public Singleton Static Access.
 
 		/** Static access to Class instance. */
 		public static function instance() {
@@ -75,39 +76,7 @@ if ( ! class_exists( $class_name ) ) {
 
 		// phpcs:ignore
 	# endregion
-
-		// phpcs:ignore
-	# region Administrator Notices.
-
-		/** Run-time error-admin-notice handler.
-		 *
-		 * @param string $message to report.
-		 */
-		public static function echo_error_notice( $message = '' ) {
-			if ( is_string( $message ) && trim( $message ) ) {
-				self::echo_admin_notice( $message, 'notice notice-error is-dismissible' );
-			}
-		}
-
-		/** Run-time admin-notice handler.
-		 *
-		 * @param string $message to report.
-		 * @param string $css_class css class.
-		 * @param bool   $esc_html escape.
-		 */
-		public static function echo_admin_notice( $message = '', $css_class = 'notice notice-info is-dismissible', $esc_html = true ) {
-			if ( $message && $css_class ) {
-				if ( true === $esc_html ) {
-					$message = esc_html( $message );
-				}
-				$output = '<div class="' . esc_attr( $css_class ) . '"><p style="white-space:pre"><strong>' . $message . '</strong></p></div>';
-				Lib::echo_html( $output );
-			}
-		}
-
-		// phpcs:ignore
-	# endregion
 	}
 } else {
-	Shared::debug( "Class already exists: $css_name" );
+	Dbg::debug( "Class already exists: $css_name" );
 }

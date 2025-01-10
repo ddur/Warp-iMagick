@@ -13,120 +13,94 @@
  * copyright notice contained within this software package.
  */
 
-/* Highlight opened section (wp-accordion) with italic font */
-.js .accordion-section.open .accordion-section-title{font-style:italic}
-
-/** @since warp-imagick 1.12.
-	Accordion styles in common.css, backward compatibility broken (wp-6.7-branch).
-	Begin - Accordion relevant styles extracted from common.css (wp-6.6-branch).
-*/
-.accordion-section-title:after {
-	content: "\f140";
-	font: normal 20px/1 dashicons;
-	display: block;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	text-decoration: none;
-	color: #787c82;
-	float: right;
-	right: 20px;
-	top: -2px;
-}
-
-.accordion-section-title:hover:after {
-	color: #1d2327;
-	/* Only visible in Windows High Contrast mode */
-	outline: 1px solid transparent;
-}
-
-.accordion-section {
+ .section-accordion {
 	border-bottom: 1px solid #dcdcde;
-	margin: 0;
-}
-
-.accordion-section.open .accordion-section-content,
-.no-js .accordion-section .accordion-section-content {
-	display: block;
-}
-
-.accordion-section.open:hover {
-	border-bottom-color: #dcdcde;
-}
-
-.accordion-section-content {
-	display: none;
-	padding: 10px 20px 15px;
 	overflow: hidden;
-	background: #fff;
 }
-
-.accordion-section-title {
-	margin: 0;
-	padding: 12px 15px 15px;
-	position: relative;
+.section-accordion-container {
+	width: 100%;
+	overflow: hidden;
+	color: black;
+	background-color: #f1f1f1;
+}
+input.section-accordion-toggle {
+	position: absolute;
+	display:none!important;
+	opacity: 0; /* always hidden (transparent) */
+	z-index: -1; /* always hidden below section-accordion-title */
+}
+.section-accordion-title {
+	display: flex;
+	justify-content: space-between;
+	padding-top: 10px;
+	padding-right: 10px;
+	padding-bottom: 10px;
+	padding-left: 15px;
 	border-left: 1px solid #dcdcde;
 	border-right: 1px solid #dcdcde;
-	-webkit-user-select: none;
-	user-select: none;
-}
-
-.js .accordion-section-title {
+	font-size: 1.3em;
+	font-weight: bold;
 	cursor: pointer;
 }
-
-.js .accordion-section-title:after {
-	position: absolute;
-	top: 12px;
-	right: 10px;
-	z-index: 1;
+.section-accordion-title::after {
+	content: "\f140"; /* content: "❯"; */
+	font: normal 20px/1 dashicons;
+	color: #787c82;
+	width: 1em;
+	height: 1em;
+	float: right;
+	transition: all 0.35s;
 }
-
-.accordion-section-title:focus {
-	/* Only visible in Windows High Contrast mode */
-	outline: 1px solid transparent;
+.section-accordion-title:hover {
+	outline: 1px solid darkgray; /* 1px solid/double/inset/outset/groove/ridge color */
 }
-
-.accordion-section-title:hover:after,
-.accordion-section-title:focus:after {
-	border-color: #a7aaad transparent;
-	/* Only visible in Windows High Contrast mode */
-	outline: 1px solid transparent;
+.section-accordion-title:hover:after {
+	color: black;
 }
-
-.cannot-expand .accordion-section-title {
-	cursor: auto;
+input.section-accordion-toggle:checked + .section-accordion-title {
+	font-style:italic;
 }
-
-.cannot-expand .accordion-section-title:after {
+input.section-accordion-toggle:checked + .section-accordion-title:after {
+	transform: rotate(180deg);
+}
+.section-accordion-content {
 	display: none;
+	max-height: 0px;
+	padding-top: 0px;
+	padding-right: 20px;
+	padding-bottom: 0px;
+	padding-left: 20px;
+	margin: 0px;
+	transition: all 0.35s;
 }
-/** @since warp-imagick 1.12.
-	Accordion styles in common.css, backward compatibility broken (wp-6.7-branch).
-	Final - Accordion relevant styles extracted from (wp-6.6-branch) common.css.
-*/
-
+input.section-accordion-toggle:checked ~ .section-accordion-content {
+	display: block;
+	max-height: fit-content;
+}
 
 /* Section submit button */
-.accordion-section .submit-button {
+.section-accordion .submit-button {
 	padding-top:10px;
-	border-top-style: solid;
-	border-top-width: 1px;
-	border-top-color: lightgray;
+	border-top: 1px solid #dcdcde;
+	margin-bottom: 25px; /* distance from section below */
+}
+
+/* section-accordion-content - field title - help cursor */
+.section-accordion-content th>label[for]>div[title] {cursor:help}
+
+/* ---------------------- */
+/* Custom tab-page-header */
+/* ---------------------- */
+.nav-tab-page-header{
+	background-color:#f1f1f1;
+	border:1px solid #ddd;
+	border-top:0px;
+	overflow:hidden;
 }
 
 /* Nav-Tab submit button */
 .nav-tab-page-footer .submit-button {
 	padding:10px 20px;
-	border-top-style: solid;
-	border-top-width: 1px;
-	border-top-color: lightgray;
+	border-top: 1px solid #dcdcde;
 }
 
-/* Align multiple-input dashicons */
-.multiple-input.dashicons-before:before{padding-top:4px}
-
-.accordion-section-content th>label[for]>div[title] {cursor:help}
-
-/* Android 2.3 :checked fix */
-@keyframes fake{from{opacity:1}to{opacity:1}}
-body{animation:fake 1s infinite}

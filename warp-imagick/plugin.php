@@ -16,9 +16,9 @@
 
 namespace ddur\Warp_iMagick;
 
-use ddur\Warp_iMagick\Plugin;
-
 defined( 'ABSPATH' ) || die( -1 );
+
+use ddur\Warp_iMagick\Plugin;
 
 require_once __DIR__ . '/classes/autoloader.php';
 

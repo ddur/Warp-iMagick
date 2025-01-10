@@ -19,8 +19,8 @@ namespace ddur\Warp_iMagick;
 defined( 'ABSPATH' ) || die( -1 );
 
 use ddur\Warp_iMagick\Base\Meta_Settings_Renderer;
-use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
-use ddur\Warp_iMagick\Shared;
+use ddur\Warp_iMagick\Hlp;
+use ddur\Warp_iMagick\Dbg;
 
 $class = __NAMESPACE__ . '\\Settings_Renderer';
 
@@ -54,10 +54,10 @@ if ( ! class_exists( $class ) ) {
 				}
 			}
 
-			$pluginbox = Lib::safe_key_value( $this->settings->get_settings(), array( 'plugin', 'metabox' ), array() );
-			$image_lnk = Lib::safe_key_value( $pluginbox, 'logo', $this->plugin->get_url_path() . '\/assets/warp-logo.png' );
-			$click_lnk = Lib::safe_key_value( $pluginbox, 'link', 'https://warp-imagick.pagespeed.club/' );
-			$box_title = Lib::safe_key_value( $pluginbox, 'name', wp_parse_url( $click_lnk, PHP_URL_HOST ) );
+			$pluginbox = Hlp::safe_key_value( $this->settings->get_settings(), array( 'plugin', 'metabox' ), array() );
+			$image_lnk = Hlp::safe_key_value( $pluginbox, 'logo', $this->plugin->get_url_path() . '\/assets/warp-logo.png' );
+			$click_lnk = Hlp::safe_key_value( $pluginbox, 'link', 'https://warp-imagick.pagespeed.club/' );
+			$box_title = Hlp::safe_key_value( $pluginbox, 'name', wp_parse_url( $click_lnk, PHP_URL_HOST ) );
 			$this->render_hard_meta_box( $image_lnk, $click_lnk, $box_title, 'logo' );
 
 			// phpcs:enable
@@ -68,9 +68,7 @@ if ( ! class_exists( $class ) ) {
 		 * Redirected here from "on_render_settings_page" event handler.
 		 */
 		public function render_page_subtitle() {
-			echo '<div>' . esc_html( Lib::safe_key_value( $this->settings->get_settings(), array( 'page', 'subtitle' ), '' ) ) . '</div>';
-
-			Lib::echo_html( Lib::safe_key_value( $this->settings->get_settings(), array( 'page', 'sub-html' ), '' ) );
+			echo '<div>' . esc_html( Hlp::safe_key_value( $this->settings->get_settings(), array( 'page', 'subtitle' ), '' ) ) . '</div>';
 
 			echo '<div>' . esc_html( __( 'To apply current settings to previously uploaded JPEG/PNG media, use ', 'warp-imagick' ) ) . '<a target=_blank rel="noopener noreferrer" href=https://wordpress.org/plugins/regenerate-thumbnails>Regenerate Thumbnails plugin</a> or <a target=_blank rel="noopener noreferrer" href="https://developer.wordpress.org/cli/commands/media/regenerate/">WP CLI media regenerate command</a>.</div>';
 
@@ -255,7 +253,7 @@ Widest image size used in responsive "srcset" is 2048 pixels (as seen in WordPre
 		 */
 		public function render_webp_thumb_options() {
 			if ( ! function_exists( '\\imagewebp' ) ) {
-				if ( Lib::is_gd_available() ) {
+				if ( Hlp::is_gd_available() ) {
 					?>
 <span style="white-space:pre-line;color:DarkRed"><b>
 Function that generates WebP images is not available in your PHP-GD extension.
@@ -269,7 +267,7 @@ PHP-GD extension is not available.
 					<?php
 				}
 			}
-			if ( Lib::is_gd_available() ) {
+			if ( Hlp::is_gd_available() ) {
 				if ( ! function_exists( '\\imagecreatefromjpeg' ) ) {
 					?>
 <span style="white-space:pre-line;color:DarkRed"><b>
@@ -316,5 +314,5 @@ PHP-GD function missing: imagepalettetotruecolor.
 		}
 	}
 } else {
-	Shared::debug( "Class already exists: $class" );
+	Dbg::debug( "Class already exists: $class" );
 }

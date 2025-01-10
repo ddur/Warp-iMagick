@@ -16,9 +16,8 @@
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use ddur\Warp_iMagick\Shared;
-use ddur\Warp_iMagick\Plugin;
+use ddur\Warp_iMagick\Dbg;
 
 $class = '\\Warp_Image_Editor_Imagick';
 
@@ -190,7 +189,7 @@ if ( ! class_exists( $class ) ) {
 						}
 					}
 				} catch ( Exception $e ) {
-					Lib::error( 'Exception: ' . $e->getMessage() );
+					Dbg::error( 'Exception: ' . $e->getMessage() );
 					return new \WP_Error( 'warp_optimize_error', $e->getMessage() );
 
 				}
@@ -316,7 +315,7 @@ if ( ! class_exists( $class ) ) {
 
 						// phpcs:enable
 					} catch ( Exception $e ) {
-						Lib::error( 'Exception: ' . $e->getMessage() );
+						Dbg::error( 'Exception: ' . $e->getMessage() );
 						return new \WP_Error( 'warp_optimize_error', $e->getMessage() );
 
 					}
@@ -390,7 +389,7 @@ if ( ! class_exists( $class ) ) {
 							}
 						}
 					} catch ( Exception $e ) {
-						Lib::error( 'Exception: ' . $e->getMessage() );
+						Dbg::error( 'Exception: ' . $e->getMessage() );
 						return new \WP_Error( 'warp_optimize_error', $e->getMessage() );
 
 					}
@@ -436,5 +435,5 @@ if ( ! class_exists( $class ) ) {
 		}
 	}
 } else {
-	Shared::debug( "Class already exists: $class" );
+	Dbg::debug( "Class already exists: $class" );
 }

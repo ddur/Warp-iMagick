@@ -18,9 +18,8 @@ namespace ddur\Warp_iMagick\Base;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use ddur\Warp_iMagick\Shared;
-use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use ddur\Warp_iMagick\Base\Base_Settings;
+use ddur\Warp_iMagick\Dbg;
 
 $class = __NAMESPACE__ . '\\Meta_Settings';
 
@@ -50,5 +49,5 @@ if ( ! class_exists( $class ) ) {
 	# endregion
 	}
 } else {
-	Shared::debug( "Class already exists: $class" );
+	Dbg::debug( "Class already exists: $class" );
 }

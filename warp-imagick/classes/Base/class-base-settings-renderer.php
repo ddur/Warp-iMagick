@@ -18,8 +18,7 @@ namespace ddur\Warp_iMagick\Base;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use ddur\Warp_iMagick\Shared;
-use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Dbg;
 
 $call_name = __NAMESPACE__ . '\\Base_Settings_Renderer';
 
@@ -60,71 +59,6 @@ if ( ! class_exists( $call_name ) ) {
 			$this->plugin   = $settings->get_plugin();
 			$this->prefix   = $this->plugin->get_prefix();
 			$this->pageslug = $this->plugin->get_slug();
-
-			add_filter( $this->prefix . '_field_args', array( $this, 'on_field_args' ), 10, 1 );
-			add_filter( $this->prefix . '_field_html', array( $this, 'on_field_html' ), 10, 2 );
-		}
-
-		/** Filter function hook on "field args", adding class attribute.
-		 *
-		 * @param array $args of field properties.
-		 */
-		public function on_field_args( $args ) {
-			$field_type = array_key_exists( 'type', $args ) ? $args ['type'] : '';
-			switch ( $field_type ) {
-				case 'range':
-					$add_class      = 'range-slider';
-					$args ['class'] = array_key_exists( 'class', $args ) ? ( strpos( $args ['class'], $add_class ) === false ? $args ['class'] . ' ' . $add_class : $args ['class'] ) : $add_class;
-					break;
-				default:
-					break;
-			}
-			return $args;
-		}
-
-		/** Filter function hook on "field html", wrapping html.
-		 *
-		 * @param string $html code of field.
-		 * @param array  $args of field properties.
-		 */
-		public function on_field_html( $html, $args ) {
-			$field_type = array_key_exists( 'type', $args ) ? $args ['type'] : '';
-			switch ( $field_type ) {
-				case 'checkbox':
-					if ( array_key_exists( 'id', $args ) ) {
-						$html = '<div class="' . esc_attr( $this->pageslug ) . '-checkbox checkbox admin-color">' .
-						$html . '<label for="' . esc_attr( $args ['id'] ) . '"></label></div>';
-					}
-					break;
-				case 'range':
-					if ( array_key_exists( 'id', $args )
-					&& array_key_exists( 'value', $args ) ) {
-						$id          = esc_attr( $args ['id'] );
-						$value       = esc_html( $args ['value'] );
-						$units       = esc_html( array_key_exists( 'units', $args ['options'] ) ? $args ['options']['units'] : '' );
-						$range_class = esc_attr( 'range-slider' );
-						$color_class = esc_attr( 'admin-color' );
-						$html        = "<div class=\"$range_class\"><div class=\"$color_class\">" . $html . "</div><output id=\"{$id}_out\" for=\"$id\">$value</output>&nbsp;$units</div>";
-					}
-					break;
-				case 'submit':
-					ob_start();
-					$field_settings = array(
-						'settings' => array(
-							'type'  => 'checkbox',
-							'fn'    => 'submit-enable',
-							'id'    => 'submit-enable-' . uniqid(),
-							'name'  => 'submit-enable',
-							'style' => '',
-						),
-					);
-					$this->settings->render_checkbox_input_field( $field_settings );
-					$html = $html . '&nbsp;&nbsp;' . ob_get_clean();
-					break;
-				default:
-					break;
-			}
-			return $html;
 		}
 
 		/** Render hard (fixed not-re/movable) Meta-Box.
@@ -165,5 +99,5 @@ if ( ! class_exists( $call_name ) ) {
 		}
 	}
 } else {
-	Shared::debug( "Class already exists: $call_name" );
+	Dbg::debug( "Class already exists: $call_name" );
 }

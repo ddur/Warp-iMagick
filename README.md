@@ -1,12 +1,12 @@
 [![WP Version compatible](https://img.shields.io/badge/WP%205.3--6.7.1-compatible%20(after%20update)-darkgreen)](https://wordpress.org/download/releases/#branch-53)
 [![PHP Version compatible](https://img.shields.io/badge/PHP%207.4/8.1/8.2-compatible-darkgreen)](https://www.php.net/supported-versions.php)
-[![WordOps compatible](https://img.shields.io/badge/WordOps-compatible-darkgreen)](https://wordops.net/) 
+[![WordOps compatible](https://img.shields.io/badge/WordOps-compatible-darkgreen)](https://wordops.net/)
 
-# Warp iMagick - WebP Converter - Plugin 4 WordPress. Resize, Optimize, Sharpen, Compress, Regenerate, Convert to WebP Clones - Next Gen Image Format.
+# Warp iMagick - WebP Converter - Plugin 4 WordPress. Resize, Optimize, Sharpen, Compress, Regenerate, Convert/Clone to WebP - Next Generation Image Format.
 
-* Unlike almost all of other WordPress Image Optimizer Plugins, this plugin is __NOT__ just connector to external Image Optimization Service. Image Optimization is performed by your WordPress site server, free and at the "expense" of your hosting provider CPU time. No external image optimization service/signup required. No limits in number or megabytes of optimized images. No risky/external binaries required to install on your site server. Plugin uses only safe PHP extension software available or installed on your server by your hosting provider: PHP-imagick and PHP-GD. **If you find any comparable and free plugin that is compressing images without using external service, please let me know 😎.**
+* Unlike almost all of other WordPress Image Optimizer Plugins, this plugin is __NOT__ just connector to external Image Optimization Service. Image Optimization is performed by your WordPress site server, free and at the "expense" of your hosting provider CPU time. No external image optimization service/signup required. No limits in number or megabytes of optimized images. No risky/external binaries required to install on your site server. Plugin uses only safe PHP extension software available or installed on your server by your hosting provider: PHP-imagick and PHP-GD.
 
-* Unlike some other WordPress Image Optimization Plugins, this plugin allows you to regenerate images to high-compression/low-quality and back to high-quality/low-compression images. You can't overcompress or unrecoverably degrade images quality by regenerating thumbnails again and again. Uploaded original image quality is always preserved. In some other plugins, once original image is (re) compressed to lower compression quality then on next regeneration, original and regenerated thumbnails are permanently degraded in quality. In this plugin, instead of compressing original, attached image is replaced with optimized version of original, but that can be disabled if you want to show high quality original photo to site visitors.
+* Unlike some other WordPress Image Optimization Plugins, this plugin allows you to regenerate images to high-compression/low-quality and back to high-quality/low-compression images. You can't overcompress or unrecoverably degrade images quality by regenerating thumbnails again and again. Uploaded original image quality is always preserved. In some other plugins, once original image is (re) compressed to lower compression quality then on next regeneration, original and regenerated thumbnails are permanently degraded in quality. In this plugin, instead of compressing uploaded original, attached image is replaced with optimized version of uploaded original, but that can be disabled if you want to show high quality original upload photo to site visitors.
 
 * Unlike any other plugin I have seen, this plugin has real visual size preview of media image and all generated thumbnails, including WebP clones. When mouse hovers over any image in a preview, a tooltip is shown with size-name (webp clone), pixel-size, file-name and byte-size.
 
@@ -26,32 +26,9 @@
 
 * Plugin is extended with [YahnisElsts/plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker) in order to replace WordPress.org hosting & update service.
 
-* Tested with WordPress version 5.3 - 6.4 (6.7.1 after update) Compatible with PHP version 7.3 up to and including 8.2.
+* Tested with WordPress version 5.3 - 6.7.1 Compatible with PHP version 7.3 up to and including 8.2.
 
 * Tested with Apache Server and NGinx Server on [WordOps](https://github.com/WordOps/WordOps) configuration.
-
-* My favorite comment (later removed by someone):
-> WordPress.org Forums <noreply@wordpress.org>
-> Jan 19, 2021, 8:26 PM
-> undisclosed wrote:
-> 
-> Thank you so much for an amazing plugin, Helped my website from 7 seconds to 2.5 seconds!!! keep up the great work!
-
-* If you like and/or or use this plugin, please share it with your colegues, friends and please award this project with a __GitHub Star__ (see top right on this page).
-
-
-# Share
-
-* [![Facebook share](https://img.shields.io/badge/Share%20on-Facebook-darkblue)](https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fgithub.com%2Fddur%2FWarp-iMagick%2F)
-
-* [![Twitter share](https://img.shields.io/badge/Share%20on-Twitter-blue)](https://twitter.com/intent/tweet?url=https%3A%2F%2Fgithub.com%2Fddur%2FWarp-iMagick%2F&amp;text=Warp%20iMagick%20WordPress%20Image%20Compressor%20Plugin%3A%20)
-
-
-# Listed on
-
-* [14 Best WordPress Plugins for Using WebP Images](https://www.cloudzat.com/webp-images-wordpress-plugins/)
-* [Awesome WP Speed Up - Image Optimization Plugins](https://github.com/lukecav/awesome-wp-speed-up#image-optimization-plugins)
-
 
 # Do not install last WordPress release - Version 1.9.6:
 
@@ -74,19 +51,6 @@
 * Go to [Plugin Update Server](https://warp-imagick.pagespeed.club/)
 * Press [Download Plugin] button and download & save free Warp iMagick plugin.
 * Use Your Wordpress Site Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select just downloaded warp-imagick.zip file. Follow WordPress instructions ....
-
-
-# Register for Automated Updates:
-
-* Open Your Wordpress Site Warp-iMagick Plugin Settings Page at "General Settings" Tab -> "Plugin Settings" Section. Select and copy text from "Plugin Update Hostname" field.
-* In another browser Tab/Window, open [Plugin Update Server](https://warp-imagick.pagespeed.club/), press [Automatic Updates] button, (register &) login. In your user profile go to section "Application Passwords". Paste copied "Plugin Update Hostname" into "New Application Password Name" field. Press "Add New Application Password" button and you will be presented with your new password. Copy text from "new password".
-* Go back to your Wordpress Site at Warp-iMagick Plugin Settings Page -> General Settings Tab -> Plugin Settings Section and paste your new password into "Plugin Update Password" Field.
-* Press [Save Changes] Button.
-* __Note__: __Your email will NEVER be sold to anyone or used for spam purposes.__
-* __Note__: __You can delete your Update Server user profile and email at any time.__
-* __Note__: __You can add/register and get update passwords for more than one Warp iMagick Plugin (for each site/host/domain where is installed).__ Each Warp iMagick Plugin has different "Plugin Update Password" for every WordPress site (hostname).
-* __Note__: Without registration and password, plugin should let you know that new update is available but may fail to download & update plugin via WordPress administration panel/interface, either on-click-update or auto-update. In that case you may still have option to download/update plugin from Update Server as described in section above.
-
 
 # __Post Install: Apache Server WebP Configuration:__
 
@@ -140,6 +104,6 @@ No Nginx configuration changes are required to automatically serve Webp images t
 
 # __Post Install: [Open Litespeed](https://openlitespeed.org/) WebP Configuration:__
 
-Using Open Litespeed was never tested nor recommended for this plugin. I especially discourage you from buying services from a2hosting which has redistributed WP versions (below 1.9.6) of Warp iMagick plugin privatelly, only to it's paying clients. They used Warp iMagick name for advertizing purposes without linking to plugin web page. Although they probably having thousands of Warp iMagick plugin installs, they refused to cooperate with plugin author. I do not know what version or modifications you got from them. Plugin support will be provided only to latest original unmodified version released by author. So, if you are client of a2hosting with older or modified Warp iMagick plugin, do not expect help here.
+Using Open Litespeed was never tested nor recommended for this plugin.
 
 :vulcan_salute:

@@ -18,7 +18,7 @@ namespace ddur\Warp_iMagick\Base\Plugin\v1;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Dbg;
 
 if ( ! class_exists( __NAMESPACE__ . '\Abstract_Plugin' ) ) {
 	/** Derive your plugin class from this abstract class.
@@ -110,7 +110,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Plugin' ) ) {
 		protected function __construct( $file ) {
 			$this->file = $file;
 
-			if ( Lib::is_debug() ) {
+			if ( Dbg::is_debug() ) {
 				$msg = array();
 				if ( ! is_string( $file ) ) {
 					$msg [] = __METHOD__ . ': Argument $file is not a string (filename)';
@@ -118,7 +118,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Plugin' ) ) {
 					$msg [] = __METHOD__ . ": File $file does not exists";
 				}
 				if ( ! empty( $msg ) ) {
-					Lib::error( implode( PHP_EOL, $msg ) );
+					Dbg::error( implode( PHP_EOL, $msg ) );
 					foreach ( $msg as $msg_line ) {
 						echo '<p>';
 						echo esc_html( $msg_line );

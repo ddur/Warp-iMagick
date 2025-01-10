@@ -19,9 +19,10 @@ namespace ddur\Warp_iMagick\Base;
 defined( 'ABSPATH' ) || die( -1 );
 
 use ddur\Warp_iMagick\Shared;
-use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use ddur\Warp_iMagick\Base\Plugin\v1\Abstract_Settings;
 use ddur\Warp_iMagick\Base\Plugin\v1\Abstract_Plugin;
+use ddur\Warp_iMagick\Hlp;
+use ddur\Warp_iMagick\Dbg;
 
 $class_name = __NAMESPACE__ . '\\Base_Settings';
 
@@ -51,14 +52,14 @@ if ( ! class_exists( $class_name ) ) {
 
 				} catch ( \Exception $e ) {
 					self::$me = null;
-					Lib::error( $e->getMessage() );
+					Dbg::error( $e->getMessage() );
 				}
 			}
 			if ( null === self::$me ) {
 				if ( null === $plugin ) {
-					Lib::error( 'Missing $plugin argument' );
+					Dbg::error( 'Missing $plugin argument' );
 				} elseif ( ! $plugin instanceof Abstract_Plugin ) {
-					Lib::error( 'Invalid $plugin argument' );
+					Dbg::error( 'Invalid $plugin argument' );
 				}
 			}
 			return self::$me;
@@ -231,10 +232,10 @@ if ( ! class_exists( $class_name ) ) {
 		protected function set_dynamic_menu_position( &$values ) {
 			$this->set_dynamic_configuration( $values );
 
-			$config_menu_parent = Lib::safe_key_value( $this->settings, array( 'menu', 'parent-slug' ), '' );
+			$config_menu_parent = Hlp::safe_key_value( $this->settings, array( 'menu', 'parent-slug' ), '' );
 
 			if ( ! self::is_valid_menu_parent_slug( $config_menu_parent ) ) {
-				$config_menu_parent = abs( Lib::safe_key_value( $this->settings, array( 'menu', 'position' ), 0 ) );
+				$config_menu_parent = abs( Hlp::safe_key_value( $this->settings, array( 'menu', 'position' ), 0 ) );
 			}
 
 			$menu_input = $values ['menu-parent-slug'];
@@ -279,5 +280,5 @@ if ( ! class_exists( $class_name ) ) {
 	# endregion
 	}
 } else {
-	Shared::debug( "Class already exists: $class_name " );
+	Dbg::debug( "Class already exists: $class_name " );
 }

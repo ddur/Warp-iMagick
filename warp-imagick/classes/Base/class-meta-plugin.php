@@ -21,10 +21,11 @@ defined( 'ABSPATH' ) || die( -1 );
 require_once __DIR__ . '/plugin-update-checker-5.3/load-v5p3.php';
 
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
-use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use ddur\Warp_iMagick\Base\Base_Plugin;
 use ddur\Warp_iMagick\Settings;
 use ddur\Warp_iMagick\Shared;
+use ddur\Warp_iMagick\Hlp;
+use ddur\Warp_iMagick\Dbg;
 
 $class_name = __NAMESPACE__ . '\\Meta_Plugin';
 
@@ -112,10 +113,10 @@ if ( ! class_exists( $class_name ) ) {
 						return $success;
 					}
 
-					if ( 'plugin' !== Lib::safe_key_value( $hook_extra, 'type', '', false ) ) {
+					if ( 'plugin' !== Hlp::safe_key_value( $hook_extra, 'type', '', false ) ) {
 						// phpcs:enable
 
-						if ( $this->get_basename() !== Lib::safe_key_value( $hook_extra, 'plugin', '', false ) ) {
+						if ( $this->get_basename() !== Hlp::safe_key_value( $hook_extra, 'plugin', '', false ) ) {
 							sleep( 0 );
 
 							return $success;
@@ -123,10 +124,10 @@ if ( ! class_exists( $class_name ) ) {
 						}
 					}
 
-					$destination_name = Lib::safe_key_value( $result, 'destination_name', '', '' );
+					$destination_name = Hlp::safe_key_value( $result, 'destination_name', '', '' );
 					if ( $this->get_slug() !== $destination_name ) {
 						if ( empty( $destination_name ) ) {
-							$destination = Lib::safe_key_value( $result, 'destination', '', false );
+							$destination = Hlp::safe_key_value( $result, 'destination', '', false );
 							if ( $this->get_path() !== $destination ) {
 								sleep( 0 );
 
@@ -195,7 +196,7 @@ if ( ! class_exists( $class_name ) ) {
 						return;
 					}
 
-					if ( 'plugin' !== Lib::safe_key_value( $hook_extra, 'type', '', false ) ) {
+					if ( 'plugin' !== Hlp::safe_key_value( $hook_extra, 'type', '', false ) ) {
 						sleep( 0 );
 
 						return;
@@ -203,13 +204,13 @@ if ( ! class_exists( $class_name ) ) {
 
 					// phpcs:enable
 
-					$process_action = Lib::safe_key_value( $hook_extra, 'action', '', 'unset' );
+					$process_action = Hlp::safe_key_value( $hook_extra, 'action', '', 'unset' );
 
 					switch ( $process_action ) {
 						case 'update':
 							sleep( 0 );
 
-							$process_plugins = Lib::safe_key_value( $hook_extra, 'plugins', array(), false );
+							$process_plugins = Hlp::safe_key_value( $hook_extra, 'plugins', array(), false );
 
 							if ( ! is_array( $process_plugins ) ) {
 								sleep( 0 );
@@ -230,7 +231,7 @@ if ( ! class_exists( $class_name ) ) {
 						case 'install':
 							sleep( 0 );
 
-							$result = Lib::safe_key_value( (array) $upgrader_instance, 'result', array(), false );
+							$result = Hlp::safe_key_value( (array) $upgrader_instance, 'result', array(), false );
 							sleep( 0 );
 
 							if ( is_wp_error( $result ) ) {
@@ -245,10 +246,10 @@ if ( ! class_exists( $class_name ) ) {
 								return;
 							}
 
-							$destination_name = Lib::safe_key_value( $result, 'destination_name', '', '' );
+							$destination_name = Hlp::safe_key_value( $result, 'destination_name', '', '' );
 							if ( $this->get_slug() !== $destination_name ) {
 								if ( empty( $destination_name ) ) {
-									$destination = Lib::safe_key_value( $result, 'destination', '', false );
+									$destination = Hlp::safe_key_value( $result, 'destination', '', false );
 									if ( $this->get_path() !== $destination ) {
 										sleep( 0 );
 
@@ -297,7 +298,7 @@ if ( ! class_exists( $class_name ) ) {
 		 */
 		protected function plugin_upgrade_checker( $uplink = '' ) {
 			if ( ! is_string( $uplink ) ) {
-				Lib::error( 'Argument $uplink is not a string ( ' . gettype( $uplink ) . ' ).' );
+				Dbg::error( 'Argument $uplink is not a string ( ' . gettype( $uplink ) . ' ).' );
 				return;
 
 			}
@@ -312,12 +313,12 @@ if ( ! class_exists( $class_name ) ) {
 				/** Set default updates server site */
 				$uplink = $protocol . $this->get_slug() . '.pagespeed.club' . $endpoint;
 
-				if ( Lib::ends_with( gethostname(), '.host.lan' ) ) {
+				if ( Hlp::ends_with( gethostname(), '.host.lan' ) ) {
 					/** This site is running on private LAN hostname */
 					sleep( 0 );
 
-					if ( Lib::ends_with( $plugin_host, '.site.lan' )
-					|| Lib::ends_with( $plugin_host, '.host.lan' ) ) {
+					if ( Hlp::ends_with( $plugin_host, '.site.lan' )
+					|| Hlp::ends_with( $plugin_host, '.host.lan' ) ) {
 						/** This site is running on private LAN test environment
 						 * Set $uplink to private LAN test updates server.
 						*/
@@ -583,7 +584,7 @@ if ( ! class_exists( $class_name ) ) {
 				$e_u_m_options = get_site_option( 'MPSUM' );
 
 				if ( is_array( $e_u_m_options ) ) {
-					$e_u_m_options_updates = Lib::safe_key_value( $e_u_m_options, array( 'core', 'plugin_updates' ), '' );
+					$e_u_m_options_updates = Hlp::safe_key_value( $e_u_m_options, array( 'core', 'plugin_updates' ), '' );
 					switch ( $e_u_m_options_updates ) {
 						case 'automatic':
 							sleep( 0 );
@@ -591,7 +592,7 @@ if ( ! class_exists( $class_name ) ) {
 							return true;
 
 						case 'individual':
-							$e_u_m_options_automatic = Lib::safe_key_value( $e_u_m_options, 'plugins_automatic', array() );
+							$e_u_m_options_automatic = Hlp::safe_key_value( $e_u_m_options, 'plugins_automatic', array() );
 							if ( is_array( $e_u_m_options_automatic )
 								&& count( $e_u_m_options_automatic ) ) {
 								if ( in_array( $basename, $e_u_m_options_automatic, true ) ) {
@@ -649,5 +650,5 @@ if ( ! class_exists( $class_name ) ) {
 	# endregion
 	}
 } else {
-	Shared::debug( "Class already exists: $class" );
+	Dbg::debug( "Class already exists: $class" );
 }

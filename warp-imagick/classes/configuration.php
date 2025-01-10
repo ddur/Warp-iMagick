@@ -16,10 +16,10 @@
 
 namespace ddur\Warp_iMagick;
 
-use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
-use ddur\Warp_iMagick\Shared;
-
 defined( 'ABSPATH' ) || die( -1 );
+
+use ddur\Warp_iMagick\Shared;
+use ddur\Warp_iMagick\Dbg;
 
 return array(
 
@@ -558,7 +558,7 @@ document.getElementById("copy-to-clipboard")
 
 				'verbose-debug-enabled'      => array(
 					'label'   => __( 'Verbose Debug', 'warp-imagick' ),
-					'type'    => Lib::is_debug() ? 'checkbox' : 'hidden',
+					'type'    => Dbg::is_debug() ? 'checkbox' : 'hidden',
 					'style'   => 'width:200px',
 					'default' => Shared::verbose_debug_enabled_value_default(),
 					'title'   => __( 'Allow all debug messages', 'warp-imagick' ),

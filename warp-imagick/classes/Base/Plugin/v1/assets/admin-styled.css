@@ -13,16 +13,6 @@
  * copyright notice contained within this software package.
  */
 
-/* ---------------------- */
-/* Custom tab-page-header */
-/* ---------------------- */
-.nav-tab-page-header{
-	background-color:#f1f1f1;
-	border:1px solid #ddd;
-	border-top:0px;
-	overflow:hidden;
-}
-
 /* admin styles */
 :root {
 	--admin-color:#999999;
@@ -81,17 +71,6 @@
 div.range-slider {
 	display:flex;
 }
-
-div.range-slider div.admin-color{
-	position: relative;
-	top: -4px; /* Initial Slider offset */
-}
-
-div.range-slider output {
-	position: relative;
-	top:2px;
-}
-
 input[type=range].range-slider {
 	position: relative;
 	top:5px;
@@ -122,6 +101,7 @@ input[type=range].range-slider::-moz-range-thumb {
 	background-color: #ffffff;
 	border-color: currentColor;
 }
+/**/
 
 /* Chrome */
 input[type=range].range-slider::-webkit-slider-runnable-track {
@@ -146,8 +126,9 @@ input[type=range].range-slider::-webkit-slider-thumb {
 	background-color: #ffffff;
 	border-color: currentColor;
 }
+/**/
 
-/* Explorer */
+/* Explorer TODO: not supported - remove */
 input[type=range].range-slider::-ms-track {
 	height: 6px;
 	cursor: pointer;
@@ -157,7 +138,7 @@ input[type=range].range-slider::-ms-track {
 	background-color: currentColor;
 }
 input[type=range].range-slider::-ms-thumb {
-	margin:12px 0px; /* forces -ms-thumb to center vertically over -ms-track */
+
 	height: 12px;
 	width: 12px;
 	cursor: pointer;
@@ -166,6 +147,8 @@ input[type=range].range-slider::-ms-thumb {
 	background-color: #ffffff;
 	border-color: currentColor;
 }
+/**/
+/* Above margin:12px 0px; forces -ms-thumb to center vertically over -ms-track */
 
 /* Chosen select */
 select.chosen-select {
@@ -173,6 +156,3 @@ select.chosen-select {
 }
 
 div.chosen-drop {margin-bottom:5px} /* only chrome */
-
-/* Let chosen-select drop-down overflow to be visible when expanded */
-.js div.accordion-section.open div.accordion-section-content{overflow:visible}

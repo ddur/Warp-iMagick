@@ -18,10 +18,10 @@ namespace ddur\Warp_iMagick;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use ddur\Warp_iMagick\Base\Meta_Plugin;
 use ddur\Warp_iMagick\Settings;
 use ddur\Warp_iMagick\Shared;
+use ddur\Warp_iMagick\Hlp;
 
 $class = __NAMESPACE__ . '\\Plugin';
 
@@ -279,18 +279,18 @@ if ( ! class_exists( $class ) ) {
 			}
 
 			if ( 0 === $attachment_id ) {
-				Lib::error( 'No $attachment_id arg provided.' );
+				Dbg::error( 'No $attachment_id arg provided.' );
 				return $metadata;
 			}
 
 			if ( ! self::is_valid_metadata( $metadata ) ) {
-				Lib::error( 'Invalid $metadata - $attachment_id: ' . $attachment_id );
+				Dbg::error( 'Invalid $metadata - $attachment_id: ' . $attachment_id );
 				return $metadata;
 			}
 
 			if ( ! is_string( $metadata['file'] )
 			|| empty( $metadata['file'] ) ) {
-				Lib::error( 'Invalid $metadata[file] - $attachment_id: ' . $attachment_id );
+				Dbg::error( 'Invalid $metadata[file] - $attachment_id: ' . $attachment_id );
 				return $metadata;
 			}
 
@@ -421,13 +421,13 @@ if ( ! class_exists( $class ) ) {
 		/** WordPress Init */
 		public function handle_wordpress_init() {
 			parent::handle_wordpress_init();
-			$this->cwebp_endpoint_enabled();
-			$this->disable_perflab_upload();
+			$this->cwebp_endpoint_do_init();
+			$this->perflab_upload_disable();
 
 			/** Check if plugin activation requirements failed?
 			 *
-			 * Property $this->my_is_disabled will
-			 * be set to false or array of strings.
+			 * Property $this->my_is_disabled will be
+			 * set to false or array of error strings
 			 */
 			$this->set_disabled( get_option( $this->get_option_id() . '-disabled', false ) );
 
@@ -463,10 +463,10 @@ if ( ! class_exists( $class ) ) {
 
 			/** User has access to 'upload_files' ? */
 			if ( $this->get_current_user_can( 'upload_files' )
-			|| Lib::is_wp_cli() ) {
+			|| Hlp::is_wp_cli() ) {
 				$this->add_preview_thumbnails_template();
 				$this->set_my_wp_upload_basedir();
-				Lib::auto_hook( $this );
+				Hlp::auto_hook( $this );
 			}
 		}
 
@@ -614,7 +614,7 @@ if ( ! class_exists( $class ) ) {
 		public function on_intermediate_image_sizes_advanced_99_filter( $sizes, $metadata = false, $attachment_id = false ) {
 			/** Since 1.1.12, only WP version >= 5.3 supported */
 			if ( ! \function_exists( '\\wp_get_original_image_path' ) ) {
-				Lib::error( 'WordPress versions below 5.3 are not supported' );
+				Dbg::error( 'WordPress versions below 5.3 are not supported' );
 				return $sizes;
 			}
 
@@ -624,7 +624,7 @@ if ( ! class_exists( $class ) ) {
 				 * See: wp-admin/includes/ajax-actions.php:3901!
 				 */
 
-				Lib::error( '$sizes is not an array.' );
+				Dbg::error( '$sizes is not an array.' );
 				return $sizes;
 			}
 
@@ -633,7 +633,7 @@ if ( ! class_exists( $class ) ) {
 				 * Not an error because this may be a valid filter call.
 				 * See: wp-admin/includes/ajax-actions.php:3901!
 				 */
-				Lib::error( '$metadata is not an array.' );
+				Dbg::error( '$metadata is not an array.' );
 				return $sizes;
 			}
 
@@ -645,13 +645,13 @@ if ( ! class_exists( $class ) ) {
 				 * without here required @param $attachment_id, which hopefully wont be changed soon or ever,
 				 * because WP-CLI media regenerate should work with WordPress versions less than 5.3.
 				 */
-				Lib::error( 'Argument $attachment_id === false' );
+				Dbg::error( 'Argument $attachment_id === false' );
 				return $sizes;
 			}
 
 			if ( ! is_int( $attachment_id ) || 0 >= $attachment_id ) {
 				/** Required parameter $attachment_id is not an integer with value greater than 0 (zero). */
-				Lib::error( 'Argument $attachment_id has invalid type or value' );
+				Dbg::error( 'Argument $attachment_id has invalid type or value' );
 				return $sizes;
 			}
 
@@ -667,39 +667,39 @@ if ( ! class_exists( $class ) ) {
 			 * just before calling wp_create_image_subsizes with next attachment ID.
 			 */
 			if ( $this->my_gen_attach_id !== $attachment_id ) {
-				if ( Lib::is_wp_cli() ) {
+				if ( Hlp::is_wp_cli() ) {
 					sleep( 0 );
 
 				} else {
-					Lib::error( 'Calling "intermediate_image_sizes_advanced" outside of function scope: wp_create_image_subsizes( _, $attachment_id ) is ' . $attachment_id . ', expected: ' . $this->my_gen_attach_id . ' !' );
+					Dbg::error( 'Calling "intermediate_image_sizes_advanced" outside of function scope: wp_create_image_subsizes( _, $attachment_id ) is ' . $attachment_id . ', expected: ' . $this->my_gen_attach_id . ' !' );
 				}
 				return $sizes;
 
 			}
 
 			if ( ! array_key_exists( 'file', $metadata ) ) {
-				Lib::error( 'Image [file] is missing from $metadata.' );
+				Dbg::error( 'Image [file] is missing from $metadata.' );
 				return $sizes;
 			}
 
 			if ( ! array_key_exists( 'width', $metadata ) ) {
-				Lib::error( 'Image [width] is missing from $metadata.' );
+				Dbg::error( 'Image [width] is missing from $metadata.' );
 				return $sizes;
 			}
 
 			if ( ! array_key_exists( 'height', $metadata ) ) {
-				Lib::error( 'Image [height] is missing from $metadata.' );
+				Dbg::error( 'Image [height] is missing from $metadata.' );
 				return $sizes;
 			}
 
 			if ( ! array_key_exists( 'sizes', $metadata ) || ! is_array( $metadata['sizes'] ) ) {
-				Lib::error( 'Image [sizes] is missing from $metadata.' );
+				Dbg::error( 'Image [sizes] is missing from $metadata.' );
 				return $sizes;
 			}
 
 			$new_file_path = $this->get_absolute_upload_file_path( $metadata['file'] );
 			if ( ! file_exists( $new_file_path ) ) {
-				Lib::error( 'File ' . $metadata['file'] . ' not found in upload directory.' );
+				Dbg::error( 'File ' . $metadata['file'] . ' not found in upload directory.' );
 				return $sizes;
 			}
 
@@ -719,24 +719,24 @@ if ( ! class_exists( $class ) ) {
 
 					break;
 				default:
-					Lib::error( 'Regenerate wp_create_image_subsizes( $file, _ ) doesn\'t match [file] or [original_image]' );
+					Dbg::error( 'Regenerate wp_create_image_subsizes( $file, _ ) doesn\'t match [file] or [original_image]' );
 					return $sizes;
 			}
 
 			$attachment = get_post( $attachment_id );
 			if ( ! is_a( $attachment, '\\WP_Post' ) ) {
-				Lib::error( 'Invalid attachment ID (can\'t get attachment WP_Post object).' );
+				Dbg::error( 'Invalid attachment ID (can\'t get attachment WP_Post object).' );
 				return $sizes;
 			}
 
 			if ( 'attachment' !== $attachment->post_type ) {
-				Lib::error( 'Invalid attached post-type (not an \'attachment\' type but \'' . $attachment->post_type . '\').' );
+				Dbg::error( 'Invalid attached post-type (not an \'attachment\' type but \'' . $attachment->post_type . '\').' );
 				return $sizes;
 			}
 
 			$post_mime_type = $attachment->post_mime_type;
 			if ( empty( $post_mime_type ) || 0 !== strpos( $post_mime_type, 'image/' ) ) {
-				Lib::error( 'Attachment mime-type is not an image mime-type: ' . $post_mime_type . '.' );
+				Dbg::error( 'Attachment mime-type is not an image mime-type: ' . $post_mime_type . '.' );
 				return $sizes;
 			}
 
@@ -744,7 +744,7 @@ if ( ! class_exists( $class ) ) {
 			$image_mime_type = $image_mime_type['type'];
 
 			if ( $post_mime_type !== $image_mime_type ) {
-				Lib::error( 'Post mime-type doesn\'t match main/attached image mime-type :' . $post_mime_type . '.' );
+				Dbg::error( 'Post mime-type doesn\'t match main/attached image mime-type :' . $post_mime_type . '.' );
 				return $sizes;
 			}
 
@@ -754,7 +754,7 @@ if ( ! class_exists( $class ) ) {
 					$this->my_mime_type = $image_mime_type;
 					break;
 				default:
-					Lib::error( 'Post mime-type is not equal to JPEG or PNG image type:' . $post_mime_type . '.' );
+					Dbg::error( 'Post mime-type is not equal to JPEG or PNG image type:' . $post_mime_type . '.' );
 					return $sizes;
 			}
 
@@ -765,12 +765,12 @@ if ( ! class_exists( $class ) ) {
 
 			$this->my_image_state = '';
 
-			$old_metadata = Lib::safe_key_value( $this->my_save_metadata, '_wp_attachment_metadata', array(), false );
-			$old_attached = Lib::safe_key_value( $this->my_save_metadata, '_wp_attached_file', '', false );
-			$backup_sizes = Lib::safe_key_value( $this->my_save_metadata, '_wp_attachment_backup_sizes', array(), false );
+			$old_metadata = Hlp::safe_key_value( $this->my_save_metadata, '_wp_attachment_metadata', array(), false );
+			$old_attached = Hlp::safe_key_value( $this->my_save_metadata, '_wp_attached_file', '', false );
+			$backup_sizes = Hlp::safe_key_value( $this->my_save_metadata, '_wp_attachment_backup_sizes', array(), false );
 
 			$is_regenerate = false !== $old_metadata;
-			if ( Lib::is_debug() && $is_regenerate === $this->my_is_upload ) {
+			if ( Dbg::is_debug() && $is_regenerate === $this->my_is_upload ) {
 				sleep( 0 );
 
 			}
@@ -802,23 +802,23 @@ if ( ! class_exists( $class ) ) {
 				if ( empty( $old_metadata ) ) {
 					sleep( 0 );
 
-					Lib::error( 'Old metadata is not available (not saved before regenerate)!' );
+					Dbg::error( 'Old metadata is not available (not saved before regenerate)!' );
 					return $sizes;
 				}
 
-				$old_file_name = Lib::safe_key_value( $old_metadata, 'file', '', false );
+				$old_file_name = Hlp::safe_key_value( $old_metadata, 'file', '', false );
 				$old_file_path = $old_file_name ? $this->get_absolute_upload_file_path( $old_file_name ) : false;
 
 				if ( $old_file_name && ! \file_exists( $old_file_path ) ) {
-					Lib::error( "Old metadata[file] does not exists on regenerate ( $old_file_name )." );
+					Dbg::error( "Old metadata[file] does not exists on regenerate ( $old_file_name )." );
 					return $sizes;
 				}
 
-				$old_orig_name = Lib::safe_key_value( $old_metadata, 'original_image', '', false );
+				$old_orig_name = Hlp::safe_key_value( $old_metadata, 'original_image', '', false );
 				$old_orig_path = $old_orig_name ? \path_join( dirname( $old_file_path ), $old_orig_name ) : false;
 
 				if ( $old_orig_name && ! \file_exists( $old_orig_path ) ) {
-					Lib::error( "Old metadata[original_image] does not exists on regenerate ( $old_orig_name )." );
+					Dbg::error( "Old metadata[original_image] does not exists on regenerate ( $old_orig_name )." );
 					return $sizes;
 				}
 
@@ -908,7 +908,7 @@ if ( ! class_exists( $class ) ) {
 							}
 						}
 					} else {
-						Lib::error( 'Image is user-edited but $backup_sizes[full-orig][file] is empty.' );
+						Dbg::error( 'Image is user-edited but $backup_sizes[full-orig][file] is empty.' );
 						$warp_original = wp_basename( $this->my_gen_file_path );
 					}
 				} else {
@@ -970,7 +970,7 @@ if ( ! class_exists( $class ) ) {
 					$orig_name = pathinfo( $metadata['original_image'], PATHINFO_FILENAME );
 					$file_name = pathinfo( $metadata['file'], PATHINFO_FILENAME );
 
-					if ( Lib::starts_with( $file_name, $orig_name ) ) {
+					if ( Hlp::starts_with( $file_name, $orig_name ) ) {
 						if ( $orig_name . '-scaled' === $file_name ) {
 							$this->my_image_state = 'scaled';
 						} elseif ( $orig_name . '-rotated' === $file_name ) {
@@ -985,13 +985,13 @@ if ( ! class_exists( $class ) ) {
 							 */
 							sleep( 0 );
 
-							Lib::error( 'Unexpected: [file]-suffix is not recognized: ' . $file_name . '.' );
+							Dbg::error( 'Unexpected: [file]-suffix is not recognized: ' . $file_name . '.' );
 							return $sizes;
 						}
 					} else {
 						sleep( 0 );
 
-						Lib::error( 'Unexpected: $file_name (' . $file_name . ' does not start with $orig_name (' . $orig_name . ').' );
+						Dbg::error( 'Unexpected: $file_name (' . $file_name . ' does not start with $orig_name (' . $orig_name . ').' );
 						return $sizes;
 
 					}
@@ -1004,7 +1004,7 @@ if ( ! class_exists( $class ) ) {
 							$this->my_image_state = 'lossless';
 							break;
 						default:
-							Lib::error( 'Unexpected mime-type: ' . $this->my_mime_type );
+							Dbg::error( 'Unexpected mime-type: ' . $this->my_mime_type );
 							return $sizes;
 					}
 				}
@@ -1093,25 +1093,25 @@ if ( ! class_exists( $class ) ) {
 
 						$editor = Shared::get_warp_editor( $source );
 						if ( \is_wp_error( $editor ) ) {
-							Lib::error( 'Function get_warp_editor() returned an error: ' . $editor->get_error_message() );
+							Dbg::error( 'Function get_warp_editor() returned an error: ' . $editor->get_error_message() );
 							return $sizes;
 						} else {
 							$pressed = $editor->compress_image( $metadata['width'], $metadata['height'] );
 							if ( \is_wp_error( $pressed ) ) {
-								Lib::error( '$editor::compress_image() failed with error: ' . $pressed->get_error_message() );
+								Dbg::error( '$editor::compress_image() failed with error: ' . $pressed->get_error_message() );
 								return $sizes;
 							} else {
 								$saved = $editor->save( $source );
 
 								if ( \is_wp_error( $saved ) ) {
-									Lib::error( '$editor::save() failed with error: ' . $saved->get_error_message() );
+									Dbg::error( '$editor::save() failed with error: ' . $saved->get_error_message() );
 									return $sizes;
 								}
 								$target = $saved['path'];
 							}
 						}
 					} catch ( \Exception $e ) {
-						Lib::error( 'Exception caught: ' . $e->getMessage() );
+						Dbg::error( 'Exception caught: ' . $e->getMessage() );
 						return $sizes;
 					}
 
@@ -1182,19 +1182,19 @@ if ( ! class_exists( $class ) ) {
 
 						$editor = Shared::get_warp_editor( $source );
 						if ( \is_wp_error( $editor ) ) {
-							Lib::error( 'Function get_warp_editor() returned an error: ' . $editor->get_error_message() );
+							Dbg::error( 'Function get_warp_editor() returned an error: ' . $editor->get_error_message() );
 							return $sizes;
 						}
 
 						$pressed = $editor->compress_image( $metadata['width'], $metadata['height'] );
 						if ( \is_wp_error( $pressed ) ) {
-							Lib::error( '$editor::compress_image() failed with error: ' . $pressed->get_error_message() );
+							Dbg::error( '$editor::compress_image() failed with error: ' . $pressed->get_error_message() );
 							return $sizes;
 						}
 
 						$saved = $editor->save();
 						if ( \is_wp_error( $saved ) ) {
-							Lib::error( '$editor::save() failed with error: ' . $saved->get_error_message() );
+							Dbg::error( '$editor::save() failed with error: ' . $saved->get_error_message() );
 							return $sizes;
 						}
 
@@ -1214,7 +1214,7 @@ if ( ! class_exists( $class ) ) {
 						$this->webp_clone_image( $target, $this->my_mime_type );
 
 					} catch ( \Exception $e ) {
-						Lib::error( 'Exception caught: ' . $e->getMessage() );
+						Dbg::error( 'Exception caught: ' . $e->getMessage() );
 						return $sizes;
 					}
 
@@ -1226,7 +1226,7 @@ if ( ! class_exists( $class ) ) {
 					break;
 
 				default:
-					Lib::error( 'Invalid image/state (value) detected: ' . $this->my_image_state );
+					Dbg::error( 'Invalid image/state (value) detected: ' . $this->my_image_state );
 					return $sizes;
 
 			}
@@ -1242,7 +1242,7 @@ if ( ! class_exists( $class ) ) {
 
 			$new_file_path = $this->get_absolute_upload_file_path( $metadata['file'] );
 			if ( ! file_exists( $new_file_path ) ) {
-				Lib::error( 'File ' . $metadata['file'] . ' is not found in upload directory.' );
+				Dbg::error( 'File ' . $metadata['file'] . ' is not found in upload directory.' );
 				return $sizes;
 			}
 
@@ -1266,17 +1266,17 @@ if ( ! class_exists( $class ) ) {
 					break;
 
 				default:
-					Lib::error( 'Invalid image state value: ' . $this->my_image_state );
+					Dbg::error( 'Invalid image state value: ' . $this->my_image_state );
 					return $sizes;
 			}
 
 			if ( empty( $thumbs_source ) ) {
-				Lib::error( 'Thumbnails source file-path is empty.' );
+				Dbg::error( 'Thumbnails source file-path is empty.' );
 				return $sizes;
 			}
 
 			if ( ! \file_exists( $thumbs_source ) ) {
-				Lib::error( 'Thumbnails source file not found: ' . $thumbs_source . '.' );
+				Dbg::error( 'Thumbnails source file not found: ' . $thumbs_source . '.' );
 				return $sizes;
 			}
 
@@ -1322,7 +1322,7 @@ if ( ! class_exists( $class ) ) {
 				$editor = Shared::get_warp_editor( $thumbs_source );
 
 				if ( is_wp_error( $editor ) ) {
-					Lib::error( 'Function get_warp_editor() returned an error: ' . $editor->get_error_message() );
+					Dbg::error( 'Function get_warp_editor() returned an error: ' . $editor->get_error_message() );
 					return $sizes;
 				} else {
 					if ( 'image/jpeg' === $this->my_mime_type && 'edited' !== $this->my_image_state ) {
@@ -1377,7 +1377,7 @@ if ( ! class_exists( $class ) ) {
 						$this->my_metadata_done = $metadata;
 
 					} else {
-						Lib::error( 'Methods multi_resize/make_subsize not found in $editor (' . get_class( $editor ) . ')' );
+						Dbg::error( 'Methods multi_resize/make_subsize not found in $editor (' . get_class( $editor ) . ')' );
 						return $sizes;
 					}
 				}
@@ -2003,7 +2003,7 @@ if ( ! class_exists( $class ) ) {
 
 					}
 				} catch ( \Exception $e ) {
-					Lib::error( 'Exception caught: ' . $e->getMessage() );
+					Dbg::error( 'Exception caught: ' . $e->getMessage() );
 					return false;
 				}
 				\imagedestroy( $gd_convert );
@@ -2071,7 +2071,7 @@ if ( ! class_exists( $class ) ) {
 		 * @param string $message debug block title.
 		 */
 		private static function debugImagickResources( $message ) {
-			if ( ! Lib::is_debug() ) {
+			if ( ! Dbg::is_debug() ) {
 				return;
 			}
 		}
@@ -2150,7 +2150,7 @@ if ( ! class_exists( $class ) ) {
 											header( $this->get_slug() . ': template' );
 											$template = $raw_image_template;
 										} else {
-											Lib::error( 'Template file not found: ' . $raw_image_template );
+											Dbg::error( 'Template file not found: ' . $raw_image_template );
 											return false;
 										}
 										return $template;
@@ -2180,7 +2180,7 @@ if ( ! class_exists( $class ) ) {
 				return false;
 			}
 
-			if ( ! isset( $my_wp_query->post->post_mime_type ) || ! Lib::starts_with( $my_wp_query->post->post_mime_type, 'image/' ) ) {
+			if ( ! isset( $my_wp_query->post->post_mime_type ) || ! Hlp::starts_with( $my_wp_query->post->post_mime_type, 'image/' ) ) {
 				return false;
 			}
 
@@ -2202,7 +2202,7 @@ if ( ! class_exists( $class ) ) {
 	# region Convert WebP on demand
 
 		/** Add endpoint Convert to WebP on demand if enabled */
-		private function cwebp_endpoint_enabled() {
+		private function cwebp_endpoint_do_init() {
 			if ( false === $this->get_option( 'webp-cwebp-on-demand' ) ) {
 				return;
 			}
@@ -2224,7 +2224,7 @@ if ( ! class_exists( $class ) ) {
 										if ( is_file( $cwebp_on_demand_template ) ) {
 											$template = $cwebp_on_demand_template;
 										} else {
-											Lib::error( 'Template file not found: ' . $cwebp_on_demand_template );
+											Dbg::error( 'Template file not found: ' . $cwebp_on_demand_template );
 											return false;
 										}
 										return $template;
@@ -2245,7 +2245,7 @@ if ( ! class_exists( $class ) ) {
 	# region Disable Performance Lab WebP Upload Crap.
 
 		/** Disable Performance Lab WebP Upload Crap. */
-		private function disable_perflab_upload() {
+		private function perflab_upload_disable() {
 			\add_filter(
 				'pre_update_option',
 				function ( $value, $option ) {
@@ -2290,7 +2290,92 @@ if ( ! class_exists( $class ) ) {
 
 		// phpcs:ignore
 	# endregion
+
+		// phpcs:ignore
+	# region static Admin notices
+
+		/** Run-time error-admin-notice handler.
+		 * Force error notice style.
+		 *
+		 * @param string $message to report.
+		 */
+		public static function echo_error_notice( $message = '' ) {
+			if ( is_string( $message ) && trim( $message ) ) {
+				self::echo_admin_notice( $message, 'notice notice-error is-dismissible' );
+			}
+		}
+
+		/** Run-time admin-notice handler.
+		 * Default style is info notice style.
+		 *
+		 * @param string $message to report.
+		 * @param string $css_class css class.
+		 */
+		public static function echo_admin_notice( $message = '', $css_class = 'notice notice-info is-dismissible' ) {
+			if ( $message && $css_class ) {
+				echo '<div class="' . esc_attr( $css_class ) . '"><p style="white-space:pre"><strong>' . esc_html( $message ) . '</strong></p></div>';
+			}
+		}
+
+		/** Transient (Short Persistent) Admin notice implementation.
+		 * Persistent until once displayed or max 1 hour.
+		 * Used by debug/debug_var/error notices.
+		 *
+		 * @todo? multi-record for concurrent admin users?
+		 * @param string $message to display.
+		 * @param string $class_name to implement (CSS).
+		 */
+		private static function t_notice( $message, $class_name ) {
+			$transient_id = __NAMESPACE__ . '-notices';
+			$transient    = get_transient( $transient_id );
+			$notices      = is_string( $transient ) ? $transient : '';
+			$notices     .= '<div class="' . esc_attr( $class_name ) . '"><p style="white-space:pre"><strong>' . esc_html( $message ) . '</strong></p></div>';
+			set_transient( $transient_id, $notices, HOUR_IN_SECONDS );
+		}
+
+		/** Transient admin info notice.
+		 *
+		 * @param string $message to display.
+		 */
+		public static function t_notice_info( $message ) {
+			self::t_notice( trim( $message ), 'notice notice-info is-dismissible' );
+		}
+
+		/** Transient admin error notice.
+		 *
+		 * @param string $message to display.
+		 */
+		public static function t_notice_error( $message ) {
+			self::t_notice( $message, 'notice notice-error is-dismissible' );
+		}
+
+		/** Transient admin success notice.
+		 *
+		 * @param string $message to display.
+		 */
+		public static function t_notice_success( $message ) {
+			self::t_notice( $message, 'notice notice-success is-dismissible' );
+		}
+
+		/** Show Transient admin notices.
+		 * Every plugin has different namespace.
+		 * This will show only transient messages
+		 * for current plugin implementation namespace.
+		 * Keep function here to match plugin namespace.
+		 */
+		public static function echo_transient_notices() {
+			$transient_id = __NAMESPACE__ . '_notices';
+			$transient    = get_transient( $transient_id );
+			if ( false !== $transient ) {
+				delete_transient( $transient_id );
+				echo esc_html( $transient );
+
+			}
+		}
+
+		// phpcs:ignore
+	# endregion
 	}
 } else {
-	Shared::debug( "Class already exists: $class" );
+	Dbg::debug( "Class already exists: $class" );
 }

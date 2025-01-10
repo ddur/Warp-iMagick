@@ -18,10 +18,10 @@ namespace ddur\Warp_iMagick;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use ddur\Warp_iMagick\Base\Meta_Settings;
 use ddur\Warp_iMagick\Settings_Renderer;
 use ddur\Warp_iMagick\Shared;
+use ddur\Warp_iMagick\Hlp;
 
 require_once ABSPATH . 'wp-admin/includes/file.php';
 
@@ -51,16 +51,16 @@ if ( ! class_exists( $class ) ) {
 
 		/** Enqueue admin page scripts. Derived & Overridden. */
 		public function enqueue_page_scripts() {
-			Lib::enqueue_style( 'abstract-settings-admin-styled' );
-			Lib::enqueue_script( 'abstract-settings-admin-styled' );
+			Hlp::enqueue_style( 'abstract-settings-admin-styled' );
+			Hlp::enqueue_script( 'abstract-settings-admin-styled' );
 
 			$dependencies   = array( 'abstract-settings-admin-styled' );
 			$plugin_version = $this->get_option( 'plugin-version', false );
-			$relative_path  = Lib::relative_path( $this->plugin->get_path() );
+			$relative_path  = Hlp::relative_path( $this->plugin->get_path() );
 
-			Lib::enqueue_style( $this->pageslug, $relative_path . '/assets/style.css', array(), $style_version = $plugin_version, 'screen' );
+			Hlp::enqueue_style( $this->pageslug, $relative_path . '/assets/style.css', array(), $style_version = $plugin_version, 'screen' );
 
-			Lib::enqueue_script( $this->pageslug, $relative_path . '/assets/script.js', $dependencies, $script_version = $plugin_version, $in_footer = true );
+			Hlp::enqueue_script( $this->pageslug, $relative_path . '/assets/script.js', $dependencies, $script_version = $plugin_version, $in_footer = true );
 
 			// phpcs:enable
 		}
@@ -605,26 +605,26 @@ if ( ! class_exists( $class ) ) {
 			$plugins = \get_plugins();
 
 			foreach ( $conflicts_active as $conflict_path => $conflict_slug ) {
-				$conflict_pl_data = Lib::safe_key_value( $plugins, $conflict_path, array(), array() );
+				$conflict_pl_data = Hlp::safe_key_value( $plugins, $conflict_path, array(), array() );
 
-				$conflict_pl_name = Lib::safe_key_value( $conflict_pl_data, 'Name', '', 'WP Email Users' );
+				$conflict_pl_name = Hlp::safe_key_value( $conflict_pl_data, 'Name', '', 'WP Email Users' );
 				$conflict_message = "Plugin ($conflict_slug) or Warp iMagick may not work properly when used along.";
 
 				switch ( $conflict_slug ) {
 					case 'wp-email-users':
-						$conflict_pl_name = Lib::safe_key_value( $conflict_pl_data, 'Name', '', 'WP Email Users' );
+						$conflict_pl_name = Hlp::safe_key_value( $conflict_pl_data, 'Name', '', 'WP Email Users' );
 						$conflict_message = "If you get error when saving Warp-iMagick plugin settings, please deactivate '$conflict_pl_name' plugin.";
 						break;
 					case 'ajax-search-lite':
-						$conflict_pl_name = Lib::safe_key_value( $conflict_pl_data, 'Name', '', 'Ajax Search Lite' );
+						$conflict_pl_name = Hlp::safe_key_value( $conflict_pl_data, 'Name', '', 'Ajax Search Lite' );
 						$conflict_message = "Plugin '$conflict_pl_name' or Warp iMagick may not work properly when used along.";
 						break;
 					case 'circles-gallery':
-						$conflict_pl_name = Lib::safe_key_value( $conflict_pl_data, 'Name', '', 'Circles Gallery' );
+						$conflict_pl_name = Hlp::safe_key_value( $conflict_pl_data, 'Name', '', 'Circles Gallery' );
 						$conflict_message = "Plugin '$conflict_pl_name' or Warp iMagick may not work properly when used along.";
 						break;
 					default:
-						$conflict_pl_name = Lib::safe_key_value( $conflict_pl_data, 'Name', '', $conflict_slug );
+						$conflict_pl_name = Hlp::safe_key_value( $conflict_pl_data, 'Name', '', $conflict_slug );
 						$conflict_message = "Plugin '$conflict_pl_name ($conflict_slug) or Warp iMagick, may not work properly when used along.";
 						break;
 
@@ -900,7 +900,7 @@ if ( ! class_exists( $class ) ) {
 
 						\delete_transient( $settings->pageslug . '-obsolete-usermeta-cleared' );
 
-						\delete_transient( Lib::get_namespace() . '-notices' );
+						\delete_transient( __NAMESPACE__ . '-notices' );
 
 						\flush_rewrite_rules();
 
@@ -1071,6 +1071,9 @@ if ( ! class_exists( $class ) ) {
 			);
 		}
 
+		// phpcs:ignore
+	# region CWebP
+
 		/** Enable or Disable WebP On Demand via server flag.
 		 * Set (insert/create or remove/delete/unlink) server redirect file-flag in home path.
 		 *
@@ -1087,5 +1090,5 @@ if ( ! class_exists( $class ) ) {
 	}
 
 } else {
-	Shared::debug( "Class already exists: $class" );
+	Dbg::debug( "Class already exists: $class" );
 }

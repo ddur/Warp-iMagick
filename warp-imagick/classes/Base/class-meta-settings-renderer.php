@@ -18,9 +18,8 @@ namespace ddur\Warp_iMagick\Base;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use ddur\Warp_iMagick\Shared;
-use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use ddur\Warp_iMagick\Base\Base_Settings_Renderer;
+use ddur\Warp_iMagick\Dbg;
 
 $class = __NAMESPACE__ . '\\Meta_Settings_Renderer';
 
@@ -31,5 +30,5 @@ if ( ! class_exists( $class ) ) {
 	 */
 	class Meta_Settings_Renderer extends Base_Settings_Renderer {}
 } else {
-	Shared::debug( "Class already exists: $class" );
+	Dbg::debug( "Class already exists: $class" );
 }

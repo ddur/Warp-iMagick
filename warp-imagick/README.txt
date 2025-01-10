@@ -4,7 +4,7 @@ Author: © 2017-2025, Dragan Đurić. All rights reserved.
 License: GPLv2
 Requires PHP: 7.4
 Tested up to: 6.7.1
-Stable tag: 1.12.1
+Stable tag: 1.12.3
 Requires at least: 5.3
 
 Optimize Images On-Site. No Cloud-Service/Signup. Convert to WebP On Upload/Regenerate. Resize Uploads. Set Sharpness, Quality & Big-Image-Threshold.
@@ -273,7 +273,14 @@ Because missing of any plugin requirements listed below:
 
 == Changelog ==
 
-= 1.12.1 (Current Version) =
+= 1.12.3 (Current Version) =
+* Refactored Settings Page (UI)
+* Removied class-lib.php dependency.
+
+= 1.12.2 =
+* JavaScript Free Accordion.
+
+= 1.12.1 =
 * Accordion & Help >= WP-6.7.
 
 = 1.12 =

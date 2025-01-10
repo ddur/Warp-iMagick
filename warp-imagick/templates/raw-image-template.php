@@ -22,10 +22,9 @@
  */
 namespace ddur\Warp_iMagick;
 
-use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
-use ddur\Warp_iMagick\Shared;
-
 defined( 'ABSPATH' ) || die( -1 );
+
+use ddur\Warp_iMagick\Shared;
 
 /** Get array of media attachment images
  *
@@ -208,8 +207,12 @@ function get_attachment_image_files( $id ) {
 
 /** Return <img> elements */
 function get_img_html_elements() {
+	WP_Filesystem();
+
+	global $wp_filesystem;
+
 	if ( ! is_callable( '\\getimagesize' ) ) {
-		Lib::error( 'Function is not callable: \getimagesize' );
+		Dbg::error( 'Function is not callable: \getimagesize' );
 		return '';
 	}
 
@@ -222,8 +225,6 @@ function get_img_html_elements() {
 
 	$img_files = array_reverse( $img_files );
 
-	$html = '';
-
 	$break = 0;
 
 	$root_path = wp_normalize_path( untrailingslashit( ABSPATH ) );
@@ -233,52 +234,47 @@ function get_img_html_elements() {
 		$mime_type = $size_data[4];
 		$file_size = \size_format( $byte_size );
 
-		if ( Lib::starts_with( $file_path, $root_path ) ) {
+		if ( Hlp::starts_with( $file_path, $root_path ) ) {
 			$breakname = \wp_basename( $file_path, '.webp' );
 			if ( $break ) {
 				if ( $break !== $breakname ) {
 					$break = $breakname;
-					$html .= '<br>' . PHP_EOL;
+					echo '<br>' . PHP_EOL;
 				}
 			} else {
 				$break = $breakname;
 			}
-			$file_size = esc_attr( $file_size );
-			$size_name = esc_attr( $size_name );
-			switch ( $mime_type ) {
-				case 'image/webp':
-					// phpcs:ignore
-					$src = 'data:' . $mime_type . ';base64,' . base64_encode( file_get_contents( $file_path ) );
 
-					break;
-				default:
-					// phpcs:ignore
-					$src = 'data:' . $mime_type . ';base64,' . base64_encode( file_get_contents( $file_path ) );
-					break;
+			$href     = site_url( substr( $file_path, strlen( $root_path ) ) );
+			$basename = basename( $file_path );
 
-			}
-			$href      = esc_url_raw( site_url( substr( $file_path, strlen( $root_path ) ) ) );
-			$width     = esc_attr( $size_data [1] );
-			$height    = esc_attr( $size_data [2] );
-			$basename  = basename( $file_path );
-			$byte_size = esc_attr( $byte_size );
-			$title     = esc_attr( "WP Size Name: $size_name\nWidth&Height: {$width}x{$height}px\nFile Basename: $basename\nFile Byte-size: $file_size ($byte_size bytes)" );
-			$html     .= "<a target='_blank' href='$href'><img data-file-size='$byte_size' data-size-name='$size_name' src='$src' width='$width' height='$height' title='$title'></a>" . PHP_EOL;
+			$src = 'data:' . $mime_type . ';base64,' . base64_encode( $wp_filesystem->file_get_contents( $file_path ) ); // phpcs:ignore
+
+			echo '<a target="_blank" href="'
+			. esc_url_raw( $href ) . '"><img data-file-size="'
+			. esc_attr( $byte_size ) . '" data-size-name="'
+			. esc_attr( $size_name ) . '" src="'
+
+			. esc_attr( $src ) . '" width="'
+			. esc_attr( $size_data [1] ) . '" height="'
+			. esc_attr( $size_data [2] ) . '" title="WP Size Name: '
+			. esc_attr( $size_name ) . "\nWidth&Height: "
+			. esc_attr( $size_data [1] ) . 'x'
+			. esc_attr( $size_data [2] ) . "px\nFile Basename: "
+			. esc_attr( $basename ) . "\nFile Byte-size: "
+			. esc_attr( $file_size ) . '('
+			. esc_attr( $byte_size ) . ' bytes)'
+			. '"></a>' . PHP_EOL;
 		}
 	}
 
-	if ( Lib::is_debug() ) {
+	if ( Dbg::is_debug() ) {
 		if ( Shared::get_option( 'preview_thumbnails_show_metadata', true ) ) {
 			$metadata = \wp_get_attachment_metadata( $my_wp_query->post->ID );
 			// phpcs:ignore
-			$html .= '<p>Image Metadata:</p><p><pre>' . print_r( $metadata, true ) . '</pre></p>';
+			echo '<p>Image Metadata:</p><p><pre>' . print_r( $metadata, true ) . '</pre></p>';
 		}
-
-		// phpcs:ignore
-
 	}
-
-	return $html;
 }
 ?><!doctype html><head><title>Thumbnails</title></head><html><body>
-<?php Lib::echo_html( get_img_html_elements() ); ?></body></html>
+<?php get_img_html_elements(); ?></body></html>

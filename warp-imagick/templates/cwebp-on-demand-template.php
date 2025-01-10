@@ -20,9 +20,6 @@
 
 namespace ddur\Warp_iMagick;
 
-use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
-use ddur\Warp_iMagick\Shared;
-
 defined( 'ABSPATH' ) || die( -1 );
 
 // phpcs:enable

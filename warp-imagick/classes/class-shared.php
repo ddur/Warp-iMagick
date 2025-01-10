@@ -20,6 +20,7 @@ defined( 'ABSPATH' ) || die( -1 );
 
 use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
 use ddur\Warp_iMagick\Plugin;
+use ddur\Warp_iMagick\Dbg;
 
 $class = __NAMESPACE__ . '\\Shared';
 
@@ -138,41 +139,6 @@ if ( ! class_exists( $class ) ) {
 		// phpcs:ignore
 	# region Public Static Wrap Debug actions.
 
-		/** Error log and admin feedback if option is enabled.
-		 * Use for verbose errors.
-		 *
-		 * @param string $message error to log and show as admin notice.
-		 */
-		public static function error( $message ) {
-			if ( self::get_option( 'verbose-debug-enabled', false ) ) {
-				return Lib::error( $message );
-			}
-		}
-
-		/** Debug log and display debug message if option is enabled..
-		 * Use for verbose debugs.
-		 *
-		 * @param string $message to log & show.
-		 * @param bool   $trace flag, set to true to dump calling function list.
-		 */
-		public static function debug( $message, $trace = false ) {
-			if ( self::get_option( 'verbose-debug-enabled', false ) ) {
-				return Lib::debug( $message, $trace );
-			}
-		}
-
-		/** Debug variable value, log & show if option is enabled.
-		 * Use for verbose debug_vars.
-		 *
-		 * @param mixed  $arg reference.
-		 * @param string $name to prefix value.
-		 */
-		public static function debug_var( &$arg, $name = '' ) {
-			if ( self::get_option( 'verbose-debug-enabled', false ) ) {
-				return Lib::debug_var( $arg, $name );
-			}
-		}
-
 		// phpcs:ignore
 	# endregion
 
@@ -218,22 +184,22 @@ if ( ! class_exists( $class ) ) {
 								sleep( 0 );
 
 								if ( true !== $imagick->scaleImage( $resize_w, 2500, true ) ) {
-									Lib::error( 'Scale image failed.' );
+									Dbg::error( 'Scale image failed.' );
 									return false;
 								}
 							}
 						} elseif ( true !== $imagick->scaleImage( $resize_w, 2500, true ) ) {
-							Lib::error( 'Scale image failed.' );
+							Dbg::error( 'Scale image failed.' );
 							return false;
 						}
 
 						wp_mkdir_p( dirname( $target_file_path ) );
 						if ( true !== $imagick->writeImage( $target_file_path ) ) {
-							Lib::error( 'Write image failed.' );
+							Dbg::error( 'Write image failed.' );
 						} else {
 							$success = $imagick->getImageGeometry();
 							if ( false === $success ) {
-								Lib::error( 'getImageGeometry failed.' );
+								Dbg::error( 'getImageGeometry failed.' );
 							}
 						}
 
@@ -241,10 +207,10 @@ if ( ! class_exists( $class ) ) {
 						$imagick->destroy();
 						$imagick = null;
 					} else {
-						Lib::error( 'PHP-imagick failed to load image.' );
+						Dbg::error( 'PHP-imagick failed to load image.' );
 					}
 				} catch ( \Exception $e ) {
-					Lib::error( 'Exception: ' . $e->getMessage() );
+					Dbg::error( 'Exception: ' . $e->getMessage() );
 				}
 
 				// phpcs:enable
@@ -275,7 +241,7 @@ if ( ! class_exists( $class ) ) {
 						$is_transparent_image_obj = false;
 					}
 				} catch ( \Exception $e ) {
-					Lib::error( 'Exception: ' . $e->getMessage() );
+					Dbg::error( 'Exception: ' . $e->getMessage() );
 				}
 			}
 			return $is_transparent_image_obj;
@@ -298,7 +264,7 @@ if ( ! class_exists( $class ) ) {
 						$im_image = null;
 					}
 				} catch ( \Exception $e ) {
-					Lib::error( 'Exception: ' . $e->getMessage() );
+					Dbg::error( 'Exception: ' . $e->getMessage() );
 				}
 			}
 			return $is_transparent_image_file;
@@ -311,22 +277,22 @@ if ( ! class_exists( $class ) ) {
 		 */
 		public static function replace_file_name_extension( $file_name_path, $extension ) {
 			if ( ! is_string( $file_name_path ) ) {
-				Lib::error( 'Invalid argument: $file_name_path' );
+				Dbg::error( 'Invalid argument: $file_name_path' );
 				return false;
 			}
 			$file_name_path = trim( $file_name_path );
 			if ( '' === $file_name_path ) {
-				Lib::error( 'Empty argument: $file_name_path' );
+				Dbg::error( 'Empty argument: $file_name_path' );
 				return false;
 			}
 
 			if ( ! is_string( $extension ) ) {
-				Lib::error( 'Invalid argument: $extension' );
+				Dbg::error( 'Invalid argument: $extension' );
 				return false;
 			}
 			$extension = trim( $extension );
 			if ( '' === $extension ) {
-				Lib::error( 'Empty argument: $extension' );
+				Dbg::error( 'Empty argument: $extension' );
 				return false;
 			}
 
@@ -349,22 +315,22 @@ if ( ! class_exists( $class ) ) {
 		 */
 		public static function append_file_name_extension( $file_name_path, $extension ) {
 			if ( ! is_string( $file_name_path ) ) {
-				Lib::error( 'Invalid argument: $file_name_path' );
+				Dbg::error( 'Invalid argument: $file_name_path' );
 				return false;
 			}
 			$file_name_path = trim( $file_name_path );
 			if ( '' === $file_name_path ) {
-				Lib::error( 'Empty argument: $file_name_path' );
+				Dbg::error( 'Empty argument: $file_name_path' );
 				return false;
 			}
 
 			if ( ! is_string( $extension ) ) {
-				Lib::error( 'Invalid argument: $extension' );
+				Dbg::error( 'Invalid argument: $extension' );
 				return false;
 			}
 			$extension = trim( $extension );
 			if ( '' === $extension ) {
-				Lib::error( 'Empty argument: $extension' );
+				Dbg::error( 'Empty argument: $extension' );
 				return false;
 			}
 
@@ -385,22 +351,22 @@ if ( ! class_exists( $class ) ) {
 		 */
 		public static function prepend_file_name_extension( $file_name_path, $extension ) {
 			if ( ! is_string( $file_name_path ) ) {
-				Lib::error( 'Invalid argument: $file_name_path' );
+				Dbg::error( 'Invalid argument: $file_name_path' );
 				return false;
 			}
 			$file_name_path = trim( $file_name_path );
 			if ( '' === $file_name_path ) {
-				Lib::error( 'Empty argument: $file_name_path' );
+				Dbg::error( 'Empty argument: $file_name_path' );
 				return false;
 			}
 
 			if ( ! is_string( $extension ) ) {
-				Lib::error( 'Invalid argument: $extension' );
+				Dbg::error( 'Invalid argument: $extension' );
 				return false;
 			}
 			$extension = trim( $extension );
 			if ( '' === $extension ) {
-				Lib::error( 'Empty argument: $extension' );
+				Dbg::error( 'Empty argument: $extension' );
 				return false;
 			}
 
@@ -424,22 +390,22 @@ if ( ! class_exists( $class ) ) {
 		 */
 		public static function append_suffix_to_file_name( $file_name_path, $suffix ) {
 			if ( ! is_string( $file_name_path ) ) {
-				Lib::error( 'Invalid argument: $file_name_path' );
+				Dbg::error( 'Invalid argument: $file_name_path' );
 				return false;
 			}
 			$file_name_path = trim( $file_name_path );
 			if ( '' === $file_name_path ) {
-				Lib::error( 'Empty argument: $file_name_path' );
+				Dbg::error( 'Empty argument: $file_name_path' );
 				return false;
 			}
 
 			if ( ! is_string( $suffix ) ) {
-				Lib::error( 'Invalid argument: $suffix' );
+				Dbg::error( 'Invalid argument: $suffix' );
 				return false;
 			}
 			$suffix = trim( $suffix );
 			if ( '' === $suffix ) {
-				Lib::error( 'Empty argument: $suffix' );
+				Dbg::error( 'Empty argument: $suffix' );
 				return false;
 			}
 
@@ -586,7 +552,7 @@ if ( ! class_exists( $class ) ) {
 		 */
 		public static function copy_file( $arg_source_file_path, $arg_target_file_path, $arg_overwrite = false ) {
 			if ( ! is_readable( $arg_source_file_path ) ) {
-				Lib::error( 'Copy: Source is not readable: ' . $arg_source_file_path );
+				Dbg::error( 'Copy: Source is not readable: ' . $arg_source_file_path );
 				return false;
 			}
 			if ( true === $arg_overwrite || ! file_exists( $arg_target_file_path ) ) {
@@ -595,9 +561,9 @@ if ( ! class_exists( $class ) ) {
 					if ( file_exists( $arg_target_file_path ) ) {
 						return $arg_target_file_path;
 					}
-					Lib::error( 'Copy: Target is not created: ' . $arg_target_file_path );
+					Dbg::error( 'Copy: Target is not created: ' . $arg_target_file_path );
 				} else {
-					Lib::error( 'Copy: Target writing failed: ' . $arg_target_file_path );
+					Dbg::error( 'Copy: Target writing failed: ' . $arg_target_file_path );
 				}
 			}
 			return false;
@@ -1091,5 +1057,5 @@ if ( ! class_exists( $class ) ) {
 	# endregion
 	}
 } else {
-	Shared::debug( "Class already exists: $class" );
+	Dbg::debug( "Class already exists: $class" );
 }

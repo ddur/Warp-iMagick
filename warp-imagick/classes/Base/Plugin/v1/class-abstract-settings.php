@@ -18,7 +18,10 @@ namespace ddur\Warp_iMagick\Base\Plugin\v1;
 
 defined( 'ABSPATH' ) || die( -1 );
 
-use ddur\Warp_iMagick\Base\Plugin\v1\Lib;
+use ddur\Warp_iMagick\Hlp;
+use ddur\Warp_iMagick\Net;
+use ddur\Warp_iMagick\Dbg;
+use ddur\Warp_iMagick\Plugin;
 
 if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 	/** Abstract Settings Class
@@ -197,15 +200,15 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 */
 		public static function is_valid_constructor_args( $plugin, $renderer ) {
 			if ( ! is_object( $plugin ) ) {
-				Lib::error( '$plugin argument must be an object instance' );
+				Dbg::error( '$plugin argument must be an object instance' );
 				return false;
 			}
 			if ( ! is_subclass_of( $plugin, __NAMESPACE__ . '\\Abstract_Plugin' ) ) {
-				Lib::error( '$plugin argument must be derived from ' . __NAMESPACE__ . '\\Abstract_Plugin' );
+				Dbg::error( '$plugin argument must be derived from ' . __NAMESPACE__ . '\\Abstract_Plugin' );
 				return false;
 			}
 			if ( isset( $renderer ) && ! is_object( $renderer ) ) {
-				Lib::error( '$renderer argument must be an object instance' );
+				Dbg::error( '$renderer argument must be an object instance' );
 				return false;
 			}
 			return true;
@@ -226,45 +229,45 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				if ( array_key_exists( 'menu', $settings ) ) {
 					if ( ! is_string( $settings ['menu']['title'] ) ||
 						trim( $settings ['menu']['title'] ) === '' ) {
-						Lib::debug( '$settings[menu][title] is required not-empty string' );
+						Dbg::debug( '$settings[menu][title] is required not-empty string' );
 						return false;
 					}
 
 					if ( array_key_exists( 'parent-slug', $settings ['menu'] ) ) {
 						if ( ! is_string( $settings ['menu']['parent-slug'] ) ||
 							trim( $settings ['menu']['parent-slug'] ) === '' ) {
-							Lib::debug( '$settings[menu][parent-slug] must be not-empty string' );
+							Dbg::debug( '$settings[menu][parent-slug] must be not-empty string' );
 							return false;
 						}
 					}
 				} else {
-					Lib::debug( '$settings[menu] array is required' );
+					Dbg::debug( '$settings[menu] array is required' );
 					return false;
 				}
 
 				if ( array_key_exists( 'page', $settings ) ) {
 					if ( ! is_string( $settings ['page']['title'] ) ||
 						trim( $settings ['page']['title'] ) === '' ) {
-						Lib::debug( '$settings[page][title] must be not-empty string' );
+						Dbg::debug( '$settings[page][title] must be not-empty string' );
 						return false;
 					}
 					if ( array_key_exists( 'render', $settings['page'] ) ) {
 						if ( ! is_string( $settings ['page']['render'] ) ||
 							trim( $settings ['page']['render'] ) === '' ) {
-							Lib::debug( '$settings[page][render] must be not-empty string' );
+							Dbg::debug( '$settings[page][render] must be not-empty string' );
 							return false;
 						}
 						if ( ! is_callable( array( $renderer, $settings ['page']['render'] ) ) ) {
-							Lib::debug( '($renderer, $settings[page][render]) is not callable' );
+							Dbg::debug( '($renderer, $settings[page][render]) is not callable' );
 							return false;
 						}
 					}
 				} else {
-					Lib::debug( '$settings[page] array is required' );
+					Dbg::debug( '$settings[page] array is required' );
 					return false;
 				}
 			} else {
-				Lib::debug( '$settings is not an array type' );
+				Dbg::debug( '$settings is not an array type' );
 				return false;
 			}
 			return true;
@@ -302,10 +305,10 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					add_action( 'init', array( $this, 'on_abstract_init_action' ) );
 
 				} else {
-					Lib::error( 'Invalid settings configuration.' );
+					Dbg::error( 'Invalid settings configuration.' );
 				}
 			} else {
-				Lib::error( 'Invalid constructor arguments.' );
+				Dbg::error( 'Invalid constructor arguments.' );
 			}
 		}
 
@@ -556,7 +559,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 								}
 							} elseif ( is_string( $local_ip ) ) {
 								if ( filter_var( $local_ip, FILTER_VALIDATE_IP ) ) {
-									if ( ! Lib::is_ip_private( $local_ip ) ) {
+									if ( ! Net::is_ip_private( $local_ip ) ) {
 										$fail []  = __( 'Invalid settings [plugin][requires][local-ip] value (not private IPv4).', 'warp-imagick' );
 										$local_ip = false;
 									}
@@ -569,7 +572,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 								$local_ip = false;
 							}
 							if ( false !== $local_ip ) {
-								$response = Lib::private_ajax_request( 'heartbeat', $local_ip );
+								$response = Net::private_ajax_request( 'heartbeat', $local_ip );
 								if ( is_array( $response )
 								&& ! is_wp_error( $response )
 								&& 200 === $response ['response']['code'] ) {
@@ -776,13 +779,13 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 */
 		protected function on_activate_plugin_failure( $fail ) {
 			if ( is_array( $fail ) ) {
-				Lib::error( implode( PHP_EOL, $fail ) );
+				Dbg::error( implode( PHP_EOL, $fail ) );
 				foreach ( $fail as $fail_reason ) {
 					echo '<p>' . esc_html( $fail_reason ) . '</p>';
 				}
 			}
 			// phpcs:ignore -- Using Debug and Silencing notice and warning is intentional.
-			@trigger_error( esc_html( 'Activation failed due to missing requirement(s).' ) );
+			@trigger_error( 'Activation failed due to missing requirement(s).' );
 		}
 
 		/** Override to implement custom activation code.
@@ -828,11 +831,11 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				return;
 			}
 
-			$server = wp_unslash( $_SERVER );
-			if ( is_array( $server )
-			&& array_key_exists( 'QUERY_STRING', $server )
-			&& false !== strpos( $server['QUERY_STRING'], 'page=' . $this->pageslug ) ) {
-				add_action( 'admin_enqueue_scripts', array( $this, 'on_abstract_admin_enqueue_scripts' ) );
+			if ( is_array( $_SERVER ) && array_key_exists( 'QUERY_STRING', $_SERVER ) ) {
+				$server = wp_unslash( $_SERVER );
+				if ( false !== strpos( $server['QUERY_STRING'], 'page=' . $this->pageslug ) ) {
+					add_action( 'admin_enqueue_scripts', array( $this, 'on_abstract_admin_enqueue_scripts' ) );
+				}
 			}
 
 			add_action( 'admin_init', array( $this, 'on_abstract_register_settings_page' ) );
@@ -876,22 +879,19 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				return;
 			}
 
-			$abstract_path = Lib::relative_path( __DIR__ );
+			$abstract_path = Hlp::relative_path( __DIR__ );
 
-			Lib::enqueue_style( 'abstract-settings-admin', $abstract_path . '/assets/admin.css', array(), $this->plugin->get_abstract_version(), 'screen' );
+			Hlp::enqueue_style( 'abstract-settings-admin', $abstract_path . '/assets/admin.css', array(), $this->plugin->get_abstract_version(), 'screen' );
 
-			Lib::register_style( 'abstract-settings-jquery-chosen', $abstract_path . '/assets/chosen/chosen.min.css', array(), '1.8.2', 'screen' );
+			Hlp::register_style( 'abstract-settings-jquery-chosen', $abstract_path . '/assets/chosen/chosen.min.css', array(), '1.8.2', 'screen' );
 
-			Lib::register_style( 'abstract-settings-admin-styled', $abstract_path . '/assets/admin-styled.css', array( 'abstract-settings-jquery-chosen' ), $this->plugin->get_abstract_version(), 'screen' );
-
-			Lib::enqueue_script( 'abstract-settings-accordion', $abstract_path . '/assets/accordion.js', array(), $this->plugin->get_abstract_version(), $in_footer = true );
+			Hlp::register_style( 'abstract-settings-admin-styled', $abstract_path . '/assets/admin-styled.css', array( 'abstract-settings-jquery-chosen' ), $this->plugin->get_abstract_version(), 'screen' );
 
 			$wp_script_dependencies = array(
 				'jquery',
 				'utils',
 				'common',
 				'postbox',
-
 				'jquery-ui-draggable',
 				'jquery-ui-droppable',
 				'jquery-ui-sortable',
@@ -899,23 +899,23 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			);
 
 			foreach ( $wp_script_dependencies as $script_identifier ) {
-				Lib::enqueue_script( $script_identifier );
+				Hlp::enqueue_script( $script_identifier );
 			}
 
-			Lib::enqueue_script( 'abstract-settings-admin', $abstract_path . '/assets/admin.js', $wp_script_dependencies, $this->plugin->get_abstract_version(), $in_footer = true );
+			Hlp::enqueue_script( 'abstract-settings-admin', $abstract_path . '/assets/admin.js', $wp_script_dependencies, $this->plugin->get_abstract_version(), $in_footer = true );
 
 			$wp_script_dependencies = array( 'jquery' );
 
-			Lib::register_script( 'abstract-settings-jquery-are-you-sure', $abstract_path . '/assets/ays/jquery.are-you-sure.js', array( 'jquery' ), '1.9.0' );
+			Hlp::register_script( 'abstract-settings-jquery-are-you-sure', $abstract_path . '/assets/ays/jquery.are-you-sure.js', array( 'jquery' ), '1.9.0' );
 
 			$wp_script_dependencies [] = 'abstract-settings-jquery-are-you-sure';
 
-			Lib::register_script( 'abstract-settings-jquery-chosen', $abstract_path . '/assets/chosen/chosen.jquery.min.js', array( 'jquery' ), '1.8.2' );
+			Hlp::register_script( 'abstract-settings-jquery-chosen', $abstract_path . '/assets/chosen/chosen.jquery.min.js', array( 'jquery' ), '1.8.2' );
 
 			$wp_script_dependencies [] = 'abstract-settings-jquery-chosen';
 			$wp_script_dependencies [] = 'abstract-settings-admin';
 
-			Lib::register_script( 'abstract-settings-admin-styled', $abstract_path . '/assets/admin-styled.js', $wp_script_dependencies, $this->plugin->get_abstract_version(), $in_footer = true );
+			Hlp::register_script( 'abstract-settings-admin-styled', $abstract_path . '/assets/admin-styled.js', $wp_script_dependencies, $this->plugin->get_abstract_version(), $in_footer = true );
 
 			// phpcs:enable
 
@@ -931,7 +931,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return bool|string - false or valid menu-parent string
 		 */
 		public function get_menu_parent_slug() {
-			$menu_parent = Lib::safe_key_value( $this->plugin->get_option(), array( 'configuration', 'menu', 'parent-slug' ), '', false );
+			$menu_parent = Hlp::safe_key_value( $this->plugin->get_option(), array( 'configuration', 'menu', 'parent-slug' ), '', false );
 			if ( false === $menu_parent && array_key_exists( 'parent-slug', $this->settings ['menu'] ) ) {
 				$menu_parent = $this->settings ['menu']['parent-slug'];
 			}
@@ -996,7 +996,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				if ( is_callable( $page_render_callback ) ) {
 					$page_render = $page_render_callback;
 				} else {
-					Lib::debug( '$this->settings[page][render] is not callable' );
+					Dbg::debug( '$this->settings[page][render] is not callable' );
 				}
 			}
 
@@ -1012,7 +1012,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				);
 
 			} else {
-				$menu_position = Lib::safe_key_value( $this->plugin->get_option(), array( 'configuration', 'menu', 'position' ), 0, false );
+				$menu_position = Hlp::safe_key_value( $this->plugin->get_option(), array( 'configuration', 'menu', 'position' ), 0, false );
 				if ( false === $menu_position ) {
 					if ( array_key_exists( 'position', $this->settings ['menu'] ) ) {
 						$menu_position = abs( intval( $this->settings ['menu']['position'] ) );
@@ -1021,7 +1021,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 					}
 				}
-				$menu_icon = Lib::safe_key_value( $this->settings ['menu'], 'menu-icon', 'none' );
+				$menu_icon = Hlp::safe_key_value( $this->settings ['menu'], 'menu-icon', 'none' );
 
 				$this->menuslug = add_menu_page(
 					$this->settings ['page']['title'],
@@ -1044,7 +1044,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				);
 			}
 			if ( false === $this->menuslug ) {
-				Lib::error( 'Failed to add menu!' );
+				Dbg::error( 'Failed to add menu!' );
 			} else {
 				add_action( "load-{$this->menuslug}", array( $this, 'on_abstract_prepare_settings_page' ) );
 			}
@@ -1070,7 +1070,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					$this->validate = $config_validate_method;
 				} else {
 					$this->validate = null;
-					Lib::debug( '($this, $this->settings[validate]) is not callable!' );
+					Dbg::debug( '($this, $this->settings[validate]) is not callable!' );
 				}
 			}
 
@@ -1113,12 +1113,12 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			}
 
 			if ( ! is_string( $section_id ) || trim( $section_id ) === '' ) {
-				Lib::debug( '$section_id argument type error' );
+				Dbg::debug( '$section_id argument type error' );
 				return;
 			}
 
 			if ( ! is_array( $section_settings ) ) {
-				Lib::debug( '$section_settings is not array!' );
+				Dbg::debug( '$section_settings is not array!' );
 				return;
 			}
 
@@ -1126,7 +1126,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			if ( array_key_exists( 'title', $section_settings ) && is_string( $section_settings ['title'] ) ) {
 				$section_title = $section_settings ['title'];
 			} else {
-				Lib::debug( '$section_settings [title] is required string!' );
+				Dbg::debug( '$section_settings [title] is required string!' );
 			}
 
 			$section_callback = null;
@@ -1135,10 +1135,10 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					if ( is_callable( array( $this->renderer, $section_settings ['render'] ) ) ) {
 						$section_callback = array( $this->renderer, $section_settings ['render'] );
 					} else {
-						Lib::error( 'Section "render" function name is not callable: ' . $section_settings ['render'] );
+						Dbg::error( 'Section "render" function name is not callable: ' . $section_settings ['render'] );
 					}
 				} elseif ( ! in_array( $section_settings ['render'], array( null, false ), true ) ) {
-					Lib::debug( 'Section "render" function name is not a string. Section: ' . $section_id );
+					Dbg::debug( 'Section "render" function name is not a string. Section: ' . $section_id );
 				}
 			}
 
@@ -1168,17 +1168,17 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			}
 
 			if ( ! is_string( $field_name ) || trim( $field_name ) === '' ) {
-				Lib::debug( '$field_name argument type or value error' );
+				Dbg::debug( '$field_name argument type or value error' );
 				return false;
 			}
 
 			if ( ! is_array( $field_settings ) || count( $field_settings ) === 0 ) {
-				Lib::debug( '$field_settings argument type or value error' );
+				Dbg::debug( '$field_settings argument type or value error' );
 				return false;
 			}
 
 			if ( ! is_string( $section_id ) || trim( $section_id ) === '' ) {
-				Lib::debug( '$section_id argument type or value error' );
+				Dbg::debug( '$section_id argument type or value error' );
 				return false;
 			}
 
@@ -1201,11 +1201,11 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			}
 
 			if ( false === $render_callable ) {
-				Lib::debug( 'Render for "' . $field_name . '" is not defined!' );
+				Dbg::debug( 'Render for "' . $field_name . '" is not defined!' );
 				return false;
 
 			} elseif ( ! is_callable( $render_callable ) ) {
-				Lib::debug( 'Render for "' . $field_name . '" is not callable!' );
+				Dbg::debug( 'Render for "' . $field_name . '" is not callable!' );
 				return false;
 			}
 
@@ -1269,58 +1269,58 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @return array $args [settings]
 		 */
 		private function get_field_settings_args( $args ) {
-			if ( Lib::is_debug() ) {
+			if ( Dbg::is_debug() ) {
 				if ( ! is_array( $args ) ) {
-					Lib::debug( '$args is not an array' );
+					Dbg::debug( '$args is not an array' );
 					return array();
 				}
 
 				if ( array_key_exists( 'settings', $args ) ) {
 					if ( ! is_array( $args ['settings'] ) ) {
-						Lib::debug( '$args[settings] is not an array' );
+						Dbg::debug( '$args[settings] is not an array' );
 						return array();
 					}
 				} else {
-					Lib::debug( '$args[settings] key does not exists' );
+					Dbg::debug( '$args[settings] key does not exists' );
 					return array();
 				}
 
 				if ( ! array_key_exists( 'fn', $args ['settings'] ) ) {
-					Lib::debug( 'No key "fn" found in $args array!' );
+					Dbg::debug( 'No key "fn" found in $args array!' );
 					return;
 				}
 				if ( ! is_string( $args ['settings']['fn'] ) ) {
-					Lib::debug( 'Value of key "fn" in $args array is not an string!' );
+					Dbg::debug( 'Value of key "fn" in $args array is not an string!' );
 					return;
 				}
 				if ( trim( $args ['settings']['fn'] ) === '' ) {
-					Lib::debug( 'Value of key "fn" in $args array is empty!' );
+					Dbg::debug( 'Value of key "fn" in $args array is empty!' );
 					return;
 				}
 
 				if ( ! array_key_exists( 'id', $args ['settings'] ) ) {
-					Lib::debug( 'No key "id" found in $args array!' );
+					Dbg::debug( 'No key "id" found in $args array!' );
 					return;
 				}
 				if ( ! is_string( $args ['settings']['id'] ) ) {
-					Lib::debug( 'Value of key "id" in $args array is not an string!' );
+					Dbg::debug( 'Value of key "id" in $args array is not an string!' );
 					return;
 				}
 				if ( trim( $args ['settings']['id'] ) === '' ) {
-					Lib::debug( 'Value of key "id" in $args array is empty!' );
+					Dbg::debug( 'Value of key "id" in $args array is empty!' );
 					return;
 				}
 
 				if ( ! array_key_exists( 'name', $args ['settings'] ) ) {
-					Lib::debug( 'No key "name" found in $args array!' );
+					Dbg::debug( 'No key "name" found in $args array!' );
 					return;
 				}
 				if ( ! is_string( $args ['settings']['name'] ) ) {
-					Lib::debug( 'Value of key "name" in $args array is not an string!' );
+					Dbg::debug( 'Value of key "name" in $args array is not an string!' );
 					return;
 				}
 				if ( trim( $args ['settings']['name'] ) === '' ) {
-					Lib::debug( 'Value of key "name" in $args array is empty!' );
+					Dbg::debug( 'Value of key "name" in $args array is empty!' );
 					return;
 				}
 			}
@@ -1342,6 +1342,31 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			return ( null === $value && array_key_exists( 'default', $args ) ? $args ['default'] : $value );
 		}
 
+		/** Echo Input field Attributes
+		 *
+		 * @ignore
+		 * @access private
+		 * @param array $attrs - attributes.
+		 * @return void
+		 */
+		private function echo_attrs( $attrs ) {
+			if ( ! is_array( $attrs ) ) {
+				return;
+			}
+			foreach ( $attrs as $a_key => $a_val ) {
+				if ( $a_key && is_string( $a_key ) ) {
+					echo ' ' . esc_html( $a_key );
+					if ( null !== $a_val ) {
+						if ( is_string( $a_val ) ) {
+							echo '="' . esc_attr( $a_val ) . '"';
+						} elseif ( is_int( $a_val ) ) {
+							echo '="' . esc_attr( $a_val ) . '"';
+						}
+					}
+				}
+			}
+		}
+
 		/** CheckBox input-type renderer
 		 *
 		 * @access public
@@ -1352,8 +1377,8 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$args = $this->get_field_settings_args( $field_args );
 
 			$a_fn = $args ['fn'];
-			$id   = esc_attr( $args ['id'] );
-			$name = esc_attr( $args ['name'] ) . '[]';
+			$id   = $args ['id'];
+			$name = $args ['name'] . '[]';
 
 			$field_options = array_key_exists( 'options', $args ) ? $args ['options'] : array();
 			$disabled      = array_key_exists( 'disabled', $field_options ) ? true === $field_options ['disabled'] : false;
@@ -1361,33 +1386,33 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$args ['value'] = $this->get_form_field_option_value( $a_fn, $args );
 
-			$args = $this->apply_field_args_filters( $args, $a_fn );
-
 			$value = isset( $args ['value'] ) && in_array( $args ['value'], array( 'on', true ), true ) ? ' value="' . esc_attr( $args ['value'] ) . '" checked' : '';
 
-			$title = esc_attr( array_key_exists( 'title', $args ) ? $args ['title'] : null );
-			$class = esc_attr( array_key_exists( 'class', $args ) ? $args ['class'] : null );
-			$style = esc_attr( array_key_exists( 'style', $args ) ? $args ['style'] : null );
+			$title = array_key_exists( 'title', $args ) ? $args ['title'] : null;
+			$class = array_key_exists( 'class', $args ) ? $args ['class'] : null;
+			$style = array_key_exists( 'style', $args ) ? $args ['style'] : null;
 
 			$attrs = array();
 
-			$title ? $attrs[] = "title=\"$title\"" : null;
-			$class ? $attrs[] = "class=\"$class\"" : null;
-			$style ? $attrs[] = "style=\"$style\"" : null;
+			$title ? $attrs['title'] = $title : null;
+			$class ? $attrs['class'] = $class : null;
+			$style ? $attrs['style'] = $style : null;
 
-			$disabled ? $attrs[] = 'disabled' : null;
-			$readonly ? $attrs[] = 'readonly' : null;
+			$disabled ? $attrs['disabled'] = null : null;
+			$readonly ? $attrs['readonly'] = null : null;
 
-			$attrs = trim( implode( ' ', $attrs ) );
-			$attrs = '' === $attrs ? '' : ' ' . $attrs;
+			echo '<div class="checkbox admin-color">';
 
-			$html = "<input id=\"$id\" type=\"checkbox\" name=\"$name\"$value$attrs/>";
+			echo '<input type="checkbox" id="' . esc_attr( $id )
+			. '" name="' . esc_attr( $name ) . '" ' . esc_attr( $value );
+			$this->echo_attrs( $attrs );
+			echo ' >';
 
-			$html = $this->apply_field_html_filters( $html, $args, $a_fn );
+			echo '<label for="' . esc_attr( $id ) . '"></label>';
+			echo '</div>';
 
-			$html .= "<input id=\"$id-hidden\" type=\"hidden\" name=\"$name\" value=\"\"/>";
-
-			Lib::echo_html( $html );
+			echo '<input type="hidden" id="' . esc_attr( $id ) . '-hidden" name=\"'
+			. esc_attr( $name ) . '" value="">';
 		}
 
 		/** RangeSlider input-type renderer.
@@ -1413,35 +1438,40 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$args ['value'] = $this->get_form_field_option_value( $a_fn, $args );
 
-			$args = $this->apply_field_args_filters( $args, $a_fn );
+			$value = $args ['value'];
 
-			$value = esc_attr( $args ['value'] );
-
-			$title = esc_attr( array_key_exists( 'title', $args ) ? $args ['title'] : null );
-			$class = esc_attr( array_key_exists( 'class', $args ) ? $args ['class'] : null );
-			$style = esc_attr( array_key_exists( 'style', $args ) ? $args ['style'] : null );
+			$title = array_key_exists( 'title', $args ) ? $args ['title'] : null;
+			$class = array_key_exists( 'class', $args ) ? $args ['class'] : null;
+			$style = array_key_exists( 'style', $args ) ? $args ['style'] : null;
+			$units = array_key_exists( 'units', $args ['options'] ) ? $args ['options']['units'] : '';
 
 			$attrs = array();
 
-			$title ? $attrs[] = "title=\"$title\"" : null;
-			$class ? $attrs[] = "class=\"$class\"" : null;
-			$style ? $attrs[] = "style=\"$style\"" : null;
+			$title ? $attrs['title'] = $title : null;
+			$class ? $attrs['class'] = $class : null;
+			$style ? $attrs['style'] = $style : null;
 
-			$disabled ? $attrs[] = 'disabled' : null;
-			$readonly ? $attrs[] = 'readonly' : null;
+			$disabled ? $attrs['disabled'] = null : null;
+			$readonly ? $attrs['readonly'] = null : null;
 
-			\is_int( $range_min ) ? $attrs[]  = "min=\"$range_min\"" : null;
-			\is_int( $range_max ) ? $attrs[]  = "max=\"$range_max\"" : null;
-			\is_int( $range_step ) ? $attrs[] = "step=\"$range_step\"" : null;
+			is_int( $range_min ) ? $attrs['min'] = $range_min : null;
+			is_int( $range_max ) ? $attrs['max'] = $range_max : null;
 
-			$attrs = \trim( \implode( ' ', $attrs ) );
-			$attrs = '' === $attrs ? '' : ' ' . $attrs;
+			is_int( $range_step ) ? $attrs['step'] = $range_step : null;
 
-			$html = "<input type=\"range\" id=\"$id\" name=\"$name\" value=\"$value\" oninput=\"document.getElementById('{$id}_out').value=this.value;\"$attrs>";
+			echo '<div class="range-slider admin-color">';
 
-			$html = $this->apply_field_html_filters( $html, $args, $a_fn );
+			echo '<input type="range" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name )
+			. '" value="' . esc_attr( $value ) . '" oninput="document.getElementById(\'' . esc_attr( $id ) . '_out\').value=this.value;"';
+			$this->echo_attrs( $attrs );
+			echo ' >';
 
-			Lib::echo_html( $html );
+			echo '&nbsp;&nbsp;';
+
+			echo '<output id="' . esc_attr( $id ) . '_out" for="' . esc_attr( $id ) . '">'
+			. esc_attr( $value ) . '</output>&nbsp;' . esc_attr( $units );
+
+			echo '</div>';
 		}
 
 		/** Hidden input-type renderer.
@@ -1455,20 +1485,15 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$args = $this->get_field_settings_args( $field_args );
 
 			$a_fn = $args ['fn'];
-			$id   = esc_attr( $args ['id'] );
-			$name = esc_attr( $args ['name'] );
+
+			$id   = $args ['id'];
+			$name = $args ['name'];
 
 			$args ['value'] = $this->get_form_field_option_value( $a_fn, $args );
 
-			$args = $this->apply_field_args_filters( $args, $a_fn );
-
 			$value = esc_attr( $args ['value'] );
 
-			$html = "<input type=\"hidden\" id=\"$id\" name=\"$name\" value=\"$value\">";
-
-			$html = $this->apply_field_html_filters( $html, $args, $a_fn );
-
-			Lib::echo_html( $html );
+			echo '<input type="hidden" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '" >';
 		}
 
 		/** TextField input-type renderer.
@@ -1482,13 +1507,13 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$args = $this->get_field_settings_args( $field_args );
 
 			$a_fn = $args ['fn'];
-			$id   = esc_attr( $args ['id'] );
-			$name = esc_attr( $args ['name'] );
+			$id   = $args ['id'];
+			$name = $args ['name'];
 
-			if ( Lib::starts_with( $args ['type'], 'text-' ) ) {
-				$type = esc_attr( substr( $args ['type'], 5 ) );
+			if ( Hlp::starts_with( $args ['type'], 'text-' ) ) {
+				$type = substr( $args ['type'], 5 );
 			} else {
-				$type = esc_attr( $args ['type'] );
+				$type = $args ['type'];
 			}
 
 			$field_options = array_key_exists( 'options', $args ) ? $args ['options'] : array();
@@ -1520,73 +1545,107 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				$args ['value'] = array_shift( $args ['value'] );
 			}
 
-			$args = $this->apply_field_args_filters( $args, $a_fn );
-
 			$value = $args ['value'];
 
-			$place = esc_attr( array_key_exists( 'placeholder', $args ) ? $args ['placeholder'] : null );
-			$title = esc_attr( array_key_exists( 'title', $args ) ? $args ['title'] : null );
-			$class = esc_attr( array_key_exists( 'class', $args ) ? $args ['class'] : null );
-			$style = esc_attr( array_key_exists( 'style', $args ) ? $args ['style'] : null );
+			$place = array_key_exists( 'placeholder', $args ) ? $args ['placeholder'] : null;
+			$title = array_key_exists( 'title', $args ) ? $args ['title'] : null;
+			$class = array_key_exists( 'class', $args ) ? $args ['class'] : null;
+			$style = array_key_exists( 'style', $args ) ? $args ['style'] : null;
 
 			$attrs = array();
 
-			$place ? $attrs[] = "placeholder=\"$place\"" : null;
-			$title ? $attrs[] = "title=\"$title\"" : null;
-			$class ? $attrs[] = "class=\"$class\"" : null;
-			$style ? $attrs[] = "style=\"$style\"" : null;
+			$place ? $attrs['placeholder'] = $place : null;
+			$title ? $attrs['title']       = $title : null;
+			$class ? $attrs['class']       = $class : null;
+			$style ? $attrs['style']       = $style : null;
 
-			$autofocus ? $attrs[] = 'autofocus' : null;
-			$disabled ? $attrs[]  = 'disabled' : null;
-			$readonly ? $attrs[]  = 'readonly' : null;
-			$required ? $attrs[]  = 'required' : null;
+			$autofocus ? $attrs['autofocus'] = null : null;
+			$disabled ? $attrs['disabled']   = null : null;
+			$readonly ? $attrs['readonly']   = null : null;
+			$required ? $attrs['required']   = null : null;
 
-			\is_int( $range_min ) ? $attrs[]  = "min=\"$range_min\"" : null;
-			\is_int( $range_max ) ? $attrs[]  = "max=\"$range_max\"" : null;
-			\is_int( $range_step ) ? $attrs[] = "step=\"$range_step\"" : null;
+			is_int( $range_min ) ? $attrs['min']   = $range_min : null;
+			is_int( $range_max ) ? $attrs['max']   = $range_max : null;
+			is_int( $range_step ) ? $attrs['step'] = $range_step : null;
 
-			$attrs = trim( implode( ' ', $attrs ) );
-			$attrs = '' === $attrs ? '' : ' ' . $attrs;
-
-			$html = '';
 			if ( $multiple ) {
-				$html_value = esc_attr( array_shift( $value ) );
-				$item_html  = $this->apply_field_html_filters( "<input type=\"$type\" id=\"$id\" name=\"$name\" value=\"$html_value\"$attrs>", $args, $a_fn );
+				$main_value = array_shift( $value );
 
 				if ( $sortable ) {
-					$item_head  = '<li style="margin:initial;padding:initial;cursor:pointer">';
-					$item_head .= '<span title="Double click to dismiss" class="multiple-input multiple-remove dashicons-before dashicons-trash"></span>';
-					$item_tail  = '<span title="Drag&amp;drop up/down" class="multiple-input dashicons-before dashicons-sort"></span></li>';
+					ob_start();
+
+					echo '<li style="margin:initial;padding:initial;cursor:pointer">';
+					echo '<span title="Double click to dismiss" class="multiple-input multiple-remove dashicons-before dashicons-trash"></span>';
+
+					echo '<input type="' . esc_attr( $type )
+					. '" name="' . esc_attr( $name ) . '"';
+
+					$this->echo_attrs( $attrs );
+					echo ' >';
+
+					echo '<span title="Drag&amp;drop up/down" class="multiple-input dashicons-before dashicons-sort"></span></li>';
+					$data_append_attr = ob_get_clean();
+
+					echo '<span class="multiple-input multiple-append dashicons-before dashicons-plus" style="margin:initial;padding:initial;cursor:pointer" data-append="';
+					echo esc_attr( $data_append_attr ) . '"></span>';
+
+					echo '<input type="' . esc_attr( $type )
+					. '" id="' . esc_attr( $id )
+					. '" name="' . esc_attr( $name )
+					. '" value="' . esc_attr( $main_value ) . '"';
+
+					$this->echo_attrs( $attrs );
+					echo ' >';
+
+					echo '<ul class="multiple-input ui-sortable" style="margin:initial;padding:initial">';
+					foreach ( $value as $item_value ) {
+						echo '<li style="margin:initial;padding:initial;cursor:pointer">';
+						echo '<span title="Double click to dismiss" class="multiple-input multiple-remove dashicons-before dashicons-trash"></span>';
+
+						echo '<input type="' . esc_attr( $type )
+						. '" name="' . esc_attr( $name )
+						. '" value="' . esc_attr( $item_value ) . '"';
+
+						$this->echo_attrs( $attrs );
+						echo ' >';
+
+						echo '<span title="Drag&amp;drop up/down" class="multiple-input dashicons-before dashicons-sort"></span></li>';
+					}
+					echo '</ul>';
+
 				} else {
-					$item_head = '<div>';
-					$item_tail = '</div>';
-				}
+					echo '<div>';
 
-				if ( $sortable ) {
-					$item_data = $item_head . "<input type=\"$type\" name=\"$name\"$attrs>" . $item_tail;
+					echo '<input type="' . esc_attr( $type )
+					. '" id="' . esc_attr( $id )
+					. '" name="' . esc_attr( $name )
+					. '" value="' . esc_attr( $main_value ) . '"';
 
-					$html .= '<span class="multiple-input multiple-append dashicons-before dashicons-plus" style="margin:initial;padding:initial;cursor:pointer" data-append="' . esc_attr( $item_data ) . '"></span>' . $item_html;
-				} else {
-					$html .= $item_head . $item_html . $item_tail;
-				}
+					$this->echo_attrs( $attrs );
+					echo ' >';
 
-				if ( $sortable ) {
-					$html .= '<ul class="multiple-input ui-sortable" style="margin:initial;padding:initial">';
-				}
-				foreach ( $value as $item_value ) {
-					$html_value = esc_attr( $item_value );
-					$item_html  = $this->apply_field_html_filters( "<input type=\"$type\" name=\"$name\" value=\"$html_value\"$attrs>", $args, $a_fn );
-					$html      .= $item_head . $item_html . $item_tail;
-				}
-				if ( $sortable ) {
-					$html .= '</ul>';
+					echo '</div>';
+
+					foreach ( $value as $item_value ) {
+						echo '<input type="' . esc_attr( $type )
+						. '" name="' . esc_attr( $name )
+						. '" value="' . esc_attr( $item_value ) . '"';
+
+						$this->echo_attrs( $attrs );
+						echo ' >';
+					}
 				}
 			} else {
-				$value = esc_attr( $args ['value'] );
-				$html .= $this->apply_field_html_filters( "<input type=\"$type\" id=\"$id\" name=\"$name\" value=\"$value\"$attrs>", $args, $a_fn );
-			}
+				$value = $args ['value'];
 
-			Lib::echo_html( $html );
+				echo '<input type="' . esc_attr( $type )
+				. '" id="' . esc_attr( $id )
+				. '" name="' . esc_attr( $name )
+				. '" value="' . esc_attr( $value ) . '"';
+
+				$this->echo_attrs( $attrs );
+				echo ' >';
+			}
 		}
 
 		/** TextArea input-type renderer.
@@ -1600,8 +1659,8 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$args = $this->get_field_settings_args( $field_args );
 
 			$a_fn = $args ['fn'];
-			$id   = esc_attr( $args ['id'] );
-			$name = esc_attr( $args ['name'] );
+			$id   = $args ['id'];
+			$name = $args ['name'];
 
 			$field_options = array_key_exists( 'options', $args ) ? $args ['options'] : array();
 			$autofocus     = array_key_exists( 'autofocus', $field_options ) ? true === $field_options ['autofocus'] : false;
@@ -1611,35 +1670,34 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			$args ['value'] = $this->get_form_field_option_value( $a_fn, $args );
 
-			$args = $this->apply_field_args_filters( $args, $a_fn );
+			$value = $args ['value'];
 
-			$value = esc_textarea( $args ['value'] );
-
-			$place = esc_attr( array_key_exists( 'placeholder', $args ) ? $args ['placeholder'] : null );
-			$title = esc_attr( array_key_exists( 'title', $args ) ? $args ['title'] : null );
-			$class = esc_attr( array_key_exists( 'class', $args ) ? $args ['class'] : null );
-			$style = esc_attr( array_key_exists( 'style', $args ) ? $args ['style'] : 'min-height:60px;max-height:300px' );
+			$place = array_key_exists( 'placeholder', $args ) ? $args ['placeholder'] : null;
+			$title = array_key_exists( 'title', $args ) ? $args ['title'] : null;
+			$class = array_key_exists( 'class', $args ) ? $args ['class'] : null;
+			$style = array_key_exists( 'style', $args ) ? $args ['style'] : 'min-height:60px;max-height:300px';
 
 			$attrs = array();
 
-			$place ? $attrs[] = "placeholder=\"$place\"" : null;
-			$title ? $attrs[] = "title=\"$title\"" : null;
-			$class ? $attrs[] = "class=\"$class\"" : null;
-			$style ? $attrs[] = "style=\"$style\"" : null;
+			$place ? $attrs['placeholder'] = $place : null;
 
-			$autofocus ? $attrs[] = 'autofocus' : null;
-			$disabled ? $attrs[]  = 'disabled' : null;
-			$readonly ? $attrs[]  = 'readonly' : null;
-			$required ? $attrs[]  = 'required' : null;
+			$title ? $attrs['title'] = $title : null;
+			$class ? $attrs['class'] = $class : null;
+			$style ? $attrs['style'] = $style : null;
 
-			$attrs = trim( implode( ' ', $attrs ) );
-			$attrs = '' === $attrs ? '' : ' ' . $attrs;
+			$autofocus ? $attrs['autofocus'] = null : null;
 
-			$html = "<textarea id=\"$id\" name=\"$name\"$attrs>$value</textarea>";
+			$disabled ? $attrs['disabled'] = null : null;
+			$readonly ? $attrs['readonly'] = null : null;
+			$required ? $attrs['required'] = null : null;
 
-			$html = $this->apply_field_html_filters( $html, $args, $a_fn );
+			echo '<textarea id="' . esc_attr( $id )
+			. '" name="' . esc_attr( $name ) . '"';
 
-			Lib::echo_html( $html );
+			$this->echo_attrs( $attrs );
+			echo ' >'
+			. esc_textarea( $value )
+			. '</textarea>';
 		}
 
 		/** UploadFile input-type renderer
@@ -1653,8 +1711,8 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$args = $this->get_field_settings_args( $field_args );
 
 			$a_fn = $args ['fn'];
-			$id   = esc_attr( $args ['id'] );
-			$name = esc_attr( $args ['name'] );
+			$id   = $args ['id'];
+			$name = $args ['name'];
 
 			$field_options = array_key_exists( 'options', $args ) ? $args ['options'] : array();
 			$autofocus     = array_key_exists( 'autofocus', $field_options ) ? true === $field_options ['autofocus'] : false;
@@ -1671,37 +1729,31 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 			unset( $args ['value'] );
 
-			$args = $this->apply_field_args_filters( $args, $a_fn );
-
 			$value = null;
 
-			$place = esc_attr( array_key_exists( 'placeholder', $args ) ? $args ['placeholder'] : null );
-			$title = esc_attr( array_key_exists( 'title', $args ) ? $args ['title'] : null );
-			$class = esc_attr( array_key_exists( 'class', $args ) ? $args ['class'] : null );
-			$style = esc_attr( array_key_exists( 'style', $args ) ? $args ['style'] : null );
+			$place = array_key_exists( 'placeholder', $args ) ? $args ['placeholder'] : null;
+			$title = array_key_exists( 'title', $args ) ? $args ['title'] : null;
+			$class = array_key_exists( 'class', $args ) ? $args ['class'] : null;
+			$style = array_key_exists( 'style', $args ) ? $args ['style'] : null;
 
 			$attrs = array();
 
-			$place ? $attrs[] = "placeholder=\"$place\"" : null;
-			$title ? $attrs[] = "title=\"$title\"" : null;
-			$class ? $attrs[] = "class=\"$class\"" : null;
-			$style ? $attrs[] = "style=\"$style\"" : null;
+			$place ? $attrs['placeholder'] = $place : null;
+			$title ? $attrs['title']       = $title : null;
+			$class ? $attrs['class']       = $class : null;
+			$style ? $attrs['style']       = $style : null;
+			$accept ? $attrs['accept']     = $accept : null;
 
-			$autofocus ? $attrs[] = 'autofocus' : null;
-			$disabled ? $attrs[]  = 'disabled' : null;
-			$readonly ? $attrs[]  = 'readonly' : null;
-			$required ? $attrs[]  = 'required' : null;
-			$multiple ? $attrs[]  = 'multiple' : null;
-			$accept ? $attrs[]    = "accept=\"$accept\"" : null;
+			$autofocus ? $attrs['autofocus'] = null : null;
+			$disabled ? $attrs['disabled']   = null : null;
+			$readonly ? $attrs['readonly']   = null : null;
+			$required ? $attrs['required']   = null : null;
+			$multiple ? $attrs['multiple']   = null : null;
 
-			$attrs = trim( implode( ' ', $attrs ) );
-			$attrs = '' === $attrs ? '' : ' ' . $attrs;
-
-			$html = "<input type=\"file\" id=\"$id\" name=\"$name\"$attrs>";
-
-			$html = $this->apply_field_html_filters( $html, $args, $a_fn );
-
-			Lib::echo_html( $html );
+			echo '<input type="file" id="' . esc_attr( $id ) .
+			'" name="' . esc_attr( $name ) . '"';
+			$this->echo_attrs( $attrs );
+			echo ' >';
 		}
 
 		/** SelectOption input-type renderer.
@@ -1715,8 +1767,8 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$args = $this->get_field_settings_args( $field_args );
 
 			$a_fn = $args ['fn'];
-			$id   = esc_attr( $args ['id'] );
-			$name = esc_attr( $args ['name'] );
+			$id   = $args ['id'];
+			$name = $args ['name'];
 
 			$field_options = array_key_exists( 'options', $args ) ? $args ['options'] : array();
 			$autofocus     = array_key_exists( 'autofocus', $field_options ) ? true === $field_options ['autofocus'] : false;
@@ -1737,8 +1789,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			} elseif ( is_array( $args ['value'] ) ) {
 				$args ['value'] = array_shift( $args ['value'] );
 			}
-
-			$args = $this->apply_field_args_filters( $args, $a_fn );
 
 			$value = $args ['value'];
 
@@ -1797,78 +1847,76 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 							$options = call_user_func( array( $this, $source_data ) );
 						}
 					} else {
-						Lib::debug( 'Not callable $source_data.' );
+						Dbg::debug( 'Not callable $source_data.' );
 					}
 					break;
 				default:
-					Lib::debug( "Unknown source \"$source_key\"." );
+					Dbg::debug( "Unknown source \"$source_key\"." );
 					break;
 			}
 			if ( ! is_array( $options ) ) {
-				Lib::debug( "Variable \$options from source \"$source_key\" is not an array." );
+				Dbg::debug( "Variable \$options from source \"$source_key\" is not an array." );
 				$options = array();
 			} elseif ( empty( $options ) ) {
-				Lib::debug( "Variable \$options from source \"$source_key\" is an empty array." );
+				Dbg::debug( "Variable \$options from source \"$source_key\" is an empty array." );
 			}
 
-			$place = esc_attr( array_key_exists( 'placeholder', $args ) ? $args ['placeholder'] : null );
-			$title = esc_attr( array_key_exists( 'title', $args ) ? $args ['title'] : null );
-			$class = esc_attr( array_key_exists( 'class', $args ) ? $args ['class'] : null );
-			$style = esc_attr( array_key_exists( 'style', $args ) ? $args ['style'] : null );
+			$place = array_key_exists( 'placeholder', $args ) ? $args ['placeholder'] : null;
+			$title = array_key_exists( 'title', $args ) ? $args ['title'] : null;
+			$class = array_key_exists( 'class', $args ) ? $args ['class'] : null;
+			$style = array_key_exists( 'style', $args ) ? $args ['style'] : null;
 
 			$attrs = array();
 
-			$place ? $attrs[] = "placeholder=\"$place\"" : null;
-			$title ? $attrs[] = "title=\"$title\"" : null;
-			$class ? $attrs[] = "class=\"$class\"" : null;
-			$style ? $attrs[] = "style=\"$style\"" : null;
+			$place ? $attrs['placeholder'] = $place : null;
+			$title ? $attrs['title']       = $title : null;
+			$class ? $attrs['class']       = $class : null;
+			$style ? $attrs['style']       = $style : null;
 
-			$autofocus ? $attrs[] = 'autofocus' : null;
-			$disabled ? $attrs[]  = 'disabled' : null;
-			$readonly ? $attrs[]  = 'readonly' : null;
-			$required ? $attrs[]  = 'required' : null;
-			$multiple ? $attrs[]  = 'multiple' : null;
+			$autofocus ? $attrs['autofocus'] = null : null;
+			$disabled ? $attrs['disabled']   = null : null;
+			$readonly ? $attrs['readonly']   = null : null;
+			$required ? $attrs['required']   = null : null;
+			$multiple ? $attrs['multiple']   = null : null;
 
-			$attrs = trim( implode( ' ', $attrs ) );
-			$attrs = '' === $attrs ? '' : ' ' . $attrs;
-
-			$html = "<select id=\"$id\" name=\"$name\"$attrs>";
+			echo '<select id="' . esc_attr( $id )
+			. '" name="' . esc_attr( $name )
+			. '" ';
+			$this->echo_attrs( $attrs );
+			echo ' >';
 			foreach ( $options as $option_key => $option_val ) {
 				switch ( gettype( $option_val ) ) {
 					case 'array':
-						$html .= "<optgroup label=\"$option_key\">";
+						echo '<optgroup label="' . esc_attr( $option_key ) . '">';
 						foreach ( $option_val as $option_key_in_group => $option_val_in_group ) {
-							$html .= '<option value="' . esc_attr( $option_key_in_group ) . '"';
+							echo '<option value="' . esc_attr( $option_key_in_group ) . '"';
 							if ( $multiple ) {
-								$html .= ( in_array( $option_key_in_group, $value, true ) ? ' selected' : '' );
+								echo esc_attr( in_array( $option_key_in_group, $value, true ) ? ' selected' : '' );
 							} else {
-								$html .= ( $option_key_in_group === $value ? ' selected' : '' );
+								echo esc_attr( $option_key_in_group === $value ? ' selected' : '' );
 							}
-							$html .= '>' . esc_html( $option_val_in_group ) . '</option>';
+							echo ' >' . esc_html( $option_val_in_group ) . '</option>';
 						}
-						$html .= '</optgroup>';
+						echo '</optgroup>';
 						break;
 
 					default:
-						$html .= '<option value="' . esc_attr( $option_key ) . '"';
+						echo '<option value="' . esc_attr( $option_key ) . '"';
 						if ( $multiple ) {
-							$html .= ( in_array( $option_key, $value, true ) ? ' selected' : '' );
+							echo esc_attr( in_array( $option_key, $value, true ) ? ' selected' : '' );
 						} else {
-							$html .= ( $option_key === $value ? ' selected' : '' );
+							echo esc_attr( $option_key === $value ? ' selected' : '' );
 						}
-						$html .= '>' . esc_html( $option_val ) . '</option>';
+						echo ' >' . esc_html( $option_val ) . '</option>';
 						break;
 				}
 			}
-			$html .= '</select>';
-
-			$html = $this->apply_field_html_filters( $html, $args, $a_fn );
+			echo '</select>';
 
 			if ( $multiple ) {
-				$html .= "<input id=\"$id-hidden\" type=\"hidden\" name=\"$name\" value=\"\"/>";
+				echo '<input id="' . esc_attr( $id ) . '-hidden" type="hidden" name="'
+				. esc_attr( $name ) . '" value="" >';
 			}
-
-			Lib::echo_html( $html );
 		}
 
 		/** Render Submit field/button.
@@ -1887,10 +1935,11 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			'value' => 'Save Changes',
 		) ) {
 			$a_fn        = $args ['fn'];
-			$args ['id'] = esc_attr( $args ['id'] . uniqid( '-' ) );
+			$args ['id'] = $args ['id'] . uniqid( '-' );
 
-			$id   = $args ['id'];
-			$name = esc_attr( $this->optionid . '[' . $args ['name'] . '][' . $tab_index . '][' . $section_id . ']' );
+			$id = $args ['id'];
+
+			$name = $this->optionid . '[' . $args ['name'] . '][' . $tab_index . '][' . $section_id . ']';
 
 			$field_options = array_key_exists( 'options', $args ) ? $args ['options'] : array();
 			$disabled      = array_key_exists( 'disabled', $field_options ) ? true === $field_options ['disabled'] : false;
@@ -1899,27 +1948,43 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$args ['value'] = isset( $args ['value'] ) && is_string( $args ['value'] ) ? $args ['value'] : 'Save Changes';
 
 			$args ['class'] = 'button button-primary ' . $this->pageslug;
-			$args           = $this->apply_field_args_filters( $args, $a_fn );
 
-			$value = esc_attr( $args ['value'] );
+			$value = $args ['value'];
 
-			$title = esc_attr( array_key_exists( 'title', $args ) ? $args ['title'] : null );
-			$class = esc_attr( array_key_exists( 'class', $args ) ? $args ['class'] : null );
-			$style = esc_attr( array_key_exists( 'style', $args ) ? $args ['style'] : null );
+			$title = array_key_exists( 'title', $args ) ? $args ['title'] : null;
+			$class = array_key_exists( 'class', $args ) ? $args ['class'] : null;
+			$style = array_key_exists( 'style', $args ) ? $args ['style'] : null;
 
-			$attrs               = array();
-			$title ? $attrs[]    = "title=\"$title\"" : null;
-			$class ? $attrs[]    = "class=\"$class\"" : null;
-			$style ? $attrs[]    = "style=\"$style\"" : null;
-			$disabled ? $attrs[] = 'disabled' : null;
-			$readonly ? $attrs[] = 'readonly' : null;
+			$attrs = array();
 
-			$attrs = trim( implode( ' ', $attrs ) );
-			$attrs = '' === $attrs ? '' : ' ' . $attrs;
+			$title ? $attrs['title'] = $title : null;
+			$class ? $attrs['class'] = $class : null;
+			$style ? $attrs['style'] = $style : null;
 
-			$html = "<input id=\"$id\" name=\"$name\" type=\"submit\" value=\"$value\"$attrs/>";
+			$disabled ? $attrs['disabled'] = null : null;
+			$readonly ? $attrs['readonly'] = null : null;
 
-			Lib::echo_html( '<div class=submit-button>' . $this->apply_field_html_filters( $html, $args, $a_fn ) . '</div>' );
+			echo '<div class=submit-button>';
+
+			echo '<input id="' . esc_attr( $id )
+			. '" name="' . esc_attr( $name )
+			. '" type="submit" value="' . esc_attr( $value ) . '"';
+			$this->echo_attrs( $attrs );
+			echo ' >';
+
+			echo '&nbsp;&nbsp;';
+
+			$field_settings = array(
+				'settings' => array(
+					'type'  => 'checkbox',
+					'fn'    => 'submit-enable',
+					'id'    => 'submit-enable-' . uniqid(),
+					'name'  => 'submit-enable',
+					'style' => '',
+				),
+			);
+			$this->render_checkbox_input_field( $field_settings );
+			echo '</div>';
 		}
 
 		// phpcs:ignore
@@ -1929,7 +1994,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 	# region Render Sections
 
 		/** Renders section (accordion) and content (section-fields)
-		 * TODO: Replace WP Accordion with jQuery accordion or simpler (see W3Schools links above).
 		 *
 		 * @ignore
 		 * @access private
@@ -1944,33 +2008,29 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		private function render_section_elements( $wp_section, $section_is_open, $sections_todo, $tab_index, $push_tabs = 0 ) {
 			global $wp_settings_fields;
 
-			$section_id      = $wp_section ['id'];
-			$section_id_attr = esc_attr( $section_id );
+			$section_id = $wp_section ['id'];
 
 			$section_title = 'Section';
 			if ( isset( $wp_section ['title'] ) && is_string( $wp_section ['title'] ) ) {
 				$section_title = esc_html( $wp_section['title'] );
 			}
 
-			Lib::echo_html( Lib::debug_eol_tabs( 0 + $push_tabs ) . "<div id=\"section-$section_id_attr\" class=\"accordion-container\">" );
+			echo esc_html( Hlp::eol_tabs( 0 + $push_tabs ) ) . '<div class="section-accordion">';
 
-			// phpcs:enable
+			echo esc_html( Hlp::eol_tabs( 0 + $push_tabs ) ) . '<div class="section-accordion-container">';
 
-				$section_attrs = 'class="accordion-section' . ( false !== $section_is_open ? ' open" aria-expanded=true' : '" aria-expanded=false' );
-				Lib::echo_html( Lib::debug_eol_tabs( 1 + $push_tabs ) . "<div $section_attrs>" );
+			echo esc_html( Hlp::eol_tabs( 1 + $push_tabs ) ) . '<input class="section-accordion-toggle" type="checkbox" id="' . esc_attr( $section_id ) . '"  data-ays-ignore="true"' . ( $section_is_open ? ' checked' : '' ) . ' >';
 
-				Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . "<h3 class=\"accordion-section-title\">$section_title</h3>" );
+			echo esc_html( Hlp::eol_tabs( 1 + $push_tabs ) ) . '<label class="section-accordion-title" for="' . esc_attr( $section_id ) . '">' . esc_html( $section_title ) . '</label>';
 
-				Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . '<div class="accordion-section-content">' );
-
-			// phpcs:enable
+			echo esc_html( Hlp::eol_tabs( 1 + $push_tabs ) ) . '<div class="section-accordion-content">';
 
 			if ( isset( $wp_section ['callback'] ) && is_callable( $wp_section ['callback'] ) ) {
 				call_user_func( $wp_section ['callback'], $wp_section );
 			}
 
-			$fields_sections   = Lib::safe_key_value( $wp_settings_fields, $this->pageslug, array() );
-			$fields_in_section = Lib::safe_key_value( $fields_sections, $section_id, array() );
+			$fields_sections   = Hlp::safe_key_value( $wp_settings_fields, $this->pageslug, array() );
+			$fields_in_section = Hlp::safe_key_value( $fields_sections, $section_id, array() );
 			if ( count( $fields_in_section ) > 0 ) {
 				$fields_in_section_hidden = array();
 				foreach ( $fields_in_section as $field_in_section_key => $field_in_section_val ) {
@@ -1984,9 +2044,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					unset( $wp_settings_fields [ $this->pageslug ][ $section_id ][ $field_in_section_key ] );
 				}
 
-				Lib::echo_html( Lib::debug_eol_tabs( 3 + $push_tabs ) . '<table class="form-table">' );
+				echo esc_html( Hlp::eol_tabs( 2 + $push_tabs ) ) . '<table class="form-table">';
 				do_settings_fields( $this->pageslug, $section_id );
-				Lib::echo_html( Lib::debug_eol_tabs( 3 + $push_tabs ) . '</table>' );
+				echo esc_html( Hlp::eol_tabs( 2 + $push_tabs ) ) . '</table>';
 			}
 
 			$section_settings = $this->settings ['sections'][ $section_id ];
@@ -2002,19 +2062,19 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					if ( is_string( $submit_value ) ) {
 						$args ['value'] = $submit_value;
 					}
-					Lib::echo_html( Lib::debug_eol_tabs( 3 + $push_tabs ) );
+					echo esc_html( Hlp::eol_tabs( 2 + $push_tabs ) );
 					$this->render_submit_field( $tab_index, $section_id, $args );
 				}
 			} elseif ( 1 !== $sections_todo ) {
-				Lib::echo_html( Lib::debug_eol_tabs( 3 + $push_tabs ) );
+				echo esc_html( Hlp::eol_tabs( 2 + $push_tabs ) );
 				$this->render_submit_field( $tab_index, $section_id );
 			}
 
-			Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . '</div>' );
+			echo esc_html( Hlp::eol_tabs( 2 + $push_tabs ) ) . '</div>';
 
-			Lib::echo_html( Lib::debug_eol_tabs( 1 + $push_tabs ) . '</div>' );
+			echo esc_html( Hlp::eol_tabs( 1 + $push_tabs ) ) . '</div>';
 
-			Lib::echo_html( Lib::debug_eol_tabs( 0 + $push_tabs ) . '</div>' );
+			echo esc_html( Hlp::eol_tabs( 0 + $push_tabs ) ) . '</div>';
 		}
 
 		// phpcs:ignore
@@ -2036,8 +2096,8 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		private function render_tab_open_elements( $tab_index, $tab_settings, $tab_sections = false, $push_tabs = 0 ) {
 			$current_index = (int) $tab_index;
 
-			$tab_class_id = rtrim( ' ' . Lib::safe_key_value( $tab_settings, 'key_index', '' ) );
-			Lib::echo_html( Lib::debug_eol_tabs( 0 + $push_tabs ) . "<div id=\"nav-tab-page-$current_index\" class=\"nav-tab-page$tab_class_id\" role=\"tabpanel\" aria-labelledby=\"nav-tab-$tab_index\">" );
+			$tab_class_id = rtrim( ' ' . Hlp::safe_key_value( $tab_settings, 'key_index', '' ) );
+			echo esc_html( Hlp::eol_tabs( 0 + $push_tabs ) ) . '<div id="nav-tab-page-' . esc_html( $current_index ) . '" class="nav-tab-page' . esc_html( $tab_class_id ) . '" role="tabpanel" aria-labelledby="nav-tab-' . esc_html( $tab_index ) . '">';
 
 			$render_method_name = array_key_exists( 'render', $tab_settings ) && is_string( $tab_settings ['render'] ) ? $tab_settings ['render'] : false;
 			if ( $render_method_name && is_callable( array( $this->renderer, $render_method_name ) ) ) {
@@ -2045,22 +2105,25 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				try {
 					ob_start();
 					call_user_func( array( $this->renderer, $render_method_name ) );
-					$tab_contents = ob_get_clean();
-					if ( strlen( $tab_contents ) > 0 ) {
-						Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . "<div id=\"nav-tab-page-header-$current_index\" class=\"nav-tab-page-header$tab_class_id\">" );
-						Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . $tab_contents );
-						Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . '</div>' );
+					$buffer = ob_get_clean();
+					if ( strlen( $buffer ) > 0 ) {
+						echo esc_html( Hlp::eol_tabs( 2 + $push_tabs ) ) . '<div id="nav-tab-page-header-' . esc_html( $current_index ) . '" class="nav-tab-page-header' . esc_html( $tab_class_id ) . '">';
+						echo esc_html( Hlp::eol_tabs( 2 + $push_tabs ) );
+						// phpcs:ignore
+						var_dump( $buffer );
+
+						echo esc_html( Hlp::eol_tabs( 2 + $push_tabs ) ) . '</div>';
 					}
 				} catch ( \Exception $e ) {
 					while ( ob_get_level() > $ob_level ) {
 						ob_end_clean();
 					}
-					Lib::error( "Exception \"{$e->getMessage()}\" caught while calling tab-render method \"$render_method_name\"" );
+					Dbg::error( "Exception \"{$e->getMessage()}\" caught while calling tab-render method \"$render_method_name\"" );
 				}
 			} else {
-				$render_method_name && Lib::debug( 'Tab render method name is not callable: ' . $render_method_name );
+				$render_method_name && Dbg::debug( 'Tab render method name is not callable: ' . $render_method_name );
 			}
-			Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . "<div id=\"nav-tab-page-content-$current_index\" class=\"nav-tab-page-content$tab_class_id\">" );
+			echo esc_html( Hlp::eol_tabs( 2 + $push_tabs ) ) . '<div id="nav-tab-page-content-' . esc_html( $current_index ) . '" class="nav-tab-page-content' . esc_html( $tab_class_id ) . '">';
 		}
 
 		/** Render Tab-Page Wrap-Close Elements.
@@ -2073,9 +2136,9 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 * @param int   $push_tabs - add X tabs for debug formatting.
 		 */
 		private function render_tab_close_elements( $tab_index, $tab_settings, $tab_sections, $push_tabs = 0 ) {
-			Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . '</div><!--nav-tab-page-content-->' );
+			echo esc_html( Hlp::eol_tabs( 2 + $push_tabs ) ) . '</div><!--nav-tab-page-content-->';
 
-			Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . '<div class="nav-tab-page-footer">' );
+			echo esc_html( Hlp::eol_tabs( 2 + $push_tabs ) ) . '<div class="nav-tab-page-footer">';
 
 			if ( array_key_exists( 'submit', $tab_settings ) ) {
 				$submit_value = $tab_settings['submit'];
@@ -2087,17 +2150,17 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 						'type'  => 'submit',
 						'value' => $submit_value,
 					);
-					Lib::echo_html( Lib::debug_eol_tabs( 3 + $push_tabs ) );
+					echo esc_html( Hlp::eol_tabs( 3 + $push_tabs ) );
 					$this->render_submit_field( $tab_index, 'tab', $args );
 				}
 			} elseif ( $tab_sections ) {
-				Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) );
+				echo esc_html( Hlp::eol_tabs( 2 + $push_tabs ) );
 				$this->render_submit_field( $tab_index );
 			}
 
-			Lib::echo_html( Lib::debug_eol_tabs( 2 + $push_tabs ) . '</div><!--nav-tab-page-footer-->' );
+			echo esc_html( Hlp::eol_tabs( 2 + $push_tabs ) ) . '</div><!--nav-tab-page-footer-->';
 
-			Lib::echo_html( Lib::debug_eol_tabs( 0 + $push_tabs ) . '</div><!--nav-tab-page-->' );
+			echo esc_html( Hlp::eol_tabs( 0 + $push_tabs ) ) . '</div><!--nav-tab-page-->';
 		}
 
 		// phpcs:ignore
@@ -2116,7 +2179,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 */
 		public function on_abstract_prepare_settings_page() {
 			if ( ! $this->authorized() ) {
-				Lib::debug( 'Not authorized!' );
+				Dbg::debug( 'Not authorized!' );
 				return;
 			}
 
@@ -2208,7 +2271,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			global $wp_settings_sections, $parent_file;
 
 			if ( ! $this->authorized() ) {
-				Lib::debug( 'Not authorized!' );
+				Dbg::debug( 'Not authorized!' );
 				return;
 			}
 
@@ -2228,40 +2291,40 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				$ui_state['tabindex'] = is_string( $ui_state['tabindex'] ) ? (int) $ui_state['tabindex'] : 0;
 			}
 
-			Lib::echo_html( Lib::debug_eol_tabs( 1 ) );
+			echo esc_html( Hlp::eol_tabs( 1 ) );
 			wp_referer_field( true );
-			Lib::echo_html( Lib::debug_eol_tabs( 1 ) );
+			echo esc_html( Hlp::eol_tabs( 1 ) );
 			wp_nonce_field( 'closedpostboxes', 'closedpostboxesnonce', false );
-			Lib::echo_html( Lib::debug_eol_tabs( 1 ) );
+			echo esc_html( Hlp::eol_tabs( 1 ) );
 			wp_nonce_field( 'meta-box-order', 'meta-box-order-nonce', false );
 
 			$add_nonces = $this->add_metabox_nonces();
 			if ( is_array( $add_nonces ) ) {
 				foreach ( $add_nonces as $action => $name ) {
-					Lib::echo_html( Lib::debug_eol_tabs( 1 ) );
+					echo esc_html( Hlp::eol_tabs( 1 ) );
 					wp_nonce_field( $action, $name, false );
 				}
 			}
 
-			Lib::echo_html( Lib::debug_eol_tabs( 1 ) . "<div id=settings-page class=wrap data-page=$this->pageslug data-action=$this->prefix>" );
+			echo esc_html( Hlp::eol_tabs( 1 ) ) . '<div id="settings-page" class="wrap" data-page="' . esc_html( $this->pageslug ) . '" data-action="' . esc_html( $this->prefix ) . '">';
 
-			$page_title = Lib::safe_key_value( $this->settings ['page'], 'title', '' );
+			$page_title = Hlp::safe_key_value( $this->settings ['page'], 'title', '' );
 			$page_title = '' !== trim( $page_title ) ? $page_title : __( 'Settings' );
 
-			Lib::echo_html( Lib::debug_eol_tabs( 2 ) . "<h1 class=\"wp-heading-inline\">$page_title</h1>" );
-			Lib::echo_html( Lib::debug_eol_tabs( 2 ) . '<hr class="wp-header-end">' );
+			echo esc_html( Hlp::eol_tabs( 2 ) ) . '<h1 class="wp-heading-inline">' . esc_html( $page_title ) . '</h1>';
+			echo esc_html( Hlp::eol_tabs( 2 ) ) . '<hr class="wp-header-end">';
 
-			$page_style = Lib::safe_key_value( $this->settings ['page'], 'style', '', false );
+			$page_style = Hlp::safe_key_value( $this->settings ['page'], 'style', '', false );
 			if ( $page_style ) {
-				Lib::echo_html( Lib::debug_eol_tabs( 2 ) . "<style>$page_style</style>" );
+				echo esc_html( Hlp::eol_tabs( 2 ) ) . '<style>' . esc_html( $page_style ) . '</style>';
 			}
 
-			Lib::echo_html( Lib::debug_eol_tabs( 1 ) );
+			echo esc_html( Hlp::eol_tabs( 1 ) );
 
-			Lib::do_transient_notices();
+			Plugin::echo_transient_notices();
 
 			if ( 'options-general.php' !== $parent_file ) {
-				Lib::echo_html( Lib::debug_eol_tabs( 1 ) );
+				echo esc_html( Hlp::eol_tabs( 1 ) );
 				settings_errors( $this->pageslug );
 			}
 
@@ -2272,8 +2335,8 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				$columns = 2; }
 			$columns_css = " columns-$columns";
 
-			Lib::echo_html( Lib::debug_eol_tabs( 2 ) . '<div id=poststuff>' );
-			Lib::echo_html( Lib::debug_eol_tabs( 3 ) . '<div id=post-body class="metabox-holder' . $columns_css . '">' );
+			echo esc_html( Hlp::eol_tabs( 2 ) ) . '<div id=poststuff>';
+			echo esc_html( Hlp::eol_tabs( 3 ) ) . '<div id=post-body class="metabox-holder' . esc_attr( $columns_css ) . '">';
 
 			$tabs_settings = array_key_exists( 'tabs', $this->settings )
 			&& is_array( $this->settings ['tabs'] )
@@ -2283,52 +2346,52 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$last_tab_index = count( $tabs_settings ) - 1;
 
 			if ( count( $tabs_settings ) === 0 ) {
-				Lib::echo_html( Lib::debug_eol_tabs( 5 ) . '<div class="nav-tab-wrapper" role="tablist"></div>' );
+				echo esc_html( Hlp::eol_tabs( 5 ) ) . '<div class="nav-tab-wrapper" role="tablist"></div>';
 
 			} else {
-				Lib::echo_html( Lib::debug_eol_tabs( 5 ) . '<style>' );
-				Lib::echo_html( Lib::debug_eol_tabs( 6 ) . '.nav-tab-page{display:none}' );
-				Lib::echo_html( Lib::debug_eol_tabs( 6 ) . 'input[type=radio][name=nav-tab-state].nav-tab-state{display:none!important;position:absolute;left:-9999px}' );
+				echo esc_html( Hlp::eol_tabs( 5 ) ) . '<style>';
+				echo esc_html( Hlp::eol_tabs( 6 ) ) . '.nav-tab-page{display:none}';
+				echo esc_html( Hlp::eol_tabs( 6 ) ) . 'input[type=radio][name=nav-tab-state].nav-tab-state{display:none!important;position:absolute;left:-9999px}';
 
-				Lib::echo_html( Lib::debug_eol_tabs( 6 ) );
+				echo esc_html( Hlp::eol_tabs( 6 ) );
 				for ( $i = 0;$i < $last_tab_index;$i++ ) {
-					Lib::echo_html( "#nav-tab-state-$i:checked~.nav-tab-wrapper #nav-tab-$i," );
+					echo '#nav-tab-state-' . esc_attr( $i ) . ':checked~.nav-tab-wrapper #nav-tab-' . esc_attr( $i ) . ',';
 				}
-				Lib::echo_html( "#nav-tab-state-$i:checked~.nav-tab-wrapper #nav-tab-$i" );
+				echo '#nav-tab-state-' . esc_attr( $i ) . ':checked~.nav-tab-wrapper #nav-tab-' . esc_attr( $i );
 
-				Lib::echo_html( '{-webkit-box-shadow:none;box-shadow:none;margin-bottom:-1px;border-bottom:1px solid #f1f1f1;background:#f1f1f1;color:#000}' );
+				echo '{-webkit-box-shadow:none;box-shadow:none;margin-bottom:-1px;border-bottom:1px solid #f1f1f1;background:#f1f1f1;color:#000}';
 
-				Lib::echo_html( Lib::debug_eol_tabs( 6 ) );
+				echo esc_html( Hlp::eol_tabs( 6 ) );
 				for ( $i = 0;$i < $last_tab_index;$i++ ) {
-					Lib::echo_html( "#nav-tab-state-$i:checked~div#post-body-content>form#{$this->pageslug}-form .nav-tab-pages #nav-tab-page-$i," );
+					echo '#nav-tab-state-' . esc_attr( $i ) . ':checked~div#post-body-content>form#' . esc_attr( $this->pageslug ) . '-form .nav-tab-pages #nav-tab-page-' . esc_attr( $i ) . ',';
 				}
-				Lib::echo_html( "#nav-tab-state-$i:checked~div#post-body-content>form#{$this->pageslug}-form .nav-tab-pages #nav-tab-page-$i{display:block}" );
+				echo '#nav-tab-state-' . esc_attr( $i ) . ':checked~div#post-body-content>form#' . esc_attr( $this->pageslug ) . '-form .nav-tab-pages #nav-tab-page-' . esc_attr( $i ) . '{display:block}';
 
-				Lib::echo_html( Lib::debug_eol_tabs( 5 ) . '</style>' );
+				echo esc_html( Hlp::eol_tabs( 5 ) ) . '</style>';
 
 				$open_tab_index = isset( $ui_state['tabindex'] ) ? $ui_state['tabindex'] : 0;
 
 				$tab_index = 0;
-				foreach ( $tabs_settings as $ignore ) {
-					Lib::echo_html( Lib::debug_eol_tabs( 5 ) . "<input type=\"radio\" class=\"nav-tab-state\" name=\"nav-tab-state\" style=\"display:none\" id=\"nav-tab-state-$tab_index\" data-ays-ignore=\"true\"" . ( $open_tab_index === $tab_index ? ' checked' : '' ) . '/>' );
+				foreach ( $tabs_settings as $_ ) {
+					echo esc_html( Hlp::eol_tabs( 5 ) ) . '<input type="radio" class="nav-tab-state" name="nav-tab-state" style="display:none!important" id="nav-tab-state-' . esc_attr( $tab_index ) . '" data-ays-ignore="true"' . ( $open_tab_index === $tab_index ? ' checked' : '' ) . ' >';
 					++$tab_index;
 				}
 
-				Lib::echo_html( Lib::debug_eol_tabs( 5 ) . '<div class="nav-tab-wrapper" role="tablist">' );
+				echo esc_html( Hlp::eol_tabs( 5 ) ) . '<div class="nav-tab-wrapper" role="tablist">';
 				$tab_index = 0;
 				foreach ( $tabs_settings as $tab_settings ) {
 					$tab_title = ( is_string( $tab_settings ['title'] ) ? trim( $tab_settings ['title'] ) : 'Tab ' . $tab_index );
-					Lib::echo_html( Lib::debug_eol_tabs( 6 ) . "<label for=\"nav-tab-state-$tab_index\" id=\"nav-tab-$tab_index\" class=\"nav-tab\" role=\"tab\" area-controls=\"nav-tab-page-$tab_index\">$tab_title</label>" );
+					echo esc_html( Hlp::eol_tabs( 6 ) ) . '<label for="nav-tab-state-' . esc_attr( $tab_index ) . '" id="nav-tab-' . esc_attr( $tab_index ) . '" class="nav-tab" role="tab" area-controls="nav-tab-page-$tab_index">' . esc_html( $tab_title ) . '</label>';
 					++$tab_index;
 				}
-				Lib::echo_html( Lib::debug_eol_tabs( 5 ) . '</div>' );
+				echo esc_html( Hlp::eol_tabs( 5 ) ) . '</div>';
 
 			}
 
-			Lib::echo_html( Lib::debug_eol_tabs( 5 ) . '<div id="post-body-content">' );
+			echo esc_html( Hlp::eol_tabs( 5 ) ) . '<div id="post-body-content">';
 
-			Lib::echo_html( Lib::debug_eol_tabs( 6 ) . "<form id=\"$this->pageslug-form\" action=options.php method=post enctype=multipart/form-data>" );
-			Lib::echo_html( Lib::debug_eol_tabs( 7 ) . settings_fields( $this->pageslug ) );
+			echo esc_html( Hlp::eol_tabs( 6 ) ) . '<form id="' . esc_attr( $this->pageslug ) . '-form" action=options.php method=post enctype=multipart/form-data>';
+			echo esc_html( Hlp::eol_tabs( 7 ) ) . esc_attr( settings_fields( $this->pageslug ) );
 
 			$wp_sections = (array) $wp_settings_sections [ $this->pageslug ];
 
@@ -2364,7 +2427,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 				$tab_sections = 0 !== $sections_todo;
 
-				Lib::echo_html( Lib::debug_eol_tabs( 7 ) . '<div class="nav-tab-pages">' );
+				echo esc_html( Hlp::eol_tabs( 7 ) ) . '<div class="nav-tab-pages">';
 				$this->render_tab_open_elements( $tab_index, $tab_settings, $tab_sections, 8 );
 
 				foreach ( $wp_sections as $wp_section ) {
@@ -2418,7 +2481,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				}
 				$this->render_tab_close_elements( $tab_index, $tab_settings, $tab_sections, 8 );
 
-				Lib::echo_html( Lib::debug_eol_tabs( 7 ) . '</div><!--nav-tab-pages-->' );
+				echo esc_html( Hlp::eol_tabs( 7 ) ) . '</div><!--nav-tab-pages-->';
 
 			} else {
 				$tab_index     = 0;
@@ -2432,12 +2495,12 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				}
 			}
 
-			Lib::echo_html( Lib::debug_eol_tabs( 6 ) . '</form>' );
+			echo esc_html( Hlp::eol_tabs( 6 ) ) . '</form>';
 
-			Lib::echo_html( Lib::debug_eol_tabs( 5 ) . '</div>' );
+			echo esc_html( Hlp::eol_tabs( 5 ) ) . '</div>';
 
-			Lib::echo_html( Lib::debug_eol_tabs( 4 ) . '<div id="postbox-container-1" class="postbox-container">' );
-			Lib::echo_html( Lib::debug_eol_tabs( 5 ) );
+			echo esc_html( Hlp::eol_tabs( 4 ) ) . '<div id="postbox-container-1" class="postbox-container">';
+			echo esc_html( Hlp::eol_tabs( 5 ) );
 			if ( $this !== $this->renderer && is_callable( array( $this->renderer, 'render_settings_page_sidebar' ) ) ) {
 				$this->renderer->render_settings_page_sidebar();
 
@@ -2445,12 +2508,12 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				$this->render_settings_page_sidebar();
 
 			}
-			Lib::echo_html( Lib::debug_eol_tabs( 5 ) );
+			echo esc_html( Hlp::eol_tabs( 5 ) );
 			do_meta_boxes( $this->menuslug, 'side', $this );
-			Lib::echo_html( Lib::debug_eol_tabs( 4 ) . '</div>' );
+			echo esc_html( Hlp::eol_tabs( 4 ) ) . '</div>';
 
-			Lib::echo_html( Lib::debug_eol_tabs( 4 ) . '<div id="postbox-container-2" class="postbox-container">' );
-			Lib::echo_html( Lib::debug_eol_tabs( 5 ) );
+			echo esc_html( Hlp::eol_tabs( 4 ) ) . '<div id="postbox-container-2" class="postbox-container">';
+			echo esc_html( Hlp::eol_tabs( 5 ) );
 			if ( $this !== $this->renderer && is_callable( array( $this->renderer, 'render_settings_page_footbar' ) ) ) {
 				$this->renderer->render_settings_page_footbar();
 
@@ -2458,17 +2521,21 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 				$this->render_settings_page_footbar();
 
 			}
-			Lib::echo_html( Lib::debug_eol_tabs( 5 ) );
+			echo esc_html( Hlp::eol_tabs( 5 ) );
+
 			do_meta_boxes( $this->menuslug, 'normal', $this );
-			Lib::echo_html( Lib::debug_eol_tabs( 5 ) );
+
+			echo esc_html( Hlp::eol_tabs( 5 ) );
+
 			do_meta_boxes( $this->menuslug, 'advanced', $this );
-			Lib::echo_html( Lib::debug_eol_tabs( 4 ) . '</div>' );
 
-			Lib::echo_html( Lib::debug_eol_tabs( 3 ) . '</div>' );
+			echo esc_html( Hlp::eol_tabs( 4 ) ) . '</div>';
 
-			Lib::echo_html( Lib::debug_eol_tabs( 2 ) . '</div>' );
+			echo esc_html( Hlp::eol_tabs( 3 ) ) . '</div>';
 
-			Lib::echo_html( Lib::debug_eol_tabs( 1 ) . '</div>' );
+			echo esc_html( Hlp::eol_tabs( 2 ) ) . '</div>';
+
+			echo esc_html( Hlp::eol_tabs( 1 ) ) . '</div>';
 		}
 
 		/** Method hook for the derived class */
@@ -2524,7 +2591,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 */
 		public function on_abstract_validate_form_input( $new_value, $old_value, $option_id ) {
 			if ( $this->optionid !== $option_id ) {
-				Lib::error( 'Option id mismatch' );
+				Dbg::error( 'Option id mismatch' );
 				return $new_value;
 			}
 
@@ -2538,12 +2605,12 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			);
 
 			if ( ! is_array( $new_value ) ) {
-				Lib::error( 'Options Input is not an array' );
+				Dbg::error( 'Options Input is not an array' );
 				$new_value = array();
 			}
 
 			if ( ! is_array( $old_value ) ) {
-				Lib::debug( 'Stored options value is not an array' );
+				Dbg::debug( 'Stored options value is not an array' );
 				$old_value = array();
 			}
 
@@ -2574,7 +2641,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 						$input_type  = gettype( $input_value );
 
 						if ( false === \is_string( $input_value ) && false === \is_array( $input_value ) ) {
-							Lib::debug( "Input Field '$field_name' is not a string or array but '$input_type'?" );
+							Dbg::debug( "Input Field '$field_name' is not a string or array but '$input_type'?" );
 						}
 
 						$field_options = \array_key_exists( 'options', $fields [ $field_name ] )
@@ -2597,7 +2664,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 										if ( \is_array( $input_item_value ) ) {
 											$input_item_value = \count( $input_item_value ) === 2 ? true : false;
 										} else {
-											Lib::debug( "Multiplied Checkbox '$field_name' value is not an array but '$input_type'?" );
+											Dbg::debug( "Multiplied Checkbox '$field_name' value is not an array but '$input_type'?" );
 											$input_accept = false;
 										}
 									}
@@ -2605,7 +2672,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 									$input_value  = \count( $input_value ) === 2 ? true : false;
 									$input_accept = true;
 								} else {
-									Lib::debug( "Checkbox '$field_name' value is not an array but '$input_type'?" );
+									Dbg::debug( "Checkbox '$field_name' value is not an array but '$input_type'?" );
 								}
 								break;
 
@@ -2629,7 +2696,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 										}
 										$input_accept = true;
 									} else {
-										Lib::debug( "Select multiple '$field_name' value is not an array but '$input_type'?" );
+										Dbg::debug( "Select multiple '$field_name' value is not an array but '$input_type'?" );
 									}
 								} elseif ( \is_string( $input_value ) ) {
 									if ( true === $is_integer ) {
@@ -2640,7 +2707,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 									$input_accept = true;
 
 								} else {
-									Lib::debug( "Select single '$field_name' value is not a string but '$input_type'?" );
+									Dbg::debug( "Select single '$field_name' value is not a string but '$input_type'?" );
 								}
 								break;
 
@@ -2652,24 +2719,24 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 										}
 										$input_accept = true;
 									} else {
-										Lib::debug( "Multiplied Textarea '$field_name' is not an array but '$input_type'?" );
+										Dbg::debug( "Multiplied Textarea '$field_name' is not an array but '$input_type'?" );
 									}
 								} elseif ( \is_string( $input_value ) ) {
 									$input_value  = \sanitize_textarea_field( $input_value );
 									$input_accept = true;
 								} else {
-									Lib::debug( "Textarea '$field_name' is not a string but '$input_type'?" );
+									Dbg::debug( "Textarea '$field_name' is not a string but '$input_type'?" );
 								}
 								break;
 
 							case 'range':
 							case 'text-range':
 								$min_value = \array_key_exists( 'min', $field_options )
-								&& \is_int( ( $field_options ['min'] ) )
+								&& is_int( ( $field_options ['min'] ) )
 								? $field_options ['min'] : 0;
 
 								$max_value = \array_key_exists( 'max', $field_options )
-								&& \is_int( ( $field_options ['max'] ) )
+								&& is_int( ( $field_options ['max'] ) )
 								? $field_options ['max'] : 100;
 
 								if ( $min_value >= $max_value ) {
@@ -2683,7 +2750,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 									$input_value  = \intval( $input_value );
 									$input_accept = $input_value >= $min_value && $input_value <= $max_value;
 								} else {
-									Lib::debug( "Range '$field_name' is not a string but '$input_type'?" );
+									Dbg::debug( "Range '$field_name' is not a string but '$input_type'?" );
 								}
 
 								break;
@@ -2706,7 +2773,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 										}
 										$input_accept = true;
 									} else {
-										Lib::debug( "Multiplied Input Field '$field_name' is not an array but '$input_type'?" );
+										Dbg::debug( "Multiplied Input Field '$field_name' is not an array but '$input_type'?" );
 									}
 								} elseif ( \is_string( $input_value ) ) {
 									if ( true === $is_integer ) {
@@ -2716,7 +2783,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 									}
 									$input_accept = true;
 								} else {
-									Lib::debug( "Input Field '$field_name' is not a string but '$input_type'?" );
+									Dbg::debug( "Input Field '$field_name' is not a string but '$input_type'?" );
 								}
 								break;
 						}
@@ -2737,7 +2804,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 					if ( array_key_exists( 'name', $uploads ) && is_array( $uploads ['name'] ) ) {
 						foreach ( $uploads ['name'] as $field_name => $file_name ) {
 							if ( ! array_key_exists( $field_name, $output ) ) {
-								Lib::debug( 'Unregistered field name: ' . $field_name );
+								Dbg::debug( 'Unregistered field name: ' . $field_name );
 								continue;
 							}
 
@@ -2768,7 +2835,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 
 						}
 					} else {
-						Lib::debug( 'Value not found: $uploads[name]' );
+						Dbg::debug( 'Value not found: $uploads[name]' );
 					}
 				}
 			}
@@ -3080,7 +3147,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		 */
 		public function add_prefix( $suffix ) {
 			if ( ! is_string( $suffix ) ) {
-				Lib::debug( 'Invalid_suffix: ' . ( is_string( $suffix ) ? $suffix : gettype( $suffix ) ) );
+				Dbg::debug( 'Invalid_suffix: ' . ( is_string( $suffix ) ? $suffix : gettype( $suffix ) ) );
 				$suffix = 'invalid_suffix';
 			}
 			return $this->prefix . '_' . $suffix;
@@ -3211,31 +3278,6 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 		// phpcs:ignore
 	# region Extension Hooks (filters/actions to hook into)
 
-		/** Apply render filters for field arguments, just before html generated.
-		 *
-		 * @ignore
-		 * @access private
-		 * @param array  $args - field args.
-		 * @param string $a_fn - field name.
-		 * @return array $args
-		 */
-		private function apply_field_args_filters( $args, $a_fn ) {
-			return apply_filters( $this->prefix . '_field_args', $args, $a_fn );
-		}
-
-		/** Apply render filters for field-html, just before html echo.
-		 *
-		 * @ignore
-		 * @access private
-		 * @param string $html - field html.
-		 * @param string $args - field args.
-		 * @param string $a_fn - field name.
-		 * @return string $html
-		 */
-		private function apply_field_html_filters( $html, $args, $a_fn ) {
-			return apply_filters( $this->prefix . '_field_html', $html, $args, $a_fn );
-		}
-
 		// phpcs:ignore
 	# endregion
 
@@ -3349,7 +3391,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$pageids    = array();
 			$mime_types = array();
 			foreach ( get_allowed_mime_types() as $mime ) {
-				if ( Lib::starts_with( $mime, 'image/' ) ) {
+				if ( Hlp::starts_with( $mime, 'image/' ) ) {
 					$mime_types [] = $mime;
 				}
 			}
@@ -3495,16 +3537,16 @@ if ( ! class_exists( __NAMESPACE__ . '\Abstract_Settings' ) ) {
 			$files = array();
 
 			if ( ! is_string( $dir ) ) {
-				Lib::debug( 'Invalid Argument $dir type: ' . gettype( $dir ) );
+				Dbg::debug( 'Invalid Argument $dir type: ' . gettype( $dir ) );
 				return $files;
 			}
 			if ( ! file_exists( $dir ) ) {
-				Lib::debug( 'Argument $dir, file does not exists: ' . $dir );
+				Dbg::debug( 'Argument $dir, file does not exists: ' . $dir );
 				return $files;
 			}
 
 			if ( false !== $callback_filter && ! is_callable( $callback_filter ) ) {
-				Lib::debug( 'Argument $callback_filter is not callable.' );
+				Dbg::debug( 'Argument $callback_filter is not callable.' );
 				$callback_filter = false;
 			}
 
