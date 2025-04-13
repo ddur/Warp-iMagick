@@ -36,7 +36,7 @@
 * [__10.000+ active installs__](https://plugintests.com/plugins/wporg/warp-imagick/latest#)
 * [![WP compatibility](https://plugintests.com/plugins/wporg/warp-imagick/wp-badge.svg)](https://plugintests.com/plugins/wporg/warp-imagick/latest)
 * [![PHP compatibility](https://plugintests.com/plugins/wporg/warp-imagick/php-badge.svg)](https://plugintests.com/plugins/wporg/warp-imagick/latest)
-* Download Warp-iMagick Version 1.9.6 from [WordPress Server](https://downloads.wordpress.org/plugin/warp-imagick.1.9.6.zip)
+* ~~Download Warp-iMagick Version 1.9.6 from [WordPress Server](https://downloads.wordpress.org/plugin/warp-imagick.1.9.6.zip)~~
 * Use Your Wordpress Site Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select just downloaded warp-imagick.1.9.6.zip file. Follow WordPress instructions ....
 * __Attention: Any Plugin version (including 1.9.6) released via Wordpress server can't and will __NOT__ be updated from WordPress-Server and can't automatically check for updates on own Update-Server. To be able to check for future version updates, download and install (or update to) latest version from Warp iMagick Update-Server as described in section below (or from this Github repository).__
 
@@ -46,11 +46,16 @@
 * In WordPress support forums some users in their [plugin list report having Warp iMagick plugin version 1.9.5.1](https://wordpress.org/support/topic/calculated-fields-form-not-visible/). That version is never released by author and can't be found or downloaded from [WordPress Server](https://downloads.wordpress.org/plugin/warp-imagick.1.9.5.1.zip).
 
 
-# Install or Update from Update Server:
+# Install or Update from this repository Releases:
 
-* Go to [Plugin Update Server](https://warp-imagick.pagespeed.club/)
-* Press [Download Plugin] button and download & save free Warp iMagick plugin.
+* Go to this repository Releases and download latest release.
 * Use Your Wordpress Site Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select just downloaded warp-imagick.zip file. Follow WordPress instructions ....
+
+# Install or Update from Update Server [currently not available]:
+
+* ~~Go to [Plugin Update Server](https://warp-imagick.pagespeed.club/)~~
+* ~~Press [Download Plugin] button and download & save free Warp iMagick plugin.~~
+* ~~Use Your Wordpress Site Admin Menu -> Plugins -> Add New -> Press [Upload Plugin] Button and select just downloaded warp-imagick.zip file. Follow WordPress instructions ....~~
 
 # __Post Install: Apache Server WebP Configuration:__
 
